@@ -155,6 +155,8 @@ jobs:
         with:
           version: "5.0.0"
           cache: true
+          # hvigor 4.x looks components up under <SDK>/<api-level>/toolchains etc.
+          fixup-path: true
 
       - name: Install hvigor from the OpenHarmony npm registry
         run: |
