@@ -16,17 +16,23 @@ export default class EntryAbility extends UIAbility {
         return;
       }
       hilog.info(0x0000, 'V2RayNG', 'loadContent succeeded');
-      // 全面屏适配：状态栏/导航条与页面同色，避免出现白色割裂条
       windowStage.getMainWindow().then((win: window.Window) => {
+        // 全面屏沉浸：内容延伸到状态栏/导航条之下，消除顶部/底部割裂白条
+        win.setWindowLayoutFullScreen(true);
         let props: window.SystemBarProperties = {
-          statusBarColor: '#0B1220',
           statusBarContentColor: '#E5EDFF',
-          navigationBarColor: '#0B1220',
           navigationBarContentColor: '#E5EDFF'
         };
         win.setWindowSystemBarProperties(props);
+        // 记录安全区高度（px），页面用 px2vp 换算后做内容避让
+        let sys = win.getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM);
+        let nav = win.getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR);
+        AppStorage.setOrCreate('sysBarHeightPx', sys.topRect.height);
+        AppStorage.setOrCreate('navBarHeightPx', nav.bottomRect.height);
+        hilog.info(0x0000, 'V2RayNG', 'immersive ok, sys=%{public}d nav=%{public}d',
+          sys.topRect.height, nav.bottomRect.height);
       }).catch((e: Error) => {
-        hilog.warn(0x0000, 'V2RayNG', 'set system bar failed: %{public}s', e.message);
+        hilog.warn(0x0000, 'V2RayNG', 'immersive setup failed: %{public}s', e.message);
       });
     });
   }

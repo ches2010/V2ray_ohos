@@ -12,6 +12,8 @@ struct SubscriptionPage {
   @State newName: string = '';
   @State newUrl: string = '';
   @State busyKey: string = '';
+  @StorageProp('sysBarHeightPx') sysBarPx: number = 0;
+  @StorageProp('navBarHeightPx') navBarPx: number = 0;
 
   aboutToAppear(): void {
     this.refresh();
@@ -115,7 +117,7 @@ struct SubscriptionPage {
           .onClick(() => { this.showAdd = !this.showAdd; })
       }
       .width('100%')
-      .padding({ left: 16, right: 16, top: 12, bottom: 8 })
+      .padding({ left: 16, right: 16, top: px2vp(this.sysBarPx) + 12, bottom: 8 })
 
       Text('订阅按分组管理：刷新会整体替换该组节点；删除会同时移除该组全部节点')
         .fontSize(11).fontColor('#64748B')
@@ -183,7 +185,7 @@ struct SubscriptionPage {
       }
       .layoutWeight(1)
       .width('100%')
-      .padding({ left: 16, right: 16, bottom: 16 })
+      .padding({ left: 16, right: 16, bottom: px2vp(this.navBarPx) + 16 })
       .scrollBar(BarState.Off)
 
       if (this.subs.length === 0) {
@@ -200,5 +202,6 @@ struct SubscriptionPage {
     .width('100%')
     .height('100%')
     .backgroundColor('#0B1220')
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
   }
 }

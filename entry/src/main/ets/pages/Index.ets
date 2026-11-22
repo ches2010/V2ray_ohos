@@ -97,6 +97,8 @@ struct Index {
   @State testTotal: number = 0;
   @State shareLink: string = '';
   @State qrPixmap: image.PixelMap | null = null;
+  @StorageProp('sysBarHeightPx') sysBarPx: number = 0;
+  @StorageProp('navBarHeightPx') navBarPx: number = 0;
   dialogController: CustomDialogController = new CustomDialogController({
     builder: LinkDialog({
       inputText: $dialogText,
@@ -119,6 +121,11 @@ struct Index {
   }
 
   aboutToAppear(): void {
+    this.refresh();
+  }
+
+  // 返回本页时（订阅管理/设置/节点编辑后）强制刷新列表
+  onPageShow(): void {
     this.refresh();
   }
 
@@ -243,7 +250,13 @@ struct Index {
       this.applyResult(r);
     }).then(() => {
       this.testRunning = false;
-      promptAction.showToast({ message: '测速完成' });
+      let ok = 0;
+      for (let i = 0; i < this.profiles.length; i++) {
+        if (this.profiles[i].testMs >= 0) {
+          ok++;
+        }
+      }
+      promptAction.showToast({ message: '测速完成：可达 ' + ok + '/' + this.profiles.length });
       ProfileStore.saveProfiles(this.profiles);
     });
   }
@@ -359,9 +372,9 @@ struct Index {
 
   build() {
     Column() {
-      // 顶栏
+      // 顶栏（沉浸式：避让状态栏）
       Row() {
-        Text('V2RayNG').fontSize(22).fontWeight(FontWeight.Bold).fontColor('#E5EDFF')
+        Text('V2ray').fontSize(22).fontWeight(FontWeight.Bold).fontColor('#E5EDFF')
         Blank()
         Text(this.vpnRunning ? '已连接' : '未连接')
           .fontSize(13)
@@ -371,7 +384,7 @@ struct Index {
           .backgroundColor(this.vpnRunning ? 'rgba(34,197,94,0.15)' : 'rgba(138,148,168,0.15)')
       }
       .width('100%')
-      .padding({ left: 16, right: 16, top: 12, bottom: 8 })
+      .padding({ left: 16, right: 16, top: px2vp(this.sysBarPx) + 12, bottom: 8 })
 
       // 连接按钮
       Column() {
@@ -457,11 +470,12 @@ struct Index {
       }
       .layoutWeight(1)
       .width('100%')
-      .padding({ left: 16, right: 16, bottom: 16 })
+      .padding({ left: 16, right: 16, bottom: px2vp(this.navBarPx) + 16 })
       .scrollBar(BarState.Off)
     }
     .width('100%')
     .height('100%')
     .backgroundColor('#0B1220')
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
   }
 }

@@ -1,6 +1,6 @@
 {
   "string": [
-    { "name": "app_name", "value": "V2RayNG" },
+    { "name": "app_name", "value": "V2ray" },
     { "name": "module_desc", "value": "v2rayNG HarmonyOS port" },
     { "name": "ability_desc", "value": "V2RayNG main entry" }
   ]

@@ -19,6 +19,8 @@ struct SettingsPage {
   @State geoIpExists: boolean = false;
   @State geoSiteExists: boolean = false;
   @State downloading: string = '';
+  @StorageProp('sysBarHeightPx') sysBarPx: number = 0;
+  @StorageProp('navBarHeightPx') navBarPx: number = 0;
 
   aboutToAppear(): void {
     ProfileStore.loadSettings().then((s: XraySettings) => {
@@ -131,7 +133,7 @@ struct SettingsPage {
         Blank()
       }
       .width('100%')
-      .padding({ left: 16, right: 16, top: 12, bottom: 4 })
+      .padding({ left: 16, right: 16, top: px2vp(this.sysBarPx) + 12, bottom: 4 })
 
       Scroll() {
         Column() {
@@ -259,7 +261,7 @@ struct SettingsPage {
           Text('设置即时保存；下次启动 VPN 隧道时生效')
             .fontSize(11).fontColor('#64748B')
             .width('100%')
-            .padding(16)
+            .padding({ left: 16, right: 16, top: 16, bottom: px2vp(this.navBarPx) + 16 })
         }
         .width('100%')
       }
@@ -270,5 +272,6 @@ struct SettingsPage {
     .width('100%')
     .height('100%')
     .backgroundColor('#0B1220')
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
   }
 }

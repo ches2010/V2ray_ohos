@@ -10,25 +10,44 @@ export class TestResult {
 /** 对 host:port 发起 TCP 连接并测量耗时（毫秒）。失败/超时返回 -2。 */
 function tcpPing(host: string, port: number, timeoutMs: number): Promise<number> {
   return new Promise<number>((resolve: (v: number) => void) => {
-    let tc = socket.constructTCPSocketInstance();
-    let start = Date.now();
-    let addr: socket.NetAddress = {
-      address: host,
-      port: port,
-      family: 1
-    };
-    let options: socket.TCPConnectOptions = {
-      address: addr,
-      timeout: timeoutMs
-    };
-    tc.connect(options).then(() => {
-      let ms = Date.now() - start;
-      tc.close().catch(() => {});
+    let finished = false;
+    let finish = (ms: number): void => {
+      if (finished) {
+        return;
+      }
+      finished = true;
       resolve(ms);
-    }).catch(() => {
-      tc.close().catch(() => {});
-      resolve(-2);
-    });
+    };
+    // 兜底定时器：无论 connect 是否回调，超时必返回
+    let timer = setTimeout(() => {
+      finish(-2);
+    }, timeoutMs + 500);
+    try {
+      let tc = socket.constructTCPSocketInstance();
+      let start = Date.now();
+      let addr: socket.NetAddress = {
+        address: host,
+        port: port,
+        family: 1
+      };
+      let options: socket.TCPConnectOptions = {
+        address: addr,
+        timeout: timeoutMs
+      };
+      tc.connect(options).then(() => {
+        let ms = Date.now() - start;
+        clearTimeout(timer);
+        tc.close().catch(() => {});
+        finish(ms);
+      }).catch(() => {
+        clearTimeout(timer);
+        tc.close().catch(() => {});
+        finish(-2);
+      });
+    } catch (e) {
+      clearTimeout(timer);
+      finish(-2);
+    }
   });
 }
 
