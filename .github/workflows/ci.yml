@@ -178,6 +178,8 @@ jobs:
           echo "OHPM_HOME=$TOOLS_DIR/ohpm" >> "$GITHUB_ENV"
           echo "$TOOLS_DIR/bin" >> "$GITHUB_PATH"
           chmod -R +x "$TOOLS_DIR/bin"
+          # GITHUB_PATH only takes effect for later steps; export within this step
+          export PATH="$TOOLS_DIR/bin:$PATH"
           hvigorw --version
 
       - name: Install dependencies (ohpm)
