@@ -1,4 +1,5 @@
-import { preferences, util } from '@kit.ArkData';
+import { preferences } from '@kit.ArkData';
+import { buffer } from '@kit.ArkTS';
 import { common } from '@kit.AbilityKit';
 import { Profile, parseShareLink } from '../model/Profile';
 
@@ -65,10 +66,7 @@ export class ProfileStore {
     if (!text.startsWith('vmess://') && !text.startsWith('vless://') && !text.startsWith('trojan://') && !text.startsWith('ss://')) {
       let decoded = '';
       try {
-        let helper = new util.Base64Helper();
-        let bytes: Uint8Array = helper.decode(text.replace(/-/g, '+').replace(/_/g, '/'));
-        let decoder = util.TextDecoder.create('utf-8');
-        decoded = decoder.decodeWithStream(bytes);
+        decoded = buffer.from(text.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf-8');
       } catch (e) {
         decoded = '';
       }

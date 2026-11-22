@@ -1,4 +1,4 @@
-import { util } from '@kit.ArkTS';
+import { buffer, util } from '@kit.ArkTS';
 
 /** 节点配置模型（对应 v2rayNG ProfileItem 的精简版） */
 export class Profile {
@@ -34,10 +34,7 @@ function b64Decode(input: string): string {
     s += '=';
   }
   try {
-    let helper = new util.Base64Helper();
-    let bytes: Uint8Array = helper.decode(s);
-    let decoder = util.TextDecoder.create('utf-8');
-    return decoder.decodeWithStream(bytes);
+    return buffer.from(s, 'base64').toString('utf-8');
   } catch (e) {
     return '';
   }
