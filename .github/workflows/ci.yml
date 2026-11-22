@@ -164,10 +164,8 @@ jobs:
 
       - name: Adapt project target to OpenHarmony (temporary, not committed)
         run: |
-          # OpenHarmony 工程要求 product 里声明 compileSdkVersion（数字形式）
-          sed -i 's/"compatibleSdkVersion": "5.0.0(12)",/"compileSdkVersion": 12,\n        "compatibleSdkVersion": 12,/' build-profile.json5
-          sed -i 's/"runtimeOS": "HarmonyOS"/"runtimeOS": "OpenHarmony"/' build-profile.json5
-          # hvigor 6.x 要求 hvigor/hvigor-config.json5 声明 modelVersion
+          # runtimeOS/compileSdkVersion/strictMode 调整 + hvigor-config.json5（hvigor 4.x 要求 modelVersion）
+          python3 scripts/adapt_openharmony.py
           mkdir -p hvigor
           printf '%s\n' \
             '{' \
