@@ -73,8 +73,9 @@ jobs:
           fi
           echo "clang: $CLANG"
           test -n "$CLANG"
-          NATIVE_DIR=$(dirname "$CLANG")/..
-          echo "OHOS_NATIVE_HOME=$NATIVE_DIR" >> "$GITHUB_ENV"
+          # 直接导出编译器绝对路径，避免 HOME 拼接层级出错
+          echo "OHOS_CLANG=$CLANG" >> "$GITHUB_ENV"
+          echo "OHOS_CLANGXX=${CLANG}++" >> "$GITHUB_ENV"
 
       - name: Build libxray.so (GOOS=openharmony GOARCH=arm64, c-shared)
         run: |
@@ -82,8 +83,8 @@ jobs:
           export GOTOOLCHAIN=local
           git clone --depth 1 --branch v26.7.28 https://github.com/XTLS/libXray.git "$HOME/libXray"
           cd "$HOME/libXray"
-          CC="$OHOS_NATIVE_HOME/llvm/bin/aarch64-unknown-linux-ohos-clang" \
-          CXX="$OHOS_NATIVE_HOME/llvm/bin/aarch64-unknown-linux-ohos-clang++" \
+          CC="$OHOS_CLANG" \
+          CXX="$OHOS_CLANGXX" \
           CGO_ENABLED=1 GOOS=openharmony GOARCH=arm64 \
           CGO_CFLAGS="-ftls-model=global-dynamic" \
           go build -trimpath -buildmode=c-shared -o "$GITHUB_WORKSPACE/libxray.so" ./cgo_bridge
