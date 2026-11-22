@@ -3,6 +3,15 @@ import { buffer, util } from '@kit.ArkTS';
 import { common } from '@kit.AbilityKit';
 import { Profile, parseShareLink, sanitizeProfile } from '../model/Profile';
 
+/** Xray 核心/路由设置（对应 v2rayNG SettingsManager 的常用项） */
+export class XraySettings {
+  routeMode: number = 1; // 0 = 全局代理, 1 = 绕过局域网及大陆
+  blockAds: boolean = false; // geosite:category-ads-all 拦截
+  enableMux: boolean = false; // Mux 多路复用
+  enableSniffing: boolean = true; // 流量嗅探（域名路由依赖）
+  logLevel: string = 'warning'; // debug | info | warning | error
+}
+
 /** 订阅分组信息 */
 export class SubscriptionInfo {
   id: string = '';
@@ -70,6 +79,44 @@ export class ProfileStore {
     list.push(p);
     await ProfileStore.saveProfiles(list);
     return p;
+  }
+
+  // ---------------- 核心设置 ----------------
+
+  static async loadSettings(): Promise<XraySettings> {
+    let store = await ProfileStore.ensure();
+    let raw = String(await store.get('settings_json', '{}'));
+    let base = new XraySettings();
+    try {
+      let obj = JSON.parse(raw) as XraySettings;
+      if (obj === null || obj === undefined) {
+        return base;
+      }
+      if (obj.routeMode === 0 || obj.routeMode === 1) {
+        base.routeMode = obj.routeMode;
+      }
+      if (obj.blockAds !== undefined && obj.blockAds !== null) {
+        base.blockAds = obj.blockAds;
+      }
+      if (obj.enableMux !== undefined && obj.enableMux !== null) {
+        base.enableMux = obj.enableMux;
+      }
+      if (obj.enableSniffing !== undefined && obj.enableSniffing !== null) {
+        base.enableSniffing = obj.enableSniffing;
+      }
+      if (obj.logLevel !== undefined && obj.logLevel !== null && obj.logLevel !== '') {
+        base.logLevel = obj.logLevel;
+      }
+      return base;
+    } catch (e) {
+      return base;
+    }
+  }
+
+  static async saveSettings(st: XraySettings): Promise<void> {
+    let store = await ProfileStore.ensure();
+    await store.put('settings_json', JSON.stringify(st));
+    await store.flush();
   }
 
   // ---------------- 订阅分组管理 ----------------

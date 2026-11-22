@@ -1,6 +1,10 @@
 import { router, promptAction } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { Profile } from '../model/Profile';
+import { common } from '@kit.AbilityKit';
+import { scanBarcode, generateBarcode } from '@kit.ScanKit';
+import { image } from '@kit.ImageKit';
+import pasteboard from '@ohos.pasteboard';
+import { Profile, toShareLink } from '../model/Profile';
 import { ProfileStore } from '../core/ProfileStore';
 import { VpnController } from '../core/VpnController';
 import { SpeedTest, TestResult } from '../core/SpeedTest';
@@ -32,6 +36,48 @@ struct LinkDialog {
   }
 }
 
+
+/** 分享节点：展示分享链接与二维码（generateBarcode 生成） */
+@CustomDialog
+struct ShareDialog {
+  controller: CustomDialogController = new CustomDialogController({ builder: '' });
+  @Link linkText: string;
+  @Link qrPixmap: image.PixelMap | null;
+
+  copyLink(): void {
+    let data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.linkText);
+    pasteboard.getSystemPasteboard().setData(data).then(() => {
+      promptAction.showToast({ message: '链接已复制' });
+    }).catch(() => {
+      promptAction.showToast({ message: '复制失败' });
+    });
+  }
+
+  build() {
+    Column({ space: 12 }) {
+      Text('分享节点').fontSize(18).fontWeight(FontWeight.Bold).fontColor('#E5EDFF')
+      if (this.qrPixmap !== null) {
+        let pm: image.PixelMap = this.qrPixmap;
+        Image(pm).width(240).height(240).borderRadius(8)
+      } else {
+        Text('二维码生成中...').fontSize(13).fontColor('#8A94A8').height(240)
+      }
+      Text(this.linkText)
+        .fontSize(11).fontColor('#8A94A8')
+        .maxLines(3).textOverflow({ overflow: TextOverflow.Ellipsis })
+        .width('100%')
+      Row({ space: 12 }) {
+        Button('复制链接').onClick(() => { this.copyLink(); }).layoutWeight(1)
+        Button('关闭').onClick(() => { this.controller.close(); }).layoutWeight(1)
+      }.width('100%')
+    }
+    .padding(16)
+    .width('90%')
+    .backgroundColor('#151E31')
+    .borderRadius(12)
+  }
+}
+
 /** 节点分组（订阅分组 / 手动添加） */
 export class NodeGroup {
   title: string = '';
@@ -50,10 +96,19 @@ struct Index {
   @State testRunning: boolean = false;
   @State testDone: number = 0;
   @State testTotal: number = 0;
+  @State shareLink: string = '';
+  @State qrPixmap: image.PixelMap | null = null;
   dialogController: CustomDialogController = new CustomDialogController({
     builder: LinkDialog({
       inputText: $dialogText,
       onConfirm: (t: string) => { this.doImportLink(t); }
+    }),
+    customStyle: false
+  });
+  shareDialogController: CustomDialogController = new CustomDialogController({
+    builder: ShareDialog({
+      linkText: $shareLink,
+      qrPixmap: $qrPixmap
     }),
     customStyle: false
   });
@@ -89,6 +144,59 @@ struct Index {
         promptAction.showToast({ message: '已添加: ' + p.name });
         this.refresh();
       }
+    });
+  }
+
+
+  /** 扫码导入节点（鸿蒙统一扫码 ScanKit，替代 v2rayNG 的 ZXing 扫码） */
+  scanImport(): void {
+    let ctx = getContext(this) as common.Context;
+    let options: scanBarcode.ScanOptions = {
+      scanTypes: [scanBarcode.ScanType.QR_CODE, scanBarcode.ScanType.DATA_MATRIX]
+    };
+    scanBarcode.startScanForResult(ctx, options).then((result: scanBarcode.ScanResult) => {
+      let text: string = result.originalValue;
+      if (text === undefined || text.trim() === '') {
+        promptAction.showToast({ message: '未识别到内容' });
+        return;
+      }
+      ProfileStore.addShareLink(text.trim()).then((p: Profile | null) => {
+        if (p === null) {
+          promptAction.showToast({ message: '二维码不是有效的节点链接' });
+        } else {
+          promptAction.showToast({ message: '已添加: ' + p.name });
+          this.refresh();
+        }
+      });
+    }).catch((e: BusinessError) => {
+      if (e.code !== 1600002) {
+        promptAction.showToast({ message: '扫码失败: ' + e.code });
+      }
+    });
+  }
+
+  /** 分享节点：生成分享链接 + 二维码 */
+  shareNode(p: Profile): void {
+    let link = toShareLink(p);
+    if (link === '') {
+      promptAction.showToast({ message: '该类型暂不支持分享' });
+      return;
+    }
+    this.shareLink = link;
+    this.qrPixmap = null;
+    let opts: generateBarcode.BarcodeImageOptions = {
+      width: 280,
+      height: 280,
+      margin: 2,
+      backgroundColor: 0xFFFFFF,
+      pixelColor: 0x000000
+    };
+    generateBarcode.createImage(link, opts).then((pm: image.PixelMap) => {
+      this.qrPixmap = pm;
+      this.shareDialogController.open();
+    }).catch(() => {
+      // 二维码生成失败时仍展示链接
+      this.shareDialogController.open();
     });
   }
 
@@ -293,10 +401,14 @@ struct Index {
             .fontSize(13).height(34)
             .backgroundColor(this.testRunning ? '#334155' : '#1D2A44')
             .onClick(() => { this.runSpeedTest(); })
+          Button('扫码导入').fontSize(13).height(34).backgroundColor('#1D2A44')
+            .onClick(() => { this.scanImport(); })
           Button('导入链接').fontSize(13).height(34).backgroundColor('#1D2A44')
             .onClick(() => { this.dialogText = ''; this.dialogController.open(); })
           Button('订阅管理').fontSize(13).height(34).backgroundColor('#1D2A44')
             .onClick(() => { this.openSubscriptions(); })
+          Button('设置').fontSize(13).height(34).backgroundColor('#1D2A44')
+            .onClick(() => { router.pushUrl({ url: 'pages/Settings' }); })
         }
       }
       .scrollable(ScrollDirection.Horizontal)
@@ -330,6 +442,8 @@ struct Index {
                       .borderRadius(6)
                       .backgroundColor('rgba(148,163,184,0.12)')
                   }
+                  Text('分享').fontSize(12).fontColor('#A78BFA')
+                    .onClick(() => { this.shareNode(p); })
                   Text('编辑').fontSize(12).fontColor('#3B82F6')
                     .onClick(() => { this.editProfile(p); })
                   Text('删除').fontSize(12).fontColor('#EF4444')

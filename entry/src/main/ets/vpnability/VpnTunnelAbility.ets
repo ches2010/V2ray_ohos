@@ -2,7 +2,7 @@ import { VpnExtensionAbility, vpnExtension } from '@kit.NetworkKit';
 import { Want } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { ProfileStore } from '../core/ProfileStore';
+import { ProfileStore, XraySettings } from '../core/ProfileStore';
 import { ConfigBuilder } from '../core/ConfigBuilder';
 import { LibXray } from '../native/libxray';
 import { Profile } from '../model/Profile';
@@ -48,7 +48,8 @@ export default class VpnTunnelAbility extends VpnExtensionAbility {
       // 初始化核心环境（asset 目录存放 geoip/geosite.dat；设备标识用于 XUDP）
       LibXray.initCoreEnv(this.context.filesDir + '/assets', 'harmonyos-' + this.context.applicationInfo.uid);
 
-      let xrayConfig = ConfigBuilder.buildXrayConfig(selected);
+      let settings: XraySettings = await ProfileStore.loadSettings();
+      let xrayConfig = ConfigBuilder.buildXrayConfig(selected, settings);
       let ok: boolean = LibXray.startLoop(xrayConfig, fd);
       hilog.info(0x0000, 'V2RayNG', 'core startLoop: %{public}s', ok ? 'ok' : 'failed');
       AppStorage.setOrCreate('vpnRunning', ok);

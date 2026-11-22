@@ -1,5 +1,6 @@
 import { vpnExtension } from '@kit.NetworkKit';
 import { Profile } from '../model/Profile';
+import { XraySettings } from './ProfileStore';
 
 type JsonObj = Record<string, Object>;
 
@@ -130,27 +131,49 @@ export class ConfigBuilder {
   }
 
   /** 生成 Xray 核心配置 JSON（socks inbound 由 native 层 tun2socks 接入） */
-  static buildXrayConfig(p: Profile): string {
+  static buildXrayConfig(p: Profile, st: XraySettings): string {
     let proxy: JsonObj | null = ConfigBuilder.buildProxyOutbound(p);
     let outbounds: Array<Object> = [];
     if (proxy !== null) {
+      if (st.enableMux && (p.configType === 'vless' || p.configType === 'vmess' || p.configType === 'trojan')) {
+        let mux: JsonObj = { 'enabled': true, 'concurrency': 8 };
+        proxy['mux'] = mux;
+      }
       outbounds.push(proxy);
     }
     let direct: JsonObj = { 'tag': 'direct', 'protocol': 'freedom' };
     outbounds.push(direct);
+    let block: JsonObj = { 'tag': 'block', 'protocol': 'blackhole' };
+    outbounds.push(block);
 
     let socksSettings: JsonObj = { 'udp': true, 'auth': 'noauth' };
     let socksInbound: JsonObj = {
       'tag': 'socks', 'port': 10808, 'listen': '127.0.0.1',
       'protocol': 'socks', 'settings': socksSettings
     };
+    if (st.enableSniffing) {
+      let destOverride: Array<string> = ['http', 'tls', 'quic'];
+      let sniffing: JsonObj = { 'enabled': true, 'destOverride': destOverride };
+      socksInbound['sniffing'] = sniffing;
+    }
     let inbounds: Array<Object> = [socksInbound];
 
-    let ipList: Array<string> = ['geoip:private'];
-    let rule: JsonObj = { 'type': 'field', 'ip': ipList, 'outboundTag': 'direct' };
-    let rules: Array<Object> = [rule];
-    let routing: JsonObj = { 'domainStrategy': 'AsIs', 'rules': rules };
-    let log: JsonObj = { 'loglevel': 'warning' };
+    // 路由规则（对应 v2rayNG routing：直连私有地址；可选绕过大陆/拦截广告）
+    let rules: Array<Object> = [];
+    let privateIps: Array<string> = ['geoip:private'];
+    rules.push({ 'type': 'field', 'ip': privateIps, 'outboundTag': 'direct' });
+    if (st.blockAds) {
+      let adDomains: Array<string> = ['geosite:category-ads-all'];
+      rules.push({ 'type': 'field', 'domain': adDomains, 'outboundTag': 'block' });
+    }
+    if (st.routeMode === 1) {
+      let cnIps: Array<string> = ['geoip:cn'];
+      rules.push({ 'type': 'field', 'ip': cnIps, 'outboundTag': 'direct' });
+      let cnDomains: Array<string> = ['geosite:cn'];
+      rules.push({ 'type': 'field', 'domain': cnDomains, 'outboundTag': 'direct' });
+    }
+    let routing: JsonObj = { 'domainStrategy': 'IPIfNonMatch', 'rules': rules };
+    let log: JsonObj = { 'loglevel': st.logLevel };
 
     let config: JsonObj = {
       'log': log, 'inbounds': inbounds, 'outbounds': outbounds, 'routing': routing
@@ -158,3 +181,4 @@ export class ConfigBuilder {
     return JSON.stringify(config);
   }
 }
+

@@ -79,6 +79,60 @@ export function sanitizeProfile(p: Profile): Profile {
   return p;
 }
 
+/** 反向生成 v2rayN 系分享链接（对应 v2rayNG ProfileItem.toUri） */
+export function toShareLink(p: Profile): string {
+  if (p.configType === 'vmess') {
+    let tlsValue: string = p.tls === '' ? '' : 'tls';
+    let obj: Record<string, Object> = {
+      'v': '2', 'ps': p.name, 'add': p.server, 'port': p.serverPort,
+      'id': p.uuid, 'aid': p.alterId, 'net': p.network, 'type': p.headerType,
+      'host': p.host, 'path': p.path, 'tls': tlsValue, 'sni': p.sni, 'fp': p.fingerprint
+    };
+    return 'vmess://' + buffer.from(JSON.stringify(obj), 'utf-8').toString('base64');
+  }
+  if (p.configType === 'vless' || p.configType === 'trojan') {
+    let userinfo: string = p.configType === 'vless' ? p.uuid : p.password;
+    let query: string = 'type=' + p.network;
+    if (p.host !== '') {
+      query += '&host=' + encodeURIComponent(p.host);
+    }
+    if (p.path !== '') {
+      query += '&path=' + encodeURIComponent(p.path);
+    }
+    if (p.serviceName !== '') {
+      query += '&serviceName=' + encodeURIComponent(p.serviceName);
+    }
+    if (p.tls !== '') {
+      query += '&security=' + p.tls;
+    }
+    if (p.sni !== '') {
+      query += '&sni=' + encodeURIComponent(p.sni);
+    }
+    if (p.fingerprint !== '') {
+      query += '&fp=' + p.fingerprint;
+    }
+    if (p.flow !== '') {
+      query += '&flow=' + p.flow;
+    }
+    if (p.publicKey !== '') {
+      query += '&pbk=' + p.publicKey;
+    }
+    if (p.shortId !== '') {
+      query += '&sid=' + p.shortId;
+    }
+    if (p.spiderX !== '') {
+      query += '&spx=' + encodeURIComponent(p.spiderX);
+    }
+    return p.configType + '://' + userinfo + '@' + p.server + ':' + p.serverPort + '?' + query + '#'
+      + encodeURIComponent(p.name);
+  }
+  if (p.configType === 'shadowsocks') {
+    let mp: string = buffer.from(p.security + ':' + p.password, 'utf-8').toString('base64');
+    return 'ss://' + mp + '@' + p.server + ':' + p.serverPort + '#' + encodeURIComponent(p.name);
+  }
+  return '';
+}
+
 /** 解析 v2rayN 系分享链接（vmess/vless/trojan/ss） */
 export function parseShareLink(url: string): Profile | null {
   let u = url.trim();
