@@ -49,7 +49,7 @@ jobs:
         run: |
           git clone --depth 1 --branch v1.26.5-beta1 https://github.com/star4277/ohos-go.git "$HOME/ohos-go"
           cd "$HOME/ohos-go/src"
-          GOROOT_BOOTSTRAP="$(go env GOROOT)" GOTOOLCHAIN=local ./make.bash
+          GOROOT_BOOTSTRAP="$(go env GOROOT)" GOTOOLCHAIN=local bash ./make.bash
 
       - name: Fetch OpenHarmony Native SDK (ohos llvm/clang)
         run: |
