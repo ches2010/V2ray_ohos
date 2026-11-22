@@ -161,16 +161,20 @@ export class ConfigBuilder {
     // 路由规则（对应 v2rayNG routing：直连私有地址；可选绕过大陆/拦截广告）
     let rules: Array<Object> = [];
     let privateIps: Array<string> = ['geoip:private'];
-    rules.push({ 'type': 'field', 'ip': privateIps, 'outboundTag': 'direct' });
+    let privateRule: JsonObj = { 'type': 'field', 'ip': privateIps, 'outboundTag': 'direct' };
+    rules.push(privateRule);
     if (st.blockAds) {
       let adDomains: Array<string> = ['geosite:category-ads-all'];
-      rules.push({ 'type': 'field', 'domain': adDomains, 'outboundTag': 'block' });
+      let adRule: JsonObj = { 'type': 'field', 'domain': adDomains, 'outboundTag': 'block' };
+      rules.push(adRule);
     }
     if (st.routeMode === 1) {
       let cnIps: Array<string> = ['geoip:cn'];
-      rules.push({ 'type': 'field', 'ip': cnIps, 'outboundTag': 'direct' });
+      let cnIpRule: JsonObj = { 'type': 'field', 'ip': cnIps, 'outboundTag': 'direct' };
+      rules.push(cnIpRule);
       let cnDomains: Array<string> = ['geosite:cn'];
-      rules.push({ 'type': 'field', 'domain': cnDomains, 'outboundTag': 'direct' });
+      let cnDomainRule: JsonObj = { 'type': 'field', 'domain': cnDomains, 'outboundTag': 'direct' };
+      rules.push(cnDomainRule);
     }
     let routing: JsonObj = { 'domainStrategy': 'IPIfNonMatch', 'rules': rules };
     let log: JsonObj = { 'loglevel': st.logLevel };

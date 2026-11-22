@@ -1,7 +1,7 @@
 import { promptAction, router } from '@kit.ArkUI';
 import { http } from '@kit.NetworkKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { fs } from '@kit.CoreFileKit';
+import fs from '@ohos.file.fs';
 import { ProfileStore, XraySettings } from '../core/ProfileStore';
 
 const LOG_LEVELS: string[] = ['debug', 'info', 'warning', 'error'];

@@ -1,7 +1,8 @@
 import { router, promptAction } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { common } from '@kit.AbilityKit';
-import { scanBarcode, generateBarcode } from '@kit.ScanKit';
+import { scanBarcode } from '@kit.ScanKit';
+import generateBarcode from '@ohos.generateBarcode';
 import { image } from '@kit.ImageKit';
 import pasteboard from '@ohos.pasteboard';
 import { Profile, toShareLink } from '../model/Profile';
@@ -57,8 +58,7 @@ struct ShareDialog {
     Column({ space: 12 }) {
       Text('分享节点').fontSize(18).fontWeight(FontWeight.Bold).fontColor('#E5EDFF')
       if (this.qrPixmap !== null) {
-        let pm: image.PixelMap = this.qrPixmap;
-        Image(pm).width(240).height(240).borderRadius(8)
+        Image(this.qrPixmap as image.PixelMap).width(240).height(240).borderRadius(8)
       } else {
         Text('二维码生成中...').fontSize(13).fontColor('#8A94A8').height(240)
       }
@@ -151,10 +151,7 @@ struct Index {
   /** 扫码导入节点（鸿蒙统一扫码 ScanKit，替代 v2rayNG 的 ZXing 扫码） */
   scanImport(): void {
     let ctx = getContext(this) as common.Context;
-    let options: scanBarcode.ScanOptions = {
-      scanTypes: [scanBarcode.ScanType.QR_CODE, scanBarcode.ScanType.DATA_MATRIX]
-    };
-    scanBarcode.startScanForResult(ctx, options).then((result: scanBarcode.ScanResult) => {
+    scanBarcode.startScanForResult(ctx).then((result: scanBarcode.ScanResult) => {
       let text: string = result.originalValue;
       if (text === undefined || text.trim() === '') {
         promptAction.showToast({ message: '未识别到内容' });
