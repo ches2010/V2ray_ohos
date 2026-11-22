@@ -10,4 +10,5 @@ add_library(entry SHARED napi_init.cpp)
 
 # libxray_ohos.so 由 ohos-go 从 2dust/AndroidLibXrayLite 编译产出，
 # 运行期通过 dlopen 加载（见 napi_init.cpp），此处无需链接。
-target_link_libraries(entry PUBLIC libhilog_ndk.z.so libnapi_ndk.z.so libdl.so)
+# OpenHarmony sysroot ships NAPI as libace_napi.z.so (no libnapi_ndk.z)
+target_link_libraries(entry PUBLIC libhilog_ndk.z.so libace_napi.z.so libdl.so)
