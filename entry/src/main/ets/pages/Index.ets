@@ -1,8 +1,7 @@
 import { router, promptAction } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { common } from '@kit.AbilityKit';
-import { scanBarcode } from '@kit.ScanKit';
-import generateBarcode from '@ohos.generateBarcode';
+import { scanBarcode, scanCore, generateBarcode } from '@kit.ScanKit';
 import { image } from '@kit.ImageKit';
 import pasteboard from '@ohos.pasteboard';
 import { Profile, toShareLink } from '../model/Profile';
@@ -181,14 +180,13 @@ struct Index {
     }
     this.shareLink = link;
     this.qrPixmap = null;
-    let opts: generateBarcode.BarcodeImageOptions = {
+    let opts: generateBarcode.CreateOptions = {
+      scanType: scanCore.ScanType.QR_CODE,
       width: 280,
       height: 280,
-      margin: 2,
-      backgroundColor: 0xFFFFFF,
-      pixelColor: 0x000000
+      margin: 2
     };
-    generateBarcode.createImage(link, opts).then((pm: image.PixelMap) => {
+    generateBarcode.createBarcode(link, opts).then((pm: image.PixelMap) => {
       this.qrPixmap = pm;
       this.shareDialogController.open();
     }).catch(() => {
