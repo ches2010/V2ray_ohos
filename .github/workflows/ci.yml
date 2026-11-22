@@ -169,16 +169,15 @@ jobs:
           sed -i 's/"runtimeOS": "HarmonyOS"/"runtimeOS": "OpenHarmony"/' build-profile.json5
           # hvigor 6.x 要求 hvigor/hvigor-config.json5 声明 modelVersion
           mkdir -p hvigor
-          cat > hvigor/hvigor-config.json5 <<'HVIGORCFG'
-{
-  "modelVersion": "5.0.0",
-  "dependencies": {},
-  "execution": {},
-  "logging": {},
-  "debugging": {},
-  "nodeOptions": {}
-}
-HVIGORCFG
+          printf '%s\n' \
+            '{' \
+            '  "modelVersion": "5.0.0",' \
+            '  "dependencies": {},' \
+            '  "execution": {},' \
+            '  "logging": {},' \
+            '  "debugging": {},' \
+            '  "nodeOptions": {}' \
+            '}' > hvigor/hvigor-config.json5
           echo "--- adapted build-profile.json5 ---"
           cat build-profile.json5
 
