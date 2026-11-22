@@ -61,7 +61,8 @@ jobs:
           # SDK 包解开后 linux/ 目录下是各组件压缩包（native 为 zip/tar.gz），需二次解压
           CLANG=$(find "$HOME/ohos-sdk" -name "aarch64-unknown-linux-ohos-clang" | head -1)
           if [ -z "$CLANG" ]; then
-            NATIVE_PKG=$(find "$HOME/ohos-sdk" \( -name "native*.zip" -o -name "native*.tar.gz" \) | head -1)
+            # 必须选 linux 目录下的 native 包；windows 包里的 clang 包装脚本在 Linux 上不可执行
+            NATIVE_PKG=$(find "$HOME/ohos-sdk" \( -name "native-linux*.zip" -o -name "native-linux*.tar.gz" \) | head -1)
             echo "native sdk package: $NATIVE_PKG"
             test -n "$NATIVE_PKG"
             mkdir -p "$HOME/ohos-native"
