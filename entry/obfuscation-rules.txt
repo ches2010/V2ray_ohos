@@ -1,0 +1,2 @@
+# Keep attribute names of NAPI bridge and JSON keys
+-enablekeepannotations

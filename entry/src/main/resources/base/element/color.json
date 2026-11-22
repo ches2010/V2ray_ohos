@@ -1,0 +1,12 @@
+{
+  "color": [
+    { "name": "start_window_background", "value": "#101828" },
+    { "name": "primary", "value": "#3B82F6" },
+    { "name": "bg", "value": "#0B1220" },
+    { "name": "card", "value": "#151E31" },
+    { "name": "text_main", "value": "#E5EDFF" },
+    { "name": "text_sub", "value": "#8A94A8" },
+    { "name": "ok", "value": "#22C55E" },
+    { "name": "warn", "value": "#F59E0B" }
+  ]
+}
