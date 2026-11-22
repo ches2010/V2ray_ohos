@@ -135,59 +135,57 @@ jobs:
           name: V2ray_ohos-with-cores
           path: V2ray_ohos-with-cores.zip
 
-  # 实验性：在 CI 上用开源 OpenHarmony SDK + hvigor 构建 HAP（无签名，尽力而为）。
-  # HarmonyOS SDK（DevEco 专有）无 Linux 版，因此构建前临时把工程目标改为
-  # OpenHarmony（仅运行期修改，不提交）。产物为未签名 HAP，仅供验证编译链路。
+  # 使用华为官方 HarmonyOS command-line-tools 构建 HAP。
+  # 该工具包内嵌 HarmonyOS SDK（含 'vpn' 扩展类型支持），无需再做 strip-vpn 适配；
+  # 构建产物为 HarmonyOS 目标的未签名 debug HAP。
+  # 工具包来自 Okysu/harmony-auto-build 的 release 镜像（commandline-tools-linux-x64-6.1.0.816，约 2.5GB）。
   build-hap:
     runs-on: ubuntu-latest
     continue-on-error: true
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "18"
 
-      - name: Setup OpenHarmony SDK 5.0.0 (API 12)
-        id: sdk
-        uses: openharmony-rs/setup-ohos-sdk@v1.0.0
+      - name: Cache HarmonyOS command-line-tools
+        id: cache-tools
+        uses: actions/cache@v4
         with:
-          version: "5.0.0"
-          cache: true
-          # hvigor 4.x looks components up under <SDK>/<api-level>/toolchains etc.
-          fixup-path: true
+          path: ./command-line-tools
+          key: ${{ runner.os }}-hmos-commandline-tools-6.1.0.816
 
-      - name: Install hvigor from the OpenHarmony npm registry
+      - name: Download HarmonyOS command-line-tools (linux-x64)
+        if: steps.cache-tools.outputs.cache-hit != 'true'
         run: |
-          echo "@ohos:registry=https://repo.harmonyos.com/npm/" >> "$HOME/.npmrc"
-          npm install @ohos/hvigor@4.0.9 @ohos/hvigor-ohos-plugin@4.0.9 --no-audit --no-fund
-          node node_modules/@ohos/hvigor/bin/hvigor.js --version
+          curl -fL --retry 3 -o tools.zip \
+            https://github.com/Okysu/harmony-auto-build/releases/download/commandline-tools-linux-x64-6.1.0.816/commandline-tools-linux-x64-6.1.0.816.zip
+          unzip -q tools.zip
+          rm tools.zip
+          test -d command-line-tools
+          echo "--- command-line-tools layout ---"
+          ls command-line-tools
 
-      - name: Adapt project target to OpenHarmony (temporary, not committed)
+      - name: Setup build environment
         run: |
-          # runtimeOS/compileSdkVersion/strictMode 调整 + hvigor-config.json5（hvigor 4.x 要求 modelVersion）
-          python3 scripts/adapt_openharmony.py --strip-vpn
-          mkdir -p hvigor
-          printf '%s\n' \
-            '{' \
-            '  "modelVersion": "5.0.0",' \
-            '  "dependencies": {},' \
-            '  "execution": {},' \
-            '  "logging": {},' \
-            '  "debugging": {},' \
-            '  "nodeOptions": {}' \
-            '}' > hvigor/hvigor-config.json5
-          echo "--- adapted build-profile.json5 ---"
-          cat build-profile.json5
+          TOOLS_DIR="$(pwd)/command-line-tools"
+          # SDK 路径：hvigor 同时读取 local.properties 与环境变量
+          echo "hwsdk.dir=$TOOLS_DIR/sdk" > local.properties
+          echo "DEVECO_SDK_HOME=$TOOLS_DIR/sdk" >> "$GITHUB_ENV"
+          echo "HOS_SDK_HOME=$TOOLS_DIR/sdk" >> "$GITHUB_ENV"
+          echo "OHPM_HOME=$TOOLS_DIR/ohpm" >> "$GITHUB_ENV"
+          echo "$TOOLS_DIR/bin" >> "$GITHUB_PATH"
+          chmod -R +x "$TOOLS_DIR/bin"
+          hvigorw --version
 
-      - name: Build unsigned HAP (hvigor assembleHap)
+      - name: Install dependencies (ohpm)
+        run: ohpm install
+
+      - name: Build unsigned HAP (hvigorw assembleHap, HarmonyOS SDK)
         run: |
-          # hvigor 4.x (API 12 era) resolves the SDK via HOS_SDK_HOME / OHOS_BASE_SDK_HOME
-          export HOS_SDK_HOME="${{ steps.sdk.outputs.ohos-base-sdk-home }}"
-          export OHOS_BASE_SDK_HOME="${{ steps.sdk.outputs.ohos-base-sdk-home }}"
-          node node_modules/@ohos/hvigor/bin/hvigor.js assembleHap --mode module \
-            -p module=entry@default -p buildMode=debug --stacktrace --no-daemon
+          hvigorw assembleHap --mode module -p module=entry@default -p product=default -p buildMode=debug --no-daemon
           echo "--- hap files ---"
           find entry/build -name "*.hap" || true
 
