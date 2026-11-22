@@ -12,6 +12,7 @@ import { LibXray } from '../native/libxray';
 struct LogsPage {
   @State statusJson: string = '';
   @State diagJson: string = '';
+  @State selftestJson: string = '';
   @State coreVersion: string = '';
   @State nodeName: string = '';
   @State routeLabel: string = '';
@@ -37,8 +38,13 @@ struct LogsPage {
       fs.readSync(file.fd, buf);
       fs.closeSync(file.fd);
       this.diagJson = buffer.from(buf).toString('utf-8');
+      // 从 VPN 进程诊断里带出的自检结果（selftest 阶段的 detail）
+      let d = JSON.parse(this.diagJson) as Record<string, Object>;
+      let detail = String(d['detail'] ?? '');
+      this.selftestJson = detail.indexOf('inbound:') >= 0 ? detail : '';
     } catch (e) {
       this.diagJson = '';
+      this.selftestJson = '';
     }
     // UI 进程视角的核心状态（仅参考）
     try {
@@ -66,6 +72,24 @@ struct LogsPage {
     this.muxLabel = s.enableMux ? '开启' : '关闭';
     this.sniffLabel = s.enableSniffing ? '开启' : '关闭';
     this.refreshing = false;
+  }
+
+  selftestPart(key: string): string {
+    if (this.selftestJson === '') {
+      return '未运行';
+    }
+    let idx = this.selftestJson.indexOf(key + ':');
+    if (idx < 0) {
+      return '未运行';
+    }
+    let rest = this.selftestJson.substring(idx + key.length + 1);
+    let end = rest.indexOf(' ');
+    let val = end < 0 ? rest : rest.substring(0, end);
+    return val === 'ok' ? '通过' : '失败';
+  }
+
+  selftestOk(key: string): string {
+    return this.selftestPart(key) === '通过' ? '#22C55E' : '#EF4444';
   }
 
   diagValue(key: string): string {
@@ -159,6 +183,18 @@ struct LogsPage {
             this.row('结果', this.diagValue('ok') === 'true' ? '成功' : this.diagValue('ok'),
               this.diagValue('ok') === 'true' ? '#22C55E' : '#EF4444')
             this.row('详情', this.diagValue('detail'), '#E5EDFF')
+          }
+          .width('100%')
+          .borderRadius(10)
+          .backgroundColor('#151E31')
+
+          Text('全链路自检（经代理连 1.1.1.1:80）').fontSize(13).fontColor('#94A3B8')
+            .width('100%').padding({ left: 4, right: 4, top: 14, bottom: 4 })
+          Column({ space: 2 }) {
+            this.row('SOCKS 入站 (10808)', this.selftestPart('inbound'), this.selftestOk('inbound'))
+            this.row('SOCKS5 握手', this.selftestPart('handshake'), this.selftestOk('handshake'))
+            this.row('经代理 TCP 连接', this.selftestPart('tcp'), this.selftestOk('tcp'))
+            this.row('HTTP 请求', this.selftestPart('http'), this.selftestOk('http'))
           }
           .width('100%')
           .borderRadius(10)

@@ -7,6 +7,11 @@
 #include <dlfcn.h>
 #include <hilog/log.h>
 #include <mutex>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <fcntl.h>
+#include <cerrno>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -52,6 +57,12 @@ static std::string g_workDir;   // 可写目录（ping 临时配置文件）
 static std::mutex g_assetMutex;
 static bool g_assetEnvSet = false;
 static std::string g_lastError; // 最近一次数据面错误（供日志诊断页展示）
+static std::atomic_bool g_hevExited(false);
+static std::atomic_int g_hevRc(-1);
+static std::string g_socksSelfTest; // startLoop 后对 127.0.0.1:10808 的连通性自检
+static std::string g_fullSelfTest;  // 通过 SOCKS5 代理的完整链路自检（独立线程执行）
+static std::mutex g_selfTestMutex;
+static std::atomic_bool g_selfTestRunning(false);
 
 static const int kVpnSocksPort = 10808; // 与 entry/src/main/ets/core/ConfigBuilder.ets 对齐
 
@@ -251,6 +262,151 @@ static bool EnsureHev() {
 }
 
 // ---------------------------------------------------------------------------
+// 完整链路自检：SOCKS5 握手 -> 经代理连接 1.1.1.1:80 -> HTTP 请求
+// 用于定位「隧道已启动但无法上网」的故障段（inbound / 握手 / 出站）
+// ---------------------------------------------------------------------------
+static bool WaitWritable(int fd, int timeoutMs) {
+    for (int i = 0; i < timeoutMs / 50; i++) {
+        fd_set wfds;
+        FD_ZERO(&wfds);
+        FD_SET(fd, &wfds);
+        struct timeval tv;
+        tv.tv_sec = 0;
+        tv.tv_usec = 50 * 1000;
+        int r = select(fd + 1, nullptr, &wfds, nullptr, &tv);
+        if (r > 0) {
+            int val = 0;
+            socklen_t len = sizeof(val);
+            getsockopt(fd, SOL_SOCKET, SO_ERROR, &val, &len);
+            return val == 0;
+        }
+    }
+    return false;
+}
+
+static bool WaitReadable(int fd, int timeoutMs) {
+    for (int i = 0; i < timeoutMs / 50; i++) {
+        fd_set rfds;
+        FD_ZERO(&rfds);
+        FD_SET(fd, &rfds);
+        struct timeval tv;
+        tv.tv_sec = 0;
+        tv.tv_usec = 50 * 1000;
+        int r = select(fd + 1, &rfds, nullptr, nullptr, &tv);
+        if (r > 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static int ConnectNonBlock(const sockaddr_in &sa, int timeoutMs) {
+    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (fd < 0) {
+        return -1;
+    }
+    fcntl(fd, F_SETFL, O_NONBLOCK);
+    int r = connect(fd, reinterpret_cast<const sockaddr *>(&sa), sizeof(sa));
+    if (r == 0) {
+        return fd;
+    }
+    if (errno == EINPROGRESS && WaitWritable(fd, timeoutMs)) {
+        int val = 0;
+        socklen_t len = sizeof(val);
+        getsockopt(fd, SOL_SOCKET, SO_ERROR, &val, &len);
+        if (val == 0) {
+            return fd;
+        }
+    }
+    close(fd);
+    return -1;
+}
+
+static bool SendAll(int fd, const char *data, size_t len, int timeoutMs) {
+    size_t off = 0;
+    while (off < len) {
+        if (!WaitWritable(fd, timeoutMs)) {
+            return false;
+        }
+        ssize_t n = send(fd, data + off, len - off, 0);
+        if (n <= 0) {
+            return false;
+        }
+        off += static_cast<size_t>(n);
+    }
+    return true;
+}
+
+static ssize_t RecvSome(int fd, char *buf, size_t len, int timeoutMs) {
+    if (!WaitReadable(fd, timeoutMs)) {
+        return -1;
+    }
+    return recv(fd, buf, len, 0);
+}
+
+static void RunFullSelfTest() {
+    std::string r1 = "inbound:fail";
+    std::string r2 = "handshake:fail";
+    std::string r3 = "tcp:fail";
+    std::string r4 = "http:fail";
+    std::string err;
+
+    sockaddr_in sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sin_family = AF_INET;
+    sa.sin_port = htons(static_cast<uint16_t>(kVpnSocksPort));
+    sa.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+
+    int fd = ConnectNonBlock(sa, 2000);
+    if (fd < 0) {
+        std::lock_guard<std::mutex> lock(g_selfTestMutex);
+        g_fullSelfTest = r1 + " " + r2 + " " + r3 + " " + r4 + " | error: connect 10808 failed";
+        return;
+    }
+    r1 = "inbound:ok";
+
+    // SOCKS5 greeting: VER=5, NMETHOD=1, METHOD=0(no auth)
+    const unsigned char greet[3] = {0x05, 0x01, 0x00};
+    if (SendAll(fd, reinterpret_cast<const char *>(greet), 3, 2000)) {
+        char buf[64];
+        ssize_t n = RecvSome(fd, buf, sizeof(buf), 2000);
+        if (n >= 2 && buf[0] == 0x05 && buf[1] == 0x00) {
+            r2 = "handshake:ok";
+            // SOCKS5 request: VER=5 CMD=1(connect) RSV=0 ATYP=1(IPv4) 1.1.1.1:80
+            const unsigned char req[10] = {0x05, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x50};
+            if (SendAll(fd, reinterpret_cast<const char *>(req), 10, 2000)) {
+                ssize_t m = RecvSome(fd, buf, sizeof(buf), 4000);
+                if (m >= 10 && buf[1] == 0x00) {
+                    r3 = "tcp:ok";
+                    const char *httpReq = "GET / HTTP/1.1\r\nHost: 1.1.1.1\r\nConnection: close\r\n\r\n";
+                    if (SendAll(fd, httpReq, strlen(httpReq), 2000)) {
+                        ssize_t h = RecvSome(fd, buf, sizeof(buf) - 1, 4000);
+                        if (h > 0) {
+                            r4 = "http:ok";
+                        }
+                    }
+                }
+            }
+        }
+    }
+    close(fd);
+    std::lock_guard<std::mutex> lock(g_selfTestMutex);
+    g_fullSelfTest = r1 + " " + r2 + " " + r3 + " " + r4;
+    if (r4 != "http:ok") {
+        g_lastError = "selftest: " + g_fullSelfTest;
+    }
+}
+
+static napi_value GetSelfTest(napi_env env, napi_callback_info info) {
+    (void)info;
+    std::lock_guard<std::mutex> lock(g_selfTestMutex);
+    napi_value result;
+    napi_create_string_utf8(env, g_fullSelfTest.c_str(), g_fullSelfTest.size(), &result);
+    return result;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 // NAPI exports（与 entry/src/main/ets/native/libxray.ets 一一对应）
 // ---------------------------------------------------------------------------
 static napi_value InitCoreEnv(napi_env env, napi_callback_info info) {
@@ -400,10 +556,65 @@ static napi_value StartLoop(napi_env env, napi_callback_info info) {
     g_hevThread = std::thread([start, yaml, tunFd]() {
         int rc = start(reinterpret_cast<const unsigned char *>(yaml.data()),
                        static_cast<unsigned int>(yaml.size()), tunFd);
+        g_hevRc.store(rc);
+        g_hevExited.store(true);
+        if (rc != 0) {
+            g_lastError = "hev tunnel exited rc=" + std::to_string(rc)
+                              + "（检查 yaml 配置或 tun fd）";
+        }
         LOGI("hev tunnel exited: %{public}d", rc);
     });
 
     g_running.store(true);
+
+    // 本地自检：确认 Xray SOCKS 入站确实在 127.0.0.1:10808 监听。
+    // 失败说明核心入站未就绪（hev 转发必然失败）。
+    {
+        int cfd = socket(AF_INET, SOCK_STREAM, 0);
+        bool selfOk = false;
+        if (cfd >= 0) {
+            sockaddr_in sa;
+            memset(&sa, 0, sizeof(sa));
+            sa.sin_family = AF_INET;
+            sa.sin_port = htons(static_cast<uint16_t>(kVpnSocksPort));
+            sa.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+            // 非阻塞 connect + 1s 轮询，避免阻塞 JS 线程
+            fcntl(cfd, F_SETFL, O_NONBLOCK);
+            int cr = connect(cfd, reinterpret_cast<sockaddr *>(&sa), sizeof(sa));
+            if (cr == 0) {
+                selfOk = true;
+            } else if (errno == EINPROGRESS) {
+                for (int i = 0; i < 20; i++) {
+                    usleep(50000); // 50ms
+                    int val = 0;
+                    socklen_t len = sizeof(val);
+                    if (getsockopt(cfd, SOL_SOCKET, SO_ERROR, &val, &len) == 0 && val == 0) {
+                        selfOk = true;
+                        break;
+                    }
+                    if (val != 0) {
+                        break;
+                    }
+                }
+            }
+            close(cfd);
+        }
+        g_socksSelfTest = selfOk ? "ok" : "fail";
+        if (!selfOk) {
+            g_lastError = "SOCKS 入站自检失败：127.0.0.1:10808 不可连（Xray inbound 未就绪）";
+        }
+        LOGI("socks selftest: %{public}s", selfOk ? "ok" : "fail");
+    }
+
+    // 启动完整链路自检（独立线程，不阻塞 JS）：经 127.0.0.1:10808 的
+    // SOCKS5 代理连接 1.1.1.1:80 并发 HTTP 请求，验证 tun->hev->xray->出站 全链路。
+    if (!g_selfTestRunning.exchange(true)) {
+        std::thread([]() {
+            RunFullSelfTest();
+            g_selfTestRunning.store(false);
+        }).detach();
+    }
+
     LOGI("startLoop ok (xray + hev tun2socks), tunFd=%{public}d", tunFd);
     napi_value ok;
     napi_get_boolean(env, true, &ok);
@@ -447,6 +658,10 @@ static napi_value GetCoreStatus(napi_env env, napi_callback_info info) {
                        ",\"xrayStarted\":" + (g_xrayStarted.load() ? "true" : "false") +
                        ",\"running\":" + (g_running.load() ? "true" : "false") +
                        ",\"assetDirSet\":" + (!g_assetDir.empty() ? "true" : "false") +
+                       ",\"hevExited\":" + (g_hevExited.load() ? "true" : "false") +
+                       ",\"hevRc\":" + std::to_string(g_hevRc.load()) +
+                       ",\"socksSelfTest\":\"" + g_socksSelfTest + "\"" +
+                       ",\"fullSelfTest\":\"" + JsonEscape(g_fullSelfTest) + "\"" +
                        ",\"lastError\":\"" + JsonEscape(g_lastError) + "\"}";
     napi_value result;
     napi_create_string_utf8(env, json.c_str(), json.size(), &result);
@@ -463,6 +678,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         {"stopLoop", nullptr, StopLoop, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"isRunning", nullptr, IsRunning, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"getCoreStatus", nullptr, GetCoreStatus, nullptr, nullptr, nullptr, napi_default, nullptr},
+        {"getSelfTest", nullptr, GetSelfTest, nullptr, nullptr, nullptr, napi_default, nullptr},
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     return exports;

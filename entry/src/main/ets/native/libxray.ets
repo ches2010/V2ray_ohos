@@ -46,4 +46,9 @@ export class LibXray {
   static getCoreStatus(): string {
     return String(native.getCoreStatus());
   }
+
+  /** 全链路自检结果（JSON 字符串）：inbound/握手/TCP/HTTP 各阶段 */
+  static getSelfTest(): string {
+    return String(native.getSelfTest());
+  }
 }

@@ -33,6 +33,7 @@ export default class VpnTunnelAbility extends VpnExtensionAbility {
 
   onCreate(want: Want): void {
     hilog.info(0x0000, 'V2RayNG', '%{public}s', 'VpnTunnelAbility onCreate');
+    this.writeDiag('onCreate', true, '');
     let selectedId = '';
     try {
       let p = want.parameters as Record<string, Object>;
@@ -95,6 +96,19 @@ export default class VpnTunnelAbility extends VpnExtensionAbility {
       this.writeDiag('startLoop', ok, ok ? 'xray + hev running' : 'startLoop failed (see hilog)');
       hilog.info(0x0000, 'V2RayNG', 'core startLoop: %{public}s', ok ? 'ok' : 'failed');
       AppStorage.setOrCreate('vpnRunning', ok);
+      if (ok) {
+        // 6 秒后落盘全链路自检结果（inbound/握手/TCP/HTTP），供日志诊断页定位故障段
+        setTimeout(() => {
+          try {
+            let st = LibXray.getCoreStatus();
+            let stTest = LibXray.getSelfTest();
+            this.writeDiag('selftest', stTest.indexOf('http:ok') >= 0,
+              stTest + ' | core: ' + st);
+          } catch (e) {
+            this.writeDiag('selftest', false, 'selftest failed');
+          }
+        }, 6000);
+      }
     } catch (err) {
       let e = err as BusinessError;
       hilog.error(0x0000, 'V2RayNG', 'startTunnel fail: %{public}s', JSON.stringify(e));
@@ -105,6 +119,7 @@ export default class VpnTunnelAbility extends VpnExtensionAbility {
 
   onDestroy(): void {
     hilog.info(0x0000, 'V2RayNG', '%{public}s', 'VpnTunnelAbility onDestroy');
+    this.writeDiag('stop', true, '');
     try {
       LibXray.stopLoop();
     } catch (e) {
