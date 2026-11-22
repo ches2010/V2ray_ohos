@@ -1,7 +1,9 @@
 import { vpnExtension } from '@kit.NetworkKit';
 import { Profile } from '../model/Profile';
 
-/** Xray JSON 配置与 VPN VpnConfig 生成（对应 v2rayNG CoreConfigManager / CoreOutboundBuilder 精简版） */
+type JsonObj = Record<string, Object>;
+
+/** Xray JSON 配置与 VPN VpnConfig 生成（对应 v2rayNG CoreConfigManager 精简版） */
 export class ConfigBuilder {
   /** 生成 VPN 虚拟网卡配置（对应 CoreVpnService.configureNetworkSettings） */
   static buildVpnConfig(mtu: number): vpnExtension.VpnConfig {
@@ -30,11 +32,12 @@ export class ConfigBuilder {
     return config;
   }
 
-  private static buildStreamSettings(p: Profile): Record<string, Object> {
-    let stream: Record<string, Object> = { 'network': p.network };
+  private static buildStreamSettings(p: Profile): JsonObj {
+    let stream: JsonObj = { 'network': p.network };
     if (p.tls === 'tls') {
       stream['security'] = 'tls';
-      let tls: Record<string, Object> = { 'serverName': p.sni === '' ? (p.host === '' ? p.server : p.host) : p.sni };
+      let serverName: string = p.sni === '' ? (p.host === '' ? p.server : p.host) : p.sni;
+      let tls: JsonObj = { 'serverName': serverName };
       if (p.allowInsecure) {
         tls['allowInsecure'] = true;
       }
@@ -44,7 +47,7 @@ export class ConfigBuilder {
       stream['tlsSettings'] = tls;
     } else if (p.tls === 'reality') {
       stream['security'] = 'reality';
-      let reality: Record<string, Object> = {
+      let reality: JsonObj = {
         'serverName': p.sni === '' ? p.server : p.sni,
         'fingerprint': p.fingerprint === '' ? 'chrome' : p.fingerprint,
         'publicKey': p.publicKey,
@@ -58,86 +61,99 @@ export class ConfigBuilder {
       stream['security'] = 'none';
     }
     if (p.network === 'ws') {
-      let ws: Record<string, Object> = { 'path': p.path === '' ? '/' : p.path };
+      let wsPath: string = p.path === '' ? '/' : p.path;
+      let ws: JsonObj = { 'path': wsPath };
       if (p.host !== '') {
-        let headers: Record<string, string> = { 'Host': p.host };
+        let headers: JsonObj = { 'Host': p.host };
         ws['headers'] = headers;
       }
       stream['wsSettings'] = ws;
     } else if (p.network === 'grpc') {
-      stream['grpcSettings'] = { 'serviceName': p.serviceName };
+      let grpc: JsonObj = { 'serviceName': p.serviceName };
+      stream['grpcSettings'] = grpc;
     }
     return stream;
   }
 
-  private static buildProxyOutbound(p: Profile): Record<string, Object> | null {
-    let stream = ConfigBuilder.buildStreamSettings(p);
+  private static buildProxyOutbound(p: Profile): JsonObj | null {
+    let stream: JsonObj = ConfigBuilder.buildStreamSettings(p);
     if (p.configType === 'vmess') {
-      let user: Record<string, Object> = { 'id': p.uuid, 'alterId': p.alterId, 'security': 'auto' };
-      let vnext: Array<Record<string, Object>> = [
-        { 'address': p.server, 'port': p.serverPort, 'users': [user] }
-      ];
-      return { 'tag': 'proxy', 'protocol': 'vmess', 'settings': { 'vnext': vnext }, 'streamSettings': stream };
+      let user: JsonObj = { 'id': p.uuid, 'alterId': p.alterId, 'security': 'auto' };
+      let users: Array<Object> = [user];
+      let vnextEntry: JsonObj = { 'address': p.server, 'port': p.serverPort, 'users': users };
+      let vnext: Array<Object> = [vnextEntry];
+      let settings: JsonObj = { 'vnext': vnext };
+      return { 'tag': 'proxy', 'protocol': 'vmess', 'settings': settings, 'streamSettings': stream };
     }
     if (p.configType === 'vless') {
-      let user: Record<string, Object> = { 'id': p.uuid, 'encryption': 'none' };
+      let user: JsonObj = { 'id': p.uuid, 'encryption': 'none' };
       if (p.flow !== '') {
         user['flow'] = p.flow;
       }
-      let vnext: Array<Record<string, Object>> = [
-        { 'address': p.server, 'port': p.serverPort, 'users': [user] }
-      ];
-      return { 'tag': 'proxy', 'protocol': 'vless', 'settings': { 'vnext': vnext }, 'streamSettings': stream };
+      let users: Array<Object> = [user];
+      let vnextEntry: JsonObj = { 'address': p.server, 'port': p.serverPort, 'users': users };
+      let vnext: Array<Object> = [vnextEntry];
+      let settings: JsonObj = { 'vnext': vnext };
+      return { 'tag': 'proxy', 'protocol': 'vless', 'settings': settings, 'streamSettings': stream };
     }
     if (p.configType === 'trojan') {
-      let server: Record<string, Object> = { 'address': p.server, 'port': p.serverPort, 'password': p.password };
-      return { 'tag': 'proxy', 'protocol': 'trojan', 'settings': { 'servers': [server] }, 'streamSettings': stream };
+      let server: JsonObj = { 'address': p.server, 'port': p.serverPort, 'password': p.password };
+      let servers: Array<Object> = [server];
+      let settings: JsonObj = { 'servers': servers };
+      return { 'tag': 'proxy', 'protocol': 'trojan', 'settings': settings, 'streamSettings': stream };
     }
     if (p.configType === 'shadowsocks') {
-      let server: Record<string, Object> = {
+      let server: JsonObj = {
         'address': p.server, 'port': p.serverPort, 'method': p.security, 'password': p.password
       };
-      return { 'tag': 'proxy', 'protocol': 'shadowsocks', 'settings': { 'servers': [server] } };
+      let servers: Array<Object> = [server];
+      let settings: JsonObj = { 'servers': servers };
+      return { 'tag': 'proxy', 'protocol': 'shadowsocks', 'settings': settings };
     }
     if (p.configType === 'socks') {
-      let user: Record<string, Object> = { 'user': p.uuid, 'passType': 'password', 'pass': p.password };
-      let server: Record<string, Object> = { 'address': p.server, 'port': p.serverPort, 'users': [user] };
-      return { 'tag': 'proxy', 'protocol': 'socks', 'settings': { 'servers': [server] } };
+      let user: JsonObj = { 'user': p.uuid, 'passType': 'password', 'pass': p.password };
+      let users: Array<Object> = [user];
+      let server: JsonObj = { 'address': p.server, 'port': p.serverPort, 'users': users };
+      let servers: Array<Object> = [server];
+      let settings: JsonObj = { 'servers': servers };
+      return { 'tag': 'proxy', 'protocol': 'socks', 'settings': settings };
     }
     if (p.configType === 'http') {
-      let user: Record<string, Object> = { 'user': p.uuid, 'pass': p.password };
-      let server: Record<string, Object> = { 'address': p.server, 'port': p.serverPort, 'users': [user] };
-      return { 'tag': 'proxy', 'protocol': 'http', 'settings': { 'servers': [server] } };
+      let user: JsonObj = { 'user': p.uuid, 'pass': p.password };
+      let users: Array<Object> = [user];
+      let server: JsonObj = { 'address': p.server, 'port': p.serverPort, 'users': users };
+      let servers: Array<Object> = [server];
+      let settings: JsonObj = { 'servers': servers };
+      return { 'tag': 'proxy', 'protocol': 'http', 'settings': settings };
     }
     return null;
   }
 
   /** 生成 Xray 核心配置 JSON（socks inbound 由 native 层 tun2socks 接入） */
   static buildXrayConfig(p: Profile): string {
-    let proxy = ConfigBuilder.buildProxyOutbound(p);
+    let proxy: JsonObj | null = ConfigBuilder.buildProxyOutbound(p);
     let outbounds: Array<Object> = [];
     if (proxy !== null) {
       outbounds.push(proxy);
     }
-    outbounds.push({ 'tag': 'direct', 'protocol': 'freedom' });
-    let config: Record<string, Object> = {
-      'log': { 'loglevel': 'warning' },
-      'inbounds': [
-        {
-          'tag': 'socks',
-          'port': 10808,
-          'listen': '127.0.0.1',
-          'protocol': 'socks',
-          'settings': { 'udp': true, 'auth': 'noauth' }
-        }
-      ],
-      'outbounds': outbounds,
-      'routing': {
-        'domainStrategy': 'AsIs',
-        'rules': [
-          { 'type': 'field', 'ip': ['geoip:private'], 'outboundTag': 'direct' }
-        ]
-      }
+    let direct: JsonObj = { 'tag': 'direct', 'protocol': 'freedom' };
+    outbounds.push(direct);
+
+    let socksSettings: JsonObj = { 'udp': true, 'auth': 'noauth' };
+    let socksInbound: JsonObj = {
+      'tag': 'socks', 'port': 10808, 'listen': '127.0.0.1',
+      'protocol': 'socks', 'settings': socksSettings
+    };
+    let inbounds: Array<Object> = [socksInbound];
+
+    let ipList: Array<string> = ['geoip:private'];
+    let rule: JsonObj = { 'type': 'field', 'ip': ipList, 'outboundTag': 'direct' };
+    let rules: Array<Object> = [rule];
+    let routing: JsonObj = { 'domainStrategy': 'AsIs', 'rules': rules };
+    let log: JsonObj = { 'loglevel': 'warning' };
+
+    let config: JsonObj = {
+      'log': log, 'inbounds': inbounds, 'outbounds': outbounds, 'routing': routing
     };
     return JSON.stringify(config);
   }

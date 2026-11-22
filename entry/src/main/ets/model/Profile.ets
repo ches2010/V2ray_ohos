@@ -35,7 +35,9 @@ function b64Decode(input: string): string {
   }
   try {
     let helper = new util.Base64Helper();
-    return helper.decodeToString(s);
+    let bytes: Uint8Array = helper.decode(s);
+    let decoder = util.TextDecoder.create('utf-8');
+    return decoder.decodeWithStream(bytes);
   } catch (e) {
     return '';
   }

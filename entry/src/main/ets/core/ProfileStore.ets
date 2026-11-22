@@ -1,4 +1,4 @@
-import { preferences } from '@kit.ArkData';
+import { preferences, util } from '@kit.ArkData';
 import { common } from '@kit.AbilityKit';
 import { Profile, parseShareLink } from '../model/Profile';
 
@@ -63,10 +63,12 @@ export class ProfileStore {
     let text = content.trim();
     // 订阅内容通常为 base64；也兼容明文多行链接
     if (!text.startsWith('vmess://') && !text.startsWith('vless://') && !text.startsWith('trojan://') && !text.startsWith('ss://')) {
-      let helper = new (await import('@kit.ArkTS')).util.Base64Helper();
       let decoded = '';
       try {
-        decoded = helper.decodeToString(text.replace(/\-/g, '+').replace(/_/g, '/'));
+        let helper = new util.Base64Helper();
+        let bytes: Uint8Array = helper.decode(text.replace(/-/g, '+').replace(/_/g, '/'));
+        let decoder = util.TextDecoder.create('utf-8');
+        decoded = decoder.decodeWithStream(bytes);
       } catch (e) {
         decoded = '';
       }

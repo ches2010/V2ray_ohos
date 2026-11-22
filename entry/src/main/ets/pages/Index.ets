@@ -1,5 +1,6 @@
-import { router } from '@kit.ArkUI';
-import { promptAction } from '@kit.ArkUI';
+import { router, promptAction } from '@kit.ArkUI';
+import { http } from '@kit.NetworkKit';
+import { BusinessError } from '@kit.BasicServicesKit';
 import { Profile } from '../model/Profile';
 import { ProfileStore } from '../core/ProfileStore';
 import { ConfigBuilder } from '../core/ConfigBuilder';
@@ -18,7 +19,7 @@ struct ImportDialog {
       Text(this.importMode === 0 ? '导入分享链接' : '导入订阅')
         .fontSize(18).fontWeight(FontWeight.Bold).fontColor('#E5EDFF')
       TextInput({ text: this.inputText, placeholder: this.importMode === 0 ? 'vless://... / vmess://... / ss://...' : '订阅地址内容(base64或明文链接列表)' })
-        .type(InputType.DEFAULT)
+        .type(InputType.Normal)
         .height(this.importMode === 0 ? 48 : 120)
         .width('100%')
         .onChange((v: string) => { this.inputText = v; })
@@ -101,7 +102,6 @@ struct Index {
       });
       return;
     }
-    import { http } from '@kit.NetworkKit';
     let req = http.createHttp();
     req.request(urlOrContent, { method: http.RequestMethod.GET, connectTimeout: 15000, readTimeout: 20000 })
       .then((res: http.HttpResponse) => {
@@ -112,7 +112,7 @@ struct Index {
         promptAction.showToast({ message: '订阅导入 ' + n + ' 个节点' });
         this.refresh();
       })
-      .catch((e: Object) => {
+      .catch((e: BusinessError) => {
         promptAction.showToast({ message: '订阅下载失败' });
       });
   }
