@@ -140,11 +140,26 @@ jobs:
   # 构建产物为 HarmonyOS 目标的未签名 debug HAP。
   # 工具包来自 Okysu/harmony-auto-build 的 release 镜像（commandline-tools-linux-x64-6.1.0.816，约 2.5GB）。
   build-hap:
+    needs: build-libxray
     runs-on: ubuntu-latest
     continue-on-error: true
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+
+      # 关键：把交叉编译出的核心库打进 HAP（运行期 napi dlopen 加载）。
+      # 缺少这两个 .so 时隧道无法转发任何流量（DNS 也会失败）。
+      - name: Download prebuilt cores into jniLibs
+        uses: actions/download-artifact@v4
+        with:
+          name: ohos-native-libs-arm64
+          path: entry/libs/arm64-v8a
+
+      - name: Verify cores present
+        run: |
+          ls -la entry/libs/arm64-v8a
+          test -f entry/libs/arm64-v8a/libxray.so
+          test -f entry/libs/arm64-v8a/libhevsocks5tun.so
 
       - uses: actions/setup-node@v4
         with:

@@ -51,6 +51,7 @@ static std::string g_assetDir;  // geoip/geosite.dat 资源目录
 static std::string g_workDir;   // 可写目录（ping 临时配置文件）
 static std::mutex g_assetMutex;
 static bool g_assetEnvSet = false;
+static std::string g_lastError; // 最近一次数据面错误（供日志诊断页展示）
 
 static const int kVpnSocksPort = 10808; // 与 entry/src/main/ets/core/ConfigBuilder.ets 对齐
 
@@ -134,12 +135,15 @@ static bool EnsureXray() {
     if (g_xrayLib == nullptr) {
         const char *err = dlerror();
         LOGE("dlopen libxray.so failed: %{public}s", err != nullptr ? err : "unknown");
+        g_lastError = "dlopen libxray.so failed: " + std::string(err != nullptr ? err : "unknown")
+                          + "（HAP 内缺少核心库，请使用带 cores 的构建）";
         return false;
     }
     g_invoke = reinterpret_cast<CGoInvokeFunc>(dlsym(g_xrayLib, "CGoInvoke"));
     g_free = reinterpret_cast<CGoFreeFunc>(dlsym(g_xrayLib, "CGoFree"));
     if (g_invoke == nullptr || g_free == nullptr) {
         LOGE("libxray.so missing CGoInvoke/CGoFree exports");
+        g_lastError = "libxray.so missing CGoInvoke/CGoFree exports";
         return false;
     }
     LOGI("libxray.so loaded (CGoInvoke dispatch)");
@@ -231,12 +235,15 @@ static bool EnsureHev() {
     if (g_hevLib == nullptr) {
         const char *err = dlerror();
         LOGE("dlopen libhevsocks5tun.so failed: %{public}s", err != nullptr ? err : "unknown");
+        g_lastError = "dlopen libhevsocks5tun.so failed: " + std::string(err != nullptr ? err : "unknown")
+                          + "（HAP 内缺少核心库，请使用带 cores 的构建）";
         return false;
     }
     g_hevStart = reinterpret_cast<HevStartFunc>(dlsym(g_hevLib, "hev_socks5_tunnel_main_from_str"));
     g_hevQuit = reinterpret_cast<HevQuitFunc>(dlsym(g_hevLib, "hev_socks5_tunnel_quit"));
     if (g_hevStart == nullptr || g_hevQuit == nullptr) {
         LOGE("libhevsocks5tun.so missing hev_socks5_tunnel symbols");
+        g_lastError = "libhevsocks5tun.so missing hev_socks5_tunnel symbols";
         return false;
     }
     LOGI("libhevsocks5tun.so loaded");
@@ -359,12 +366,14 @@ static napi_value StartLoop(napi_env env, napi_callback_info info) {
     std::string response, err;
     if (!InvokeXray("runXrayFromJson", payload, response, err)) {
         LOGE("runXrayFromJson failed: %{public}s", err.c_str());
+        g_lastError = "runXrayFromJson failed: " + err;
         napi_value ok;
         napi_get_boolean(env, false, &ok);
         return ok;
     }
     if (!InvokeSuccess(response, err)) {
         LOGE("runXrayFromJson error: %{public}s", err.c_str());
+        g_lastError = "Xray config rejected: " + err;
         napi_value ok;
         napi_get_boolean(env, false, &ok);
         return ok;
@@ -430,6 +439,20 @@ static napi_value IsRunning(napi_env env, napi_callback_info info) {
     return result;
 }
 
+// 诊断信息：核心库加载状态 + 最近错误（供日志页展示）
+static napi_value GetCoreStatus(napi_env env, napi_callback_info info) {
+    (void)info;
+    std::string json = std::string("{\"xrayLibLoaded\":") + (g_xrayLib != nullptr ? "true" : "false") +
+                       ",\"hevLibLoaded\":" + (g_hevLib != nullptr ? "true" : "false") +
+                       ",\"xrayStarted\":" + (g_xrayStarted.load() ? "true" : "false") +
+                       ",\"running\":" + (g_running.load() ? "true" : "false") +
+                       ",\"assetDirSet\":" + (!g_assetDir.empty() ? "true" : "false") +
+                       ",\"lastError\":\"" + JsonEscape(g_lastError) + "\"}";
+    napi_value result;
+    napi_create_string_utf8(env, json.c_str(), json.size(), &result);
+    return result;
+}
+
 EXTERN_C_START
 static napi_value Init(napi_env env, napi_value exports) {
     napi_property_descriptor desc[] = {
@@ -439,6 +462,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         {"startLoop", nullptr, StartLoop, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"stopLoop", nullptr, StopLoop, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"isRunning", nullptr, IsRunning, nullptr, nullptr, nullptr, napi_default, nullptr},
+        {"getCoreStatus", nullptr, GetCoreStatus, nullptr, nullptr, nullptr, napi_default, nullptr},
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     return exports;

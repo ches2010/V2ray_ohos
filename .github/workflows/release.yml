@@ -12,10 +12,24 @@ jobs:
   # 用华为官方 HarmonyOS command-line-tools 构建未签名 HAP
   build-hap:
     name: Build unsigned HAP (HarmonyOS command-line-tools)
+    needs: build-cores
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+
+      # 关键：把交叉编译出的核心库打进 HAP（运行期 napi dlopen 加载）
+      - name: Download prebuilt cores into jniLibs
+        uses: actions/download-artifact@v4
+        with:
+          name: ohos-native-libs-arm64
+          path: entry/libs/arm64-v8a
+
+      - name: Verify cores present
+        run: |
+          ls -la entry/libs/arm64-v8a
+          test -f entry/libs/arm64-v8a/libxray.so
+          test -f entry/libs/arm64-v8a/libhevsocks5tun.so
 
       - uses: actions/setup-node@v4
         with:

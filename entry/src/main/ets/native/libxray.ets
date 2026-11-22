@@ -41,4 +41,9 @@ export class LibXray {
   static isRunning(): boolean {
     return Boolean(native.isRunning());
   }
+
+  /** 诊断信息（JSON 字符串）：核心库加载状态 + 最近错误 */
+  static getCoreStatus(): string {
+    return String(native.getCoreStatus());
+  }
 }

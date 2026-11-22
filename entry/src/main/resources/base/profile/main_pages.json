@@ -3,6 +3,8 @@
     "pages/Index",
     "pages/ServerEdit",
     "pages/Subscription",
-    "pages/Settings"
+    "pages/Settings",
+    "pages/Logs",
+    "pages/About"
   ]
 }

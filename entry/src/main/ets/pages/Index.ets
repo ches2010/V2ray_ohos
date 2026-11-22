@@ -223,6 +223,7 @@ struct Index {
         promptAction.showToast({ message: 'VPN 已启动（首次使用需在系统弹窗中授权）' });
       }).catch(() => {
         this.busy = false;
+        promptAction.showToast({ message: '启动失败，请到 设置-日志诊断 查看原因' });
       });
     }
   }

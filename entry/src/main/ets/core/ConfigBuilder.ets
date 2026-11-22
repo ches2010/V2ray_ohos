@@ -178,9 +178,12 @@ export class ConfigBuilder {
     }
     let routing: JsonObj = { 'domainStrategy': 'IPIfNonMatch', 'rules': rules };
     let log: JsonObj = { 'loglevel': st.logLevel };
+    // 内置 DNS：VPN 内的 DNS 查询由核心代答，避免隧道建立后 DNS 失败
+    let dnsServers: Array<string> = ['223.5.5.5', '8.8.8.8'];
+    let dns: JsonObj = { 'servers': dnsServers };
 
     let config: JsonObj = {
-      'log': log, 'inbounds': inbounds, 'outbounds': outbounds, 'routing': routing
+      'log': log, 'dns': dns, 'inbounds': inbounds, 'outbounds': outbounds, 'routing': routing
     };
     return JSON.stringify(config);
   }

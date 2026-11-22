@@ -258,6 +258,38 @@ struct SettingsPage {
           .borderRadius(10)
           .backgroundColor('rgba(21,30,49,0.5)')
 
+          this.sectionTitle('更多')
+
+          Column({ space: 10 }) {
+            Row({ space: 10 }) {
+              Column({ space: 2 }) {
+                Text('日志诊断').fontSize(15).fontColor('#E5EDFF')
+                Text('核心库加载状态、最近错误与生效配置').fontSize(11).fontColor('#8A94A8')
+              }
+              .alignItems(HorizontalAlign.Start)
+              .layoutWeight(1)
+              Text('查看 →').fontSize(13).fontColor('#3B82F6')
+                .onClick(() => { router.pushUrl({ url: 'pages/Logs' }); })
+            }
+            .width('100%')
+
+            Row({ space: 10 }) {
+              Column({ space: 2 }) {
+                Text('关于与检查更新').fontSize(15).fontColor('#E5EDFF')
+                Text('版本信息、上游项目、新版本检测').fontSize(11).fontColor('#8A94A8')
+              }
+              .alignItems(HorizontalAlign.Start)
+              .layoutWeight(1)
+              Text('查看 →').fontSize(13).fontColor('#3B82F6')
+                .onClick(() => { router.pushUrl({ url: 'pages/About' }); })
+            }
+            .width('100%')
+          }
+          .width('100%')
+          .padding(12)
+          .borderRadius(10)
+          .backgroundColor('rgba(21,30,49,0.5)')
+
           Text('设置即时保存；下次启动 VPN 隧道时生效')
             .fontSize(11).fontColor('#64748B')
             .width('100%')
