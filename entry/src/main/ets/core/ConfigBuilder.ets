@@ -131,7 +131,7 @@ export class ConfigBuilder {
   }
 
   /** 生成 Xray 核心配置 JSON（socks inbound 由 native 层 tun2socks 接入） */
-  static buildXrayConfig(p: Profile, st: XraySettings): string {
+  static buildXrayConfig(p: Profile, st: XraySettings, hasGeo: boolean): string {
     let proxy: JsonObj | null = ConfigBuilder.buildProxyOutbound(p);
     let outbounds: Array<Object> = [];
     if (proxy !== null) {
@@ -158,17 +158,22 @@ export class ConfigBuilder {
     }
     let inbounds: Array<Object> = [socksInbound];
 
-    // 路由规则（对应 v2rayNG routing：直连私有地址；可选绕过大陆/拦截广告）
+    // 路由规则（对应 v2rayNG routing）。
+    // hasGeo=false（尚未下载 geoip/geosite.dat）时不引用 geo 规则，
+    // 改用 CIDR 直连私有地址，保证 Xray 能启动、全局代理可用。
     let rules: Array<Object> = [];
-    let privateIps: Array<string> = ['geoip:private'];
+    let privateIps: Array<string> = hasGeo
+      ? ['geoip:private']
+      : ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', '127.0.0.0/8',
+         '169.254.0.0/16', '224.0.0.0/4', '255.255.255.255/32'];
     let privateRule: JsonObj = { 'type': 'field', 'ip': privateIps, 'outboundTag': 'direct' };
     rules.push(privateRule);
-    if (st.blockAds) {
+    if (hasGeo && st.blockAds) {
       let adDomains: Array<string> = ['geosite:category-ads-all'];
       let adRule: JsonObj = { 'type': 'field', 'domain': adDomains, 'outboundTag': 'block' };
       rules.push(adRule);
     }
-    if (st.routeMode === 1) {
+    if (hasGeo && st.routeMode === 1) {
       let cnIps: Array<string> = ['geoip:cn'];
       let cnIpRule: JsonObj = { 'type': 'field', 'ip': cnIps, 'outboundTag': 'direct' };
       rules.push(cnIpRule);

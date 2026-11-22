@@ -218,7 +218,7 @@ struct Index {
         this.busy = false;
       });
     } else {
-      VpnController.start().then(() => {
+      VpnController.start(this.selectedId).then(() => {
         this.busy = false;
         promptAction.showToast({ message: 'VPN 已启动（首次使用需在系统弹窗中授权）' });
       }).catch(() => {

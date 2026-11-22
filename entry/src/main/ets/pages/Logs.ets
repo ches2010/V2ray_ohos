@@ -1,4 +1,7 @@
 import { router } from '@kit.ArkUI';
+import { buffer } from '@kit.ArkTS';
+import { fs } from '@ohos.file.fs';
+import { common } from '@kit.AbilityKit';
 import { Profile } from '../model/Profile';
 import { ProfileStore, XraySettings } from '../core/ProfileStore';
 import { LibXray } from '../native/libxray';
@@ -8,6 +11,7 @@ import { LibXray } from '../native/libxray';
 @Component
 struct LogsPage {
   @State statusJson: string = '';
+  @State diagJson: string = '';
   @State coreVersion: string = '';
   @State nodeName: string = '';
   @State routeLabel: string = '';
@@ -22,8 +26,21 @@ struct LogsPage {
     this.collect();
   }
 
-  collect(): void {
+  async collect(): Promise<void> {
     this.refreshing = true;
+    // VPN 进程（VpnExtensionAbility 独立进程）会把阶段状态写入 files/diag.json
+    try {
+      let ctx = getContext(this) as common.Context;
+      let file = fs.openSync(ctx.filesDir + '/diag.json', fs.OpenMode.READ_ONLY);
+      let stat = fs.statSync(file.fd);
+      let buf = new ArrayBuffer(stat.size);
+      fs.readSync(file.fd, buf);
+      fs.closeSync(file.fd);
+      this.diagJson = buffer.from(buf).toString('utf-8');
+    } catch (e) {
+      this.diagJson = '';
+    }
+    // UI 进程视角的核心状态（仅参考）
     try {
       this.statusJson = LibXray.getCoreStatus();
     } catch (e) {
@@ -32,26 +49,39 @@ struct LogsPage {
     try {
       this.coreVersion = LibXray.checkVersion();
     } catch (e) {
-      this.coreVersion = '未知（核心库未加载）';
+      this.coreVersion = '未知';
     }
-    ProfileStore.loadProfiles().then((list: Profile[]) => {
-      return ProfileStore.loadSelectedId().then((id: string) => {
-        for (let i = 0; i < list.length; i++) {
-          if (list[i].id === id) {
-            this.nodeName = list[i].name + '（' + list[i].configType.toUpperCase()
-              + ' ' + list[i].server + ':' + list[i].serverPort + '）';
-            return;
-          }
-        }
-        this.nodeName = '未选择节点';
-      });
-    });
-    ProfileStore.loadSettings().then((s: XraySettings) => {
-      this.routeLabel = s.routeMode === 0 ? '全局代理' : '绕过局域网及大陆';
-      this.muxLabel = s.enableMux ? '开启' : '关闭';
-      this.sniffLabel = s.enableSniffing ? '开启' : '关闭';
-    });
+    let profiles: Profile[] = await ProfileStore.loadProfiles();
+    let id: string = await ProfileStore.loadSelectedId();
+    this.nodeName = '未选择节点';
+    for (let i = 0; i < profiles.length; i++) {
+      if (profiles[i].id === id) {
+        this.nodeName = profiles[i].name + '（' + profiles[i].configType.toUpperCase()
+          + ' ' + profiles[i].server + ':' + profiles[i].serverPort + '）';
+        break;
+      }
+    }
+    let s: XraySettings = await ProfileStore.loadSettings();
+    this.routeLabel = s.routeMode === 0 ? '全局代理' : '绕过局域网及大陆';
+    this.muxLabel = s.enableMux ? '开启' : '关闭';
+    this.sniffLabel = s.enableSniffing ? '开启' : '关闭';
     this.refreshing = false;
+  }
+
+  diagValue(key: string): string {
+    if (this.diagJson === '') {
+      return '（VPN 进程尚未写入诊断）';
+    }
+    try {
+      let obj = JSON.parse(this.diagJson) as Record<string, Object>;
+      let v = obj[key];
+      if (v === undefined || v === null) {
+        return '-';
+      }
+      return String(v);
+    } catch (e) {
+      return '-';
+    }
   }
 
   statusValue(key: string): string {
@@ -117,6 +147,18 @@ struct LogsPage {
               this.vpnRunning ? '#22C55E' : '#8A94A8')
             this.row('Geo 资源目录就绪', this.statusValue('assetDirSet'),
               this.statusValue('assetDirSet') === '正常' ? '#22C55E' : '#EAB308')
+          }
+          .width('100%')
+          .borderRadius(10)
+          .backgroundColor('#151E31')
+
+          Text('VPN 进程阶段状态').fontSize(13).fontColor('#94A3B8')
+            .width('100%').padding({ left: 4, right: 4, top: 14, bottom: 4 })
+          Column({ space: 2 }) {
+            this.row('阶段', this.diagValue('stage'), '#E5EDFF')
+            this.row('结果', this.diagValue('ok') === 'true' ? '成功' : this.diagValue('ok'),
+              this.diagValue('ok') === 'true' ? '#22C55E' : '#EF4444')
+            this.row('详情', this.diagValue('detail'), '#E5EDFF')
           }
           .width('100%')
           .borderRadius(10)
