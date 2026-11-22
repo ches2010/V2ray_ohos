@@ -1,5 +1,6 @@
 name: Release
 
+# 推送 v* tag 时自动构建并发布 GitHub Release
 on:
   push:
     tags: ["v*"]
@@ -8,19 +9,186 @@ permissions:
   contents: write
 
 jobs:
-  release:
+  # 用华为官方 HarmonyOS command-line-tools 构建未签名 HAP
+  build-hap:
+    name: Build unsigned HAP (HarmonyOS command-line-tools)
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
-      - name: Package source zip
-        run: zip -r "V2ray_ohos-${GITHUB_REF_NAME}-src.zip" . -x ".git/*" "node_modules/*"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Cache HarmonyOS command-line-tools
+        id: cache-tools
+        uses: actions/cache@v4
+        with:
+          path: ./command-line-tools
+          key: ${{ runner.os }}-hmos-commandline-tools-6.1.0.816
+
+      - name: Download HarmonyOS command-line-tools (linux-x64)
+        if: steps.cache-tools.outputs.cache-hit != 'true'
+        run: |
+          curl -fL --retry 3 -o tools.zip \
+            https://github.com/Okysu/harmony-auto-build/releases/download/commandline-tools-linux-x64-6.1.0.816/commandline-tools-linux-x64-6.1.0.816.zip
+          unzip -q tools.zip
+          rm tools.zip
+          test -d command-line-tools
+
+      - name: Setup build environment
+        run: |
+          TOOLS_DIR="$(pwd)/command-line-tools"
+          echo "hwsdk.dir=$TOOLS_DIR/sdk" > local.properties
+          echo "DEVECO_SDK_HOME=$TOOLS_DIR/sdk" >> "$GITHUB_ENV"
+          echo "HOS_SDK_HOME=$TOOLS_DIR/sdk" >> "$GITHUB_ENV"
+          echo "OHPM_HOME=$TOOLS_DIR/ohpm" >> "$GITHUB_ENV"
+          echo "$TOOLS_DIR/bin" >> "$GITHUB_PATH"
+          chmod -R +x "$TOOLS_DIR/bin"
+          # GITHUB_PATH only takes effect for later steps; export within this step
+          export PATH="$TOOLS_DIR/bin:$PATH"
+          hvigorw --version
+
+      - name: Install dependencies (ohpm)
+        run: ohpm install
+
+      - name: Build unsigned HAP (hvigorw assembleHap, HarmonyOS SDK)
+        run: |
+          hvigorw assembleHap --mode module -p module=entry@default -p product=default -p buildMode=debug --no-daemon
+          echo "--- hap files ---"
+          find entry/build -name "*.hap" || true
+
+      - name: Collect HAP artifact
+        run: |
+          mkdir -p dist
+          find entry/build -name "*.hap" -exec cp {} dist/ \;
+          test -n "$(ls dist 2>/dev/null)"
+          mv "dist/$(ls dist | head -1)" "dist/V2ray_ohos-${GITHUB_REF_NAME}-unsigned.hap"
+          ls -la dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: entry-hap-unsigned
+          path: dist/*.hap
+
+  # 构建 OHOS Go 工具链并交叉编译 Xray 核心 + hev-socks5-tunnel（GOOS=openharmony）
+  build-cores:
+    name: Build Xray core libraries (ohos-go)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.x"
+
+      - name: Build OHOS Go toolchain (star4277/ohos-go v1.26.5-beta1)
+        run: |
+          git clone --depth 1 --branch v1.26.5-beta1 https://github.com/star4277/ohos-go.git "$HOME/ohos-go"
+          cd "$HOME/ohos-go/src"
+          GOROOT_BOOTSTRAP="$(go env GOROOT)" GOTOOLCHAIN=local bash ./make.bash
+
+      - name: Fetch OpenHarmony Native SDK (ohos llvm/clang)
+        run: |
+          curl -fL --retry 3 -o /tmp/ohos-sdk.tar.gz \
+            https://repo.huaweicloud.com/openharmony/os/6.1.1-LTS/ohos-sdk-windows_linux-public.tar.gz
+          mkdir -p "$HOME/ohos-sdk" && tar xzf /tmp/ohos-sdk.tar.gz -C "$HOME/ohos-sdk"
+          CLANG=$(find "$HOME/ohos-sdk" -name "aarch64-unknown-linux-ohos-clang" | head -1)
+          if [ -z "$CLANG" ]; then
+            NATIVE_PKG=$(find "$HOME/ohos-sdk" \( -name "native-linux*.zip" -o -name "native-linux*.tar.gz" \) | head -1)
+            echo "native sdk package: $NATIVE_PKG"
+            test -n "$NATIVE_PKG"
+            mkdir -p "$HOME/ohos-native"
+            case "$NATIVE_PKG" in
+              *.zip) unzip -q "$NATIVE_PKG" -d "$HOME/ohos-native" ;;
+              *.tar.gz) tar xzf "$NATIVE_PKG" -C "$HOME/ohos-native" ;;
+            esac
+            CLANG=$(find "$HOME/ohos-native" -name "aarch64-unknown-linux-ohos-clang" | head -1)
+          fi
+          echo "clang: $CLANG"
+          test -n "$CLANG"
+          echo "OHOS_CLANG=$CLANG" >> "$GITHUB_ENV"
+          echo "OHOS_CLANGXX=${CLANG}++" >> "$GITHUB_ENV"
+
+      - name: Build libxray.so (GOOS=openharmony GOARCH=arm64, c-shared)
+        run: |
+          export PATH="$HOME/ohos-go/bin:$PATH"
+          export GOTOOLCHAIN=local
+          git clone --depth 1 --branch v26.7.28 https://github.com/XTLS/libXray.git "$HOME/libXray"
+          cd "$HOME/libXray"
+          CC="$OHOS_CLANG" \
+          CXX="$OHOS_CLANGXX" \
+          CGO_ENABLED=1 GOOS=openharmony GOARCH=arm64 \
+          CGO_CFLAGS="-ftls-model=global-dynamic" \
+          go build -trimpath -buildmode=c-shared -o "$GITHUB_WORKSPACE/libxray.so" ./cgo_bridge
+
+      - name: Build libhevsocks5tun.so (hev-socks5-tunnel 2.9.0, pure C)
+        run: |
+          LLVM_BIN=$(dirname "$OHOS_CLANG")
+          SYSROOT=$(find "$HOME/ohos-native" -maxdepth 4 -name sysroot -type d | head -1)
+          test -n "$SYSROOT"
+          git clone --recursive --depth 1 --branch 2.9.0 https://github.com/heiher/hev-socks5-tunnel.git "$HOME/hev"
+          cd "$HOME/hev"
+          make clean >/dev/null 2>&1 || true
+          make -j4 CC="$OHOS_CLANG" AR="$LLVM_BIN/llvm-ar" RANLIB="$LLVM_BIN/llvm-ranlib" \
+            CFLAGS="--target=aarch64-linux-ohos --sysroot=$SYSROOT -fPIC -O2" static
+          MAIN_LIB=$(find . -name 'libhev-socks5-tunnel.a' | head -1)
+          test -n "$MAIN_LIB"
+          OTHER_LIBS=$(find . -name '*.a' ! -name 'libhev-socks5-tunnel.a' | tr '\n' ' ')
+          "$OHOS_CLANG" --target=aarch64-linux-ohos --sysroot=$SYSROOT -fPIC -shared \
+            -o "$GITHUB_WORKSPACE/libhevsocks5tun.so" \
+            -Wl,--whole-archive "$MAIN_LIB" -Wl,--no-whole-archive $OTHER_LIBS -lpthread
+
+      - name: Sanity-check produced libraries
+        run: |
+          file libxray.so libhevsocks5tun.so
+          readelf -l libxray.so | grep -i TLS || echo "WARN: no PT_TLS"
+          nm -D libxray.so | grep -E "CGoInvoke|CGoFree" || echo "WARN: CGo exports not found"
+
+      - name: Assemble project package with prebuilt cores
+        run: |
+          mkdir -p entry/libs/arm64-v8a
+          cp libxray.so libhevsocks5tun.so entry/libs/arm64-v8a/
+          zip -r "V2ray_ohos-${GITHUB_REF_NAME}-with-cores.zip" . -x ".git/*" "node_modules/*"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ohos-native-libs-arm64
+          path: |
+            libxray.so
+            libhevsocks5tun.so
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: V2ray_ohos-with-cores
+          path: "V2ray_ohos-${{ github.ref_name }}-with-cores.zip"
+
+  # 汇总产物并发布 GitHub Release（自动生成 release notes）
+  release:
+    name: Publish GitHub Release
+    needs: [build-hap, build-cores]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Organize release files
+        run: |
+          mkdir -p release
+          find artifacts -type f | while read -r f; do cp "$f" release/; done
+          ls -la release
 
       - name: Create GitHub Release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create "$GITHUB_REF_NAME" \
-            "V2ray_ohos-${GITHUB_REF_NAME}-src.zip" \
-            --title "V2ray_ohos $GITHUB_REF_NAME" \
-            --generate-notes
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "V2ray_ohos ${{ github.ref_name }}"
+          generate_release_notes: true
+          files: |
+            release/*.hap
+            release/*.zip
+            release/*.so
