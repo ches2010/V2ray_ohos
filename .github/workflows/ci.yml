@@ -134,3 +134,58 @@ jobs:
         with:
           name: V2ray_ohos-with-cores
           path: V2ray_ohos-with-cores.zip
+
+  # 实验性：在 CI 上用开源 OpenHarmony SDK + hvigor 构建 HAP（无签名，尽力而为）。
+  # HarmonyOS SDK（DevEco 专有）无 Linux 版，因此构建前临时把工程目标改为
+  # OpenHarmony（仅运行期修改，不提交）。产物为未签名 HAP，仅供验证编译链路。
+  build-hap:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup OpenHarmony SDK 5.0.0 (API 12)
+        id: sdk
+        uses: openharmony-rs/setup-ohos-sdk@v1.0.0
+        with:
+          version: "5.0.0"
+          cache: true
+
+      - name: Install hvigor from the OpenHarmony npm registry
+        run: |
+          echo "@ohos:registry=https://repo.harmonyos.com/npm/" >> "$HOME/.npmrc"
+          npm install @ohos/hvigor @ohos/hvigor-ohos-plugin --no-audit --no-fund
+          ./node_modules/.bin/hvigor --version
+
+      - name: Adapt project target to OpenHarmony (temporary, not committed)
+        run: |
+          sed -i 's/"runtimeOS": "HarmonyOS"/"runtimeOS": "OpenHarmony"/' build-profile.json5
+          sed -i 's/"compatibleSdkVersion": "5.0.0(12)"/"compatibleSdkVersion": "5.0.0"/' build-profile.json5
+          echo "--- adapted build-profile.json5 ---"
+          cat build-profile.json5
+
+      - name: Build unsigned HAP (hvigor assembleHap)
+        run: |
+          export OHOS_SDK_HOME="${{ steps.sdk.outputs.ohos-base-sdk-home }}"
+          export DEVECO_SDK_HOME="${{ steps.sdk.outputs.ohos-base-sdk-home }}"
+          ./node_modules/.bin/hvigor assembleHap --mode module -p module=entry@default \
+            -p buildMode=debug --stacktrace --no-daemon
+          echo "--- hap files ---"
+          find entry/build -name "*.hap" || true
+
+      - name: Collect HAP artifact
+        run: |
+          mkdir -p dist
+          find entry/build -name "*.hap" -exec cp {} dist/ \;
+          ls -la dist
+          test -n "$(ls dist 2>/dev/null)"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: entry-hap-unsigned
+          path: dist/*.hap
