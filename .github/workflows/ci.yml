@@ -167,7 +167,7 @@ jobs:
       - name: Adapt project target to OpenHarmony (temporary, not committed)
         run: |
           # runtimeOS/compileSdkVersion/strictMode 调整 + hvigor-config.json5（hvigor 4.x 要求 modelVersion）
-          python3 scripts/adapt_openharmony.py
+          python3 scripts/adapt_openharmony.py --strip-vpn
           mkdir -p hvigor
           printf '%s\n' \
             '{' \
