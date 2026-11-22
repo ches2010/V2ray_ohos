@@ -188,6 +188,8 @@ jobs:
         with:
           name: "V2ray_ohos ${{ github.ref_name }}"
           generate_release_notes: true
+          # v0.1.0-rc.1 这类带连字符的 tag 自动标记为 pre-release
+          prerelease: ${{ contains(github.ref_name, '-') }}
           files: |
             release/*.hap
             release/*.zip
