@@ -50,6 +50,18 @@ cd AndroidLibXrayLite
 
 geoip.dat / geosite.dat 请放到应用沙箱 `filesDir/assets/` 下（首次启动后可通过应用内下载功能补齐）。
 
+## CI / 自动化
+
+仓库自带 GitHub Actions（`.github/workflows/`）：
+
+- **CI**（push / PR 触发）：
+  - `verify`：结构校验（必需文件、json5/json 语法、VPN extension 与 INTERNET 权限声明、页面路由注册，见 `scripts/ci_check.py`）+ 源码 zip 打包上传 artifact；
+  - `build-libxray`（尽力而为，`continue-on-error`）：源码构建 [star4277/ohos-go](https://github.com/star4277/ohos-go) v1.26.5-beta1 工具链，下载 OpenHarmony 6.1.1-LTS Native SDK 的 ohos clang，按 `GOOS=openharmony GOARCH=arm64 -buildmode=c-shared`（TLSDESC，musl 可 dlopen）交叉编译 [libXray](https://github.com/XTLS/libXray) v26.7.28，并校验 PT_TLS / TLSDESC / CGo 导出后上传 artifact。配方参考 [popsiclelmlm/Hey](https://github.com/popsiclelmlm/Hey) 的公开构建脚本与文档。
+- **Release**（推送 `v*` tag 触发）：打包源码 zip 并创建 GitHub Release。
+
+> 注：`build-libxray` 产出的是 libXray `cgo_bridge` 形态（`CGoInvoke`/`CGoFree` 分发入口）；
+> 接入 `entry/src/main/cpp/napi_init.cpp` 时按该分发入口适配 `K_SYM_*` 符号即可。
+
 ## 许可证
 
 本移植遵循源项目 [v2rayNG 的 GPL-3.0 许可证](https://github.com/2dust/v2rayNG/blob/master/LICENSE)，衍生分发须同样以 GPL-3.0 开源并保留版权声明。

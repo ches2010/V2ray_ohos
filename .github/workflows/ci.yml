@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  # 稳定检查：工程结构 + json5/json 语法 + VPN 声明 + 源码打包
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install json5 parser
+        run: pip install json5
+
+      - name: Structure & syntax check
+        run: python3 scripts/ci_check.py
+
+      - name: Package source zip
+        run: zip -r source-package.zip . -x ".git/*" "node_modules/*"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source-package
+          path: source-package.zip
+
+  # 尽力而为：构建 OHOS Go 工具链并交叉编译 Xray 核心（GOOS=openharmony + TLSDESC）。
+  # 参考 popsiclelmlm/Hey 的公开配方（scripts/build_libxray_ohos.sh / docs/harmonyos-go-tls-wall.md）。
+  # 失败不应阻塞合并——产物仅作为后续接入 entry/src/main/cpp 的候选 .so。
+  build-libxray:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.x"
+
+      - name: Build OHOS Go toolchain (star4277/ohos-go v1.26.5-beta1)
+        run: |
+          git clone --depth 1 --branch v1.26.5-beta1 https://github.com/star4277/ohos-go.git "$HOME/ohos-go"
+          cd "$HOME/ohos-go/src"
+          GOROOT_BOOTSTRAP="$(go env GOROOT)" GOTOOLCHAIN=local ./make.bash
+
+      - name: Fetch OpenHarmony Native SDK (ohos llvm/clang)
+        run: |
+          curl -fL --retry 3 -o /tmp/ohos-sdk.tar.gz \
+            https://repo.huaweicloud.com/openharmony/os/6.1.1-LTS/ohos-sdk-windows_linux-public.tar.gz
+          mkdir -p "$HOME/ohos-sdk" && tar xzf /tmp/ohos-sdk.tar.gz -C "$HOME/ohos-sdk"
+          NATIVE_TGZ=$(find "$HOME/ohos-sdk" -name "native*.tar.gz" | head -1)
+          echo "native sdk tarball: $NATIVE_TGZ"
+          mkdir -p "$HOME/ohos-native" && tar xzf "$NATIVE_TGZ" -C "$HOME/ohos-native"
+          NATIVE_DIR=$(dirname "$(find "$HOME/ohos-native" -name aarch64-unknown-linux-ohos-clang | head -1)")/..
+          echo "OHOS_NATIVE_HOME=$NATIVE_DIR" >> "$GITHUB_ENV"
+
+      - name: Build libxray.so (GOOS=openharmony GOARCH=arm64, c-shared)
+        run: |
+          export PATH="$HOME/ohos-go/bin:$PATH"
+          export GOTOOLCHAIN=local
+          git clone --depth 1 --branch v26.7.28 https://github.com/XTLS/libXray.git "$HOME/libXray"
+          cd "$HOME/libXray"
+          CC="$OHOS_NATIVE_HOME/llvm/bin/aarch64-unknown-linux-ohos-clang" \
+          CXX="$OHOS_NATIVE_HOME/llvm/bin/aarch64-unknown-linux-ohos-clang++" \
+          CGO_ENABLED=1 GOOS=openharmony GOARCH=arm64 \
+          CGO_CFLAGS="-ftls-model=global-dynamic" \
+          go build -trimpath -buildmode=c-shared -o "$GITHUB_WORKSPACE/libxray.so" ./cgo_bridge
+
+      - name: Sanity-check produced library (PT_TLS / TLSDESC / exports)
+        run: |
+          file libxray.so
+          readelf -l libxray.so | grep -i TLS || echo "WARN: no PT_TLS"
+          readelf -r libxray.so | grep -i TLSDESC || echo "WARN: no TLSDESC relocs"
+          nm -D libxray.so | grep -E "CGoInvoke|CGoFree" || echo "WARN: CGo exports not found"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: libxray-ohos-arm64
+          path: libxray.so
