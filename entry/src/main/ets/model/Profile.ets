@@ -24,6 +24,11 @@ export class Profile {
   shortId: string = '';
   spiderX: string = '';
   allowInsecure: boolean = false;
+  // 订阅分组归属
+  subId: string = '';
+  subName: string = '';
+  // 一键测速结果：-1 未测，-2 超时/失败，其他为 RTT 毫秒
+  testMs: number = -1;
 }
 
 export const SUPPORTED_TYPES: string[] = ['vless', 'vmess', 'trojan', 'shadowsocks', 'socks', 'http'];
@@ -44,6 +49,36 @@ function newId(): string {
   return util.generateRandomUUID(true);
 }
 
+/** 端口安全解析：非法端口返回 0（调用方据此跳过坏节点，避免出现 "host:null"） */
+function toPort(s: string): number {
+  let n = Number(s);
+  if (!Number.isFinite(n) || n <= 0 || n > 65535) {
+    return 0;
+  }
+  return Math.floor(n);
+}
+
+/** 兼容旧持久化数据：修复缺失字段与非法端口（旧版本曾把 NaN 序列化成 null） */
+export function sanitizeProfile(p: Profile): Profile {
+  if (p.serverPort === null || p.serverPort === undefined || !Number.isFinite(p.serverPort)
+    || p.serverPort <= 0 || p.serverPort > 65535) {
+    p.serverPort = 443;
+  }
+  if (p.subId === null || p.subId === undefined) {
+    p.subId = '';
+  }
+  if (p.subName === null || p.subName === undefined) {
+    p.subName = '';
+  }
+  if (p.testMs === null || p.testMs === undefined || !Number.isFinite(p.testMs)) {
+    p.testMs = -1;
+  }
+  if (p.name === null || p.name === undefined) {
+    p.name = '';
+  }
+  return p;
+}
+
 /** 解析 v2rayN 系分享链接（vmess/vless/trojan/ss） */
 export function parseShareLink(url: string): Profile | null {
   let u = url.trim();
@@ -55,7 +90,7 @@ export function parseShareLink(url: string): Profile | null {
       p.configType = 'vmess';
       p.name = String(obj['ps'] ?? '');
       p.server = String(obj['add'] ?? '');
-      p.serverPort = Number(obj['port'] ?? 443);
+      p.serverPort = toPort(String(obj['port'] ?? '443'));
       p.uuid = String(obj['id'] ?? '');
       p.alterId = Number(obj['aid'] ?? 0);
       p.network = String(obj['net'] ?? 'tcp');
@@ -65,7 +100,7 @@ export function parseShareLink(url: string): Profile | null {
       p.tls = String(obj['tls'] ?? '') === 'tls' ? 'tls' : '';
       p.sni = String(obj['sni'] ?? '');
       p.fingerprint = String(obj['fp'] ?? '');
-      if (p.server === '' || p.uuid === '') {
+      if (p.server === '' || p.uuid === '' || p.serverPort === 0) {
         return null;
       }
       if (p.name === '') {
@@ -96,7 +131,7 @@ export function parseShareLink(url: string): Profile | null {
       return null;
     }
     let host = hostport.substring(0, colon);
-    let port = Number(hostport.substring(colon + 1));
+    let port = toPort(hostport.substring(colon + 1));
     let params: Record<string, string> = {};
     query.split('&').forEach((kv: string) => {
       let i = kv.indexOf('=');
@@ -128,7 +163,7 @@ export function parseShareLink(url: string): Profile | null {
     p.publicKey = params['pbk'] ?? '';
     p.shortId = params['sid'] ?? '';
     p.spiderX = params['spx'] ?? '';
-    if (p.server === '' || (scheme === 'vless' ? p.uuid === '' : p.password === '')) {
+    if (p.server === '' || p.serverPort === 0 || (scheme === 'vless' ? p.uuid === '' : p.password === '')) {
       return null;
     }
     return p;
@@ -151,12 +186,16 @@ export function parseShareLink(url: string): Profile | null {
       if (colon < 0) {
         return null;
       }
+      let port = toPort(hostport.substring(colon + 1));
+      if (port === 0) {
+        return null;
+      }
       let p = new Profile();
       p.id = newId();
       p.configType = 'shadowsocks';
       p.name = decodeURIComponent(frag) === '' ? hostport : decodeURIComponent(frag);
       p.server = hostport.substring(0, colon);
-      p.serverPort = Number(hostport.substring(colon + 1));
+      p.serverPort = port;
       p.security = methodpass.substring(0, mc);
       p.password = methodpass.substring(mc + 1);
       return p;
@@ -173,14 +212,18 @@ export function parseShareLink(url: string): Profile | null {
       if (colon < 0) {
         return null;
       }
+      let port = toPort(hostport.substring(colon + 1));
+      if (port === 0) {
+        return null;
+      }
       let p = new Profile();
       p.id = newId();
       p.configType = 'shadowsocks';
-      p.name = decodeURIComponent(frag) === '' ? p.server : decodeURIComponent(frag);
+      p.name = decodeURIComponent(frag) === '' ? '' : decodeURIComponent(frag);
       p.security = all.substring(0, mc);
       p.password = all.substring(mc + 1, ac);
       p.server = hostport.substring(0, colon);
-      p.serverPort = Number(hostport.substring(colon + 1));
+      p.serverPort = port;
       if (p.name === '') {
         p.name = p.server;
       }

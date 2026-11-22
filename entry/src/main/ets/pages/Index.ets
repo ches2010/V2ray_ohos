@@ -1,31 +1,28 @@
 import { router, promptAction } from '@kit.ArkUI';
-import { http } from '@kit.NetworkKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { Profile } from '../model/Profile';
 import { ProfileStore } from '../core/ProfileStore';
-import { ConfigBuilder } from '../core/ConfigBuilder';
 import { VpnController } from '../core/VpnController';
-import { LibXray } from '../native/libxray';
+import { SpeedTest, TestResult } from '../core/SpeedTest';
 
 @CustomDialog
-struct ImportDialog {
+struct LinkDialog {
   controller: CustomDialogController = new CustomDialogController({ builder: '' });
   @Link inputText: string;
-  @Link importMode: number; // 0 = 分享链接, 1 = 订阅
-  onConfirm: (text: string, mode: number) => void = (t: string, m: number) => {};
+  onConfirm: (text: string) => void = (t: string) => {};
 
   build() {
     Column({ space: 12 }) {
-      Text(this.importMode === 0 ? '导入分享链接' : '导入订阅')
+      Text('导入分享链接')
         .fontSize(18).fontWeight(FontWeight.Bold).fontColor('#E5EDFF')
-      TextInput({ text: this.inputText, placeholder: this.importMode === 0 ? 'vless://... / vmess://... / ss://...' : '订阅地址内容(base64或明文链接列表)' })
+      TextInput({ text: this.inputText, placeholder: 'vless://... / vmess://... / ss://...' })
         .type(InputType.Normal)
-        .height(this.importMode === 0 ? 48 : 120)
+        .height(48)
         .width('100%')
         .onChange((v: string) => { this.inputText = v; })
       Row({ space: 12 }) {
         Button('取消').onClick(() => { this.controller.close(); }).layoutWeight(1)
-        Button('导入').onClick(() => { this.controller.close(); this.onConfirm(this.inputText, this.importMode); }).layoutWeight(1)
+        Button('导入').onClick(() => { this.controller.close(); this.onConfirm(this.inputText); }).layoutWeight(1)
       }.width('100%')
     }
     .padding(16)
@@ -33,6 +30,12 @@ struct ImportDialog {
     .backgroundColor('#151E31')
     .borderRadius(12)
   }
+}
+
+/** 节点分组（订阅分组 / 手动添加） */
+export class NodeGroup {
+  title: string = '';
+  items: Profile[] = [];
 }
 
 @Entry
@@ -44,12 +47,13 @@ struct Index {
   @State latency: number = -1;
   @State busy: boolean = false;
   @State dialogText: string = '';
-  @State importMode: number = 0;
+  @State testRunning: boolean = false;
+  @State testDone: number = 0;
+  @State testTotal: number = 0;
   dialogController: CustomDialogController = new CustomDialogController({
-    builder: ImportDialog({
+    builder: LinkDialog({
       inputText: $dialogText,
-      importMode: $importMode,
-      onConfirm: (t: string, m: number) => { this.doImport(t, m); }
+      onConfirm: (t: string) => { this.doImportLink(t); }
     }),
     customStyle: false
   });
@@ -73,48 +77,19 @@ struct Index {
     });
   }
 
-  doImport(text: string, mode: number): void {
+  doImportLink(text: string): void {
     let t = text.trim();
     if (t === '') {
       return;
     }
-    if (mode === 0) {
-      ProfileStore.addShareLink(t).then((p: Profile | null) => {
-        if (p === null) {
-          promptAction.showToast({ message: '链接解析失败' });
-        } else {
-          promptAction.showToast({ message: '已添加: ' + p.name });
-          this.refresh();
-        }
-      });
-    } else {
-      // 订阅地址内容：尝试先下载再解析
-      this.fetchSubscription(t);
-    }
-  }
-
-  fetchSubscription(urlOrContent: string): void {
-    let isUrl = urlOrContent.startsWith('http://') || urlOrContent.startsWith('https://');
-    if (!isUrl) {
-      ProfileStore.importSubscription(urlOrContent).then((n: number) => {
-        promptAction.showToast({ message: '导入 ' + n + ' 个节点' });
+    ProfileStore.addShareLink(t).then((p: Profile | null) => {
+      if (p === null) {
+        promptAction.showToast({ message: '链接解析失败' });
+      } else {
+        promptAction.showToast({ message: '已添加: ' + p.name });
         this.refresh();
-      });
-      return;
-    }
-    let req = http.createHttp();
-    req.request(urlOrContent, { method: http.RequestMethod.GET, connectTimeout: 15000, readTimeout: 20000 })
-      .then((res: http.HttpResponse) => {
-        let body = String(res.result);
-        return ProfileStore.importSubscription(body);
-      })
-      .then((n: number) => {
-        promptAction.showToast({ message: '订阅导入 ' + n + ' 个节点' });
-        this.refresh();
-      })
-      .catch((e: BusinessError) => {
-        promptAction.showToast({ message: '订阅下载失败' });
-      });
+      }
+    });
   }
 
   toggleVpn(): void {
@@ -142,22 +117,99 @@ struct Index {
     }
   }
 
-  testLatency(): void {
-    let target: Profile | null = null;
-    for (let i = 0; i < this.profiles.length; i++) {
-      if (this.profiles[i].id === this.selectedId) {
-        target = this.profiles[i];
-        break;
-      }
-    }
-    if (target === null) {
-      promptAction.showToast({ message: '未选择节点' });
+  /** 一键测速：并发对全部节点做 TCP 握手，结果显示在节点卡片上 */
+  runSpeedTest(): void {
+    if (this.testRunning) {
       return;
     }
-    let cfg = ConfigBuilder.buildXrayConfig(target);
-    let ms = LibXray.measureOutboundDelay(cfg, 'https://www.gstatic.com/generate_204');
-    this.latency = ms;
-    promptAction.showToast({ message: ms >= 0 ? ('延迟 ' + ms + ' ms') : '测速失败' });
+    if (this.profiles.length === 0) {
+      promptAction.showToast({ message: '没有可测速的节点' });
+      return;
+    }
+    this.testRunning = true;
+    this.testDone = 0;
+    this.testTotal = this.profiles.length;
+    let cleared: Profile[] = [];
+    for (let i = 0; i < this.profiles.length; i++) {
+      let p = this.profiles[i];
+      p.testMs = -1;
+      cleared.push(p);
+    }
+    this.profiles = cleared;
+    SpeedTest.testAll(this.profiles, 4, 5000, (r: TestResult) => {
+      this.applyResult(r);
+    }).then(() => {
+      this.testRunning = false;
+      promptAction.showToast({ message: '测速完成' });
+      ProfileStore.saveProfiles(this.profiles);
+    });
+  }
+
+  private applyResult(r: TestResult): void {
+    this.testDone++;
+    let list: Profile[] = [];
+    for (let i = 0; i < this.profiles.length; i++) {
+      let p = this.profiles[i];
+      if (p.id === r.id) {
+        p.testMs = r.ms;
+      }
+      list.push(p);
+    }
+    this.profiles = list;
+  }
+
+  msLabel(ms: number): string {
+    if (ms === -1 || ms === 0) {
+      return '';
+    }
+    if (ms < 0) {
+      return '超时';
+    }
+    return ms + 'ms';
+  }
+
+  msColor(ms: number): string {
+    if (ms < 0) {
+      return '#EF4444';
+    }
+    if (ms < 300) {
+      return '#22C55E';
+    }
+    if (ms < 800) {
+      return '#EAB308';
+    }
+    return '#F97316';
+  }
+
+  /** 按订阅分组：订阅组在前，手动添加的节点归入"手动添加"组放在最后 */
+  getGroups(): NodeGroup[] {
+    let groups: NodeGroup[] = [];
+    let manual = new NodeGroup();
+    manual.title = '手动添加';
+    for (let i = 0; i < this.profiles.length; i++) {
+      let p = this.profiles[i];
+      if (p.subId === '') {
+        manual.items.push(p);
+        continue;
+      }
+      let g: NodeGroup | null = null;
+      for (let j = 0; j < groups.length; j++) {
+        if (groups[j].title === p.subName) {
+          g = groups[j];
+          break;
+        }
+      }
+      if (g === null) {
+        g = new NodeGroup();
+        g.title = p.subName === '' ? '订阅' : p.subName;
+        groups.push(g);
+      }
+      g.items.push(p);
+    }
+    if (manual.items.length > 0) {
+      groups.push(manual);
+    }
+    return groups;
   }
 
   selectProfile(id: string): void {
@@ -173,6 +225,10 @@ struct Index {
     router.pushUrl({ url: 'pages/ServerEdit' });
   }
 
+  openSubscriptions(): void {
+    router.pushUrl({ url: 'pages/Subscription' });
+  }
+
   removeProfile(p: Profile): void {
     let list: Profile[] = [];
     for (let i = 0; i < this.profiles.length; i++) {
@@ -186,6 +242,16 @@ struct Index {
       this.selectedId = '';
       ProfileStore.saveSelectedId('');
     }
+  }
+
+  @Builder
+  groupHeader(g: NodeGroup) {
+    Row({ space: 8 }) {
+      Text(g.title).fontSize(13).fontWeight(FontWeight.Medium).fontColor('#94A3B8')
+      Text(g.items.length + ' 个节点').fontSize(11).fontColor('#64748B')
+    }
+    .width('100%')
+    .padding({ left: 4, right: 4, top: 8, bottom: 2 })
   }
 
   build() {
@@ -218,52 +284,72 @@ struct Index {
       .width('100%')
       .padding({ top: 8, bottom: 12 })
 
-      // 操作栏
-      Row({ space: 10 }) {
-        Button('添加节点').fontSize(13).height(34).backgroundColor('#1D2A44').onClick(() => { this.addNew(); })
-        Button('测速').fontSize(13).height(34).backgroundColor('#1D2A44').onClick(() => { this.testLatency(); })
-        Button('导入链接').fontSize(13).height(34).backgroundColor('#1D2A44')
-          .onClick(() => { this.importMode = 0; this.dialogText = ''; this.dialogController.open(); })
-        Button('导入订阅').fontSize(13).height(34).backgroundColor('#1D2A44')
-          .onClick(() => { this.importMode = 1; this.dialogText = ''; this.dialogController.open(); })
+      // 操作栏（横向可滚动，避免小屏挤压）
+      Scroll() {
+        Row({ space: 10 }) {
+          Button('添加节点').fontSize(13).height(34).backgroundColor('#1D2A44')
+            .onClick(() => { this.addNew(); })
+          Button(this.testRunning ? ('测速中 ' + this.testDone + '/' + this.testTotal) : '一键测速')
+            .fontSize(13).height(34)
+            .backgroundColor(this.testRunning ? '#334155' : '#1D2A44')
+            .onClick(() => { this.runSpeedTest(); })
+          Button('导入链接').fontSize(13).height(34).backgroundColor('#1D2A44')
+            .onClick(() => { this.dialogText = ''; this.dialogController.open(); })
+          Button('订阅管理').fontSize(13).height(34).backgroundColor('#1D2A44')
+            .onClick(() => { this.openSubscriptions(); })
+        }
       }
+      .scrollable(ScrollDirection.Horizontal)
       .width('100%')
       .padding({ left: 16, right: 16, bottom: 6 })
 
-      // 节点列表
+      // 节点列表（按订阅分组）
       List({ space: 8 }) {
-        ForEach(this.profiles, (p: Profile) => {
-          ListItem() {
-            Row({ space: 10 }) {
-              Circle({ width: 10, height: 10 })
-                .fill(p.id === this.selectedId ? '#22C55E' : '#334155')
-              Column({ space: 3 }) {
-                Text(p.name === '' ? p.server : p.name)
-                  .fontSize(15).fontWeight(FontWeight.Medium).fontColor('#E5EDFF')
-                  .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
-                Text(p.configType.toUpperCase() + ' · ' + p.server + ':' + p.serverPort)
-                  .fontSize(11).fontColor('#8A94A8')
-                  .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
-              }
-              .alignItems(HorizontalAlign.Start)
-              .layoutWeight(1)
+        ForEach(this.getGroups(), (g: NodeGroup) => {
+          ListItemGroup({ header: this.groupHeader(g) }) {
+            ForEach(g.items, (p: Profile) => {
+              ListItem() {
+                Row({ space: 10 }) {
+                  Circle({ width: 10, height: 10 })
+                    .fill(p.id === this.selectedId ? '#22C55E' : '#334155')
+                  Column({ space: 3 }) {
+                    Text(p.name === '' ? p.server : p.name)
+                      .fontSize(15).fontWeight(FontWeight.Medium).fontColor('#E5EDFF')
+                      .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+                    Text(p.configType.toUpperCase() + ' · ' + p.server + ':' + p.serverPort)
+                      .fontSize(11).fontColor('#8A94A8')
+                      .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+                  }
+                  .alignItems(HorizontalAlign.Start)
+                  .layoutWeight(1)
 
-              Text('编辑').fontSize(12).fontColor('#3B82F6')
-                .onClick(() => { this.editProfile(p); })
-              Text('删除').fontSize(12).fontColor('#EF4444')
-                .onClick(() => { this.removeProfile(p); })
-            }
-            .width('100%')
-            .padding(12)
-            .borderRadius(10)
-            .backgroundColor(p.id === this.selectedId ? 'rgba(59,130,246,0.12)' : '#151E31')
-            .onClick(() => { this.selectProfile(p.id); })
+                  if (this.msLabel(p.testMs) !== '') {
+                    Text(this.msLabel(p.testMs))
+                      .fontSize(11).fontColor(this.msColor(p.testMs))
+                      .padding({ left: 6, right: 6, top: 2, bottom: 2 })
+                      .borderRadius(6)
+                      .backgroundColor('rgba(148,163,184,0.12)')
+                  }
+                  Text('编辑').fontSize(12).fontColor('#3B82F6')
+                    .onClick(() => { this.editProfile(p); })
+                  Text('删除').fontSize(12).fontColor('#EF4444')
+                    .onClick(() => { this.removeProfile(p); })
+                }
+                .width('100%')
+                .padding(12)
+                .borderRadius(10)
+                .backgroundColor(p.id === this.selectedId ? 'rgba(59,130,246,0.12)' : '#151E31')
+                .onClick(() => { this.selectProfile(p.id); })
+              }
+            }, (p: Profile) => p.id + '_' + p.testMs)
           }
-        }, (p: Profile) => p.id)
+          .width('100%')
+        }, (g: NodeGroup) => g.title + '_' + g.items.length)
       }
       .layoutWeight(1)
       .width('100%')
       .padding({ left: 16, right: 16, bottom: 16 })
+      .scrollBar(BarState.Off)
     }
     .width('100%')
     .height('100%')

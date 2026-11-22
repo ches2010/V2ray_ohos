@@ -1,7 +1,16 @@
 import { preferences } from '@kit.ArkData';
-import { buffer } from '@kit.ArkTS';
+import { buffer, util } from '@kit.ArkTS';
 import { common } from '@kit.AbilityKit';
-import { Profile, parseShareLink } from '../model/Profile';
+import { Profile, parseShareLink, sanitizeProfile } from '../model/Profile';
+
+/** 订阅分组信息 */
+export class SubscriptionInfo {
+  id: string = '';
+  name: string = '';
+  url: string = '';
+  count: number = 0;
+  lastUpdated: number = 0; // epoch ms，0 表示未更新过
+}
 
 /** 节点与设置的持久化（对应 v2rayNG MMKV 存储，此处用 preferences + JSON） */
 export class ProfileStore {
@@ -25,7 +34,11 @@ export class ProfileStore {
     let raw = String(await store.get('profiles_json', '[]'));
     try {
       let arr: Profile[] = JSON.parse(raw) as Profile[];
-      return arr;
+      let out: Profile[] = [];
+      for (let i = 0; i < arr.length; i++) {
+        out.push(sanitizeProfile(arr[i]));
+      }
+      return out;
     } catch (e) {
       return [];
     }
@@ -59,11 +72,29 @@ export class ProfileStore {
     return p;
   }
 
-  /** 导入订阅：返回成功解析的节点数 */
-  static async importSubscription(content: string): Promise<number> {
+  // ---------------- 订阅分组管理 ----------------
+
+  static async loadSubscriptions(): Promise<SubscriptionInfo[]> {
+    let store = await ProfileStore.ensure();
+    let raw = String(await store.get('subscriptions_json', '[]'));
+    try {
+      return JSON.parse(raw) as SubscriptionInfo[];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  private static async saveSubscriptions(list: SubscriptionInfo[]): Promise<void> {
+    let store = await ProfileStore.ensure();
+    await store.put('subscriptions_json', JSON.stringify(list));
+    await store.flush();
+  }
+
+  /** 从订阅内容（base64 或明文多行链接）解析节点，并打上分组标记 */
+  private static parseNodes(content: string, subId: string, subName: string): Profile[] {
     let text = content.trim();
-    // 订阅内容通常为 base64；也兼容明文多行链接
-    if (!text.startsWith('vmess://') && !text.startsWith('vless://') && !text.startsWith('trojan://') && !text.startsWith('ss://')) {
+    if (!text.startsWith('vmess://') && !text.startsWith('vless://') && !text.startsWith('trojan://')
+      && !text.startsWith('ss://')) {
       let decoded = '';
       try {
         decoded = buffer.from(text.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf-8');
@@ -75,8 +106,7 @@ export class ProfileStore {
       }
     }
     let lines = text.split('\n');
-    let list = await ProfileStore.loadProfiles();
-    let added = 0;
+    let nodes: Profile[] = [];
     for (let i = 0; i < lines.length; i++) {
       let line = lines[i].trim();
       if (line === '') {
@@ -84,13 +114,89 @@ export class ProfileStore {
       }
       let p = parseShareLink(line);
       if (p !== null) {
-        list.push(p);
-        added++;
+        p.subId = subId;
+        p.subName = subName;
+        nodes.push(p);
       }
     }
-    if (added > 0) {
-      await ProfileStore.saveProfiles(list);
+    return nodes;
+  }
+
+  /** 新增订阅：解析内容、替换同组旧节点、记录订阅信息。返回节点数。 */
+  static async addSubscription(name: string, url: string, content: string): Promise<number> {
+    let subId = util.generateRandomUUID(true);
+    let nodes = ProfileStore.parseNodes(content, subId, name);
+    let list = await ProfileStore.loadProfiles();
+    let kept: Profile[] = [];
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].subId !== subId) {
+        kept.push(list[i]);
+      }
     }
-    return added;
+    for (let i = 0; i < nodes.length; i++) {
+      kept.push(nodes[i]);
+    }
+    await ProfileStore.saveProfiles(kept);
+    let subs = await ProfileStore.loadSubscriptions();
+    let info = new SubscriptionInfo();
+    info.id = subId;
+    info.name = name;
+    info.url = url;
+    info.count = nodes.length;
+    info.lastUpdated = Date.now();
+    subs.push(info);
+    await ProfileStore.saveSubscriptions(subs);
+    return nodes.length;
+  }
+
+  /** 刷新已有订阅：重新解析并整体替换该组节点。返回节点数（订阅不存在返回 -1）。 */
+  static async refreshSubscription(subId: string, content: string): Promise<number> {
+    let subs = await ProfileStore.loadSubscriptions();
+    let target: SubscriptionInfo | null = null;
+    for (let i = 0; i < subs.length; i++) {
+      if (subs[i].id === subId) {
+        target = subs[i];
+        break;
+      }
+    }
+    if (target === null) {
+      return -1;
+    }
+    let nodes = ProfileStore.parseNodes(content, subId, target.name);
+    let list = await ProfileStore.loadProfiles();
+    let kept: Profile[] = [];
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].subId !== subId) {
+        kept.push(list[i]);
+      }
+    }
+    for (let i = 0; i < nodes.length; i++) {
+      kept.push(nodes[i]);
+    }
+    await ProfileStore.saveProfiles(kept);
+    target.count = nodes.length;
+    target.lastUpdated = Date.now();
+    await ProfileStore.saveSubscriptions(subs);
+    return nodes.length;
+  }
+
+  /** 删除订阅及其全部节点 */
+  static async deleteSubscription(subId: string): Promise<void> {
+    let list = await ProfileStore.loadProfiles();
+    let kept: Profile[] = [];
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].subId !== subId) {
+        kept.push(list[i]);
+      }
+    }
+    await ProfileStore.saveProfiles(kept);
+    let subs = await ProfileStore.loadSubscriptions();
+    let keptSubs: SubscriptionInfo[] = [];
+    for (let i = 0; i < subs.length; i++) {
+      if (subs[i].id !== subId) {
+        keptSubs.push(subs[i]);
+      }
+    }
+    await ProfileStore.saveSubscriptions(keptSubs);
   }
 }
