@@ -1,6 +1,6 @@
 import { router } from '@kit.ArkUI';
 import { buffer } from '@kit.ArkTS';
-import { fs } from '@ohos.file.fs';
+import fs from '@ohos.file.fs';
 import { common } from '@kit.AbilityKit';
 import { Profile } from '../model/Profile';
 import { ProfileStore, XraySettings } from '../core/ProfileStore';

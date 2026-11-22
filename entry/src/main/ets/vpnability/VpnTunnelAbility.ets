@@ -2,7 +2,7 @@ import { VpnExtensionAbility, vpnExtension } from '@kit.NetworkKit';
 import { Want } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { fs } from '@ohos.file.fs';
+import fs from '@ohos.file.fs';
 import { ProfileStore, XraySettings } from '../core/ProfileStore';
 import { ConfigBuilder } from '../core/ConfigBuilder';
 import { LibXray } from '../native/libxray';
@@ -35,7 +35,7 @@ export default class VpnTunnelAbility extends VpnExtensionAbility {
     hilog.info(0x0000, 'V2RayNG', '%{public}s', 'VpnTunnelAbility onCreate');
     let selectedId = '';
     try {
-      let p = want.parameters;
+      let p = want.parameters as Record<string, Object>;
       if (p !== undefined && p !== null) {
         selectedId = String(p['selectedId'] ?? '');
       }
