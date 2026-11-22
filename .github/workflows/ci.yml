@@ -56,10 +56,24 @@ jobs:
           curl -fL --retry 3 -o /tmp/ohos-sdk.tar.gz \
             https://repo.huaweicloud.com/openharmony/os/6.1.1-LTS/ohos-sdk-windows_linux-public.tar.gz
           mkdir -p "$HOME/ohos-sdk" && tar xzf /tmp/ohos-sdk.tar.gz -C "$HOME/ohos-sdk"
-          NATIVE_TGZ=$(find "$HOME/ohos-sdk" -name "native*.tar.gz" | head -1)
-          echo "native sdk tarball: $NATIVE_TGZ"
-          mkdir -p "$HOME/ohos-native" && tar xzf "$NATIVE_TGZ" -C "$HOME/ohos-native"
-          NATIVE_DIR=$(dirname "$(find "$HOME/ohos-native" -name aarch64-unknown-linux-ohos-clang | head -1)")/..
+          echo "--- sdk layout (top) ---"
+          find "$HOME/ohos-sdk" -maxdepth 3 | head -40
+          # SDK 包解开后 linux/ 目录下是各组件压缩包（native 为 zip/tar.gz），需二次解压
+          CLANG=$(find "$HOME/ohos-sdk" -name "aarch64-unknown-linux-ohos-clang" | head -1)
+          if [ -z "$CLANG" ]; then
+            NATIVE_PKG=$(find "$HOME/ohos-sdk" \( -name "native*.zip" -o -name "native*.tar.gz" \) | head -1)
+            echo "native sdk package: $NATIVE_PKG"
+            test -n "$NATIVE_PKG"
+            mkdir -p "$HOME/ohos-native"
+            case "$NATIVE_PKG" in
+              *.zip) unzip -q "$NATIVE_PKG" -d "$HOME/ohos-native" ;;
+              *.tar.gz) tar xzf "$NATIVE_PKG" -C "$HOME/ohos-native" ;;
+            esac
+            CLANG=$(find "$HOME/ohos-native" -name "aarch64-unknown-linux-ohos-clang" | head -1)
+          fi
+          echo "clang: $CLANG"
+          test -n "$CLANG"
+          NATIVE_DIR=$(dirname "$CLANG")/..
           echo "OHOS_NATIVE_HOME=$NATIVE_DIR" >> "$GITHUB_ENV"
 
       - name: Build libxray.so (GOOS=openharmony GOARCH=arm64, c-shared)
