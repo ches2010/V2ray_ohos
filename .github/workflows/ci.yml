@@ -159,7 +159,7 @@ jobs:
       - name: Install hvigor from the OpenHarmony npm registry
         run: |
           echo "@ohos:registry=https://repo.harmonyos.com/npm/" >> "$HOME/.npmrc"
-          npm install @ohos/hvigor@6.26.20 @ohos/hvigor-ohos-plugin@6.26.20 --no-audit --no-fund
+          npm install @ohos/hvigor@4.0.9 @ohos/hvigor-ohos-plugin@4.0.9 --no-audit --no-fund
           node node_modules/@ohos/hvigor/bin/hvigor.js --version
 
       - name: Adapt project target to OpenHarmony (temporary, not committed)
@@ -183,8 +183,9 @@ jobs:
 
       - name: Build unsigned HAP (hvigor assembleHap)
         run: |
-          export OHOS_SDK_HOME="${{ steps.sdk.outputs.ohos-base-sdk-home }}"
-          export DEVECO_SDK_HOME="${{ steps.sdk.outputs.ohos-base-sdk-home }}"
+          # hvigor 4.x (API 12 era) resolves the SDK via HOS_SDK_HOME / OHOS_BASE_SDK_HOME
+          export HOS_SDK_HOME="${{ steps.sdk.outputs.ohos-base-sdk-home }}"
+          export OHOS_BASE_SDK_HOME="${{ steps.sdk.outputs.ohos-base-sdk-home }}"
           node node_modules/@ohos/hvigor/bin/hvigor.js assembleHap --mode module \
             -p module=entry@default -p buildMode=debug --stacktrace --no-daemon
           echo "--- hap files ---"
