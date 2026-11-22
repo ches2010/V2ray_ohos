@@ -90,14 +90,47 @@ jobs:
           CGO_CFLAGS="-ftls-model=global-dynamic" \
           go build -trimpath -buildmode=c-shared -o "$GITHUB_WORKSPACE/libxray.so" ./cgo_bridge
 
-      - name: Sanity-check produced library (PT_TLS / TLSDESC / exports)
+      - name: Build libhevsocks5tun.so (hev-socks5-tunnel 2.9.0, pure C)
         run: |
-          file libxray.so
+          LLVM_BIN=$(dirname "$OHOS_CLANG")
+          SYSROOT=$(find "$HOME/ohos-native" -maxdepth 4 -name sysroot -type d | head -1)
+          echo "sysroot: $SYSROOT"
+          test -n "$SYSROOT"
+          git clone --recursive --depth 1 --branch 2.9.0 https://github.com/heiher/hev-socks5-tunnel.git "$HOME/hev"
+          cd "$HOME/hev"
+          make clean >/dev/null 2>&1 || true
+          make -j4 CC="$OHOS_CLANG" AR="$LLVM_BIN/llvm-ar" RANLIB="$LLVM_BIN/llvm-ranlib" \
+            CFLAGS="--target=aarch64-linux-ohos --sysroot=$SYSROOT -fPIC -O2" static
+          MAIN_LIB=$(find . -name 'libhev-socks5-tunnel.a' | head -1)
+          echo "main lib: $MAIN_LIB"
+          test -n "$MAIN_LIB"
+          OTHER_LIBS=$(find . -name '*.a' ! -name 'libhev-socks5-tunnel.a' | tr '\n' ' ')
+          "$OHOS_CLANG" --target=aarch64-linux-ohos --sysroot=$SYSROOT -fPIC -shared \
+            -o "$GITHUB_WORKSPACE/libhevsocks5tun.so" \
+            -Wl,--whole-archive "$MAIN_LIB" -Wl,--no-whole-archive $OTHER_LIBS -lpthread
+
+      - name: Sanity-check produced libraries (PT_TLS / TLSDESC / exports)
+        run: |
+          file libxray.so libhevsocks5tun.so
           readelf -l libxray.so | grep -i TLS || echo "WARN: no PT_TLS"
           readelf -r libxray.so | grep -i TLSDESC || echo "WARN: no TLSDESC relocs"
           nm -D libxray.so | grep -E "CGoInvoke|CGoFree" || echo "WARN: CGo exports not found"
+          nm -D libhevsocks5tun.so | grep hev_socks5_tunnel || echo "WARN: hev exports not found"
+
+      - name: Assemble project package with prebuilt cores
+        run: |
+          mkdir -p entry/libs/arm64-v8a
+          cp libxray.so libhevsocks5tun.so entry/libs/arm64-v8a/
+          zip -r V2ray_ohos-with-cores.zip . -x ".git/*" "node_modules/*"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: libxray-ohos-arm64
-          path: libxray.so
+          name: ohos-native-libs-arm64
+          path: |
+            libxray.so
+            libhevsocks5tun.so
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: V2ray_ohos-with-cores
+          path: V2ray_ohos-with-cores.zip

@@ -1,13 +1,15 @@
 import native from 'libentry.so';
 
 /**
- * NAPI 桥：libXray（Xray core, Go）+ tun2socks（C）。
+ * NAPI 桥：libxray.so（libXray/Xray core, Go, CGoInvoke 分发入口）
+ *          + libhevsocks5tun.so（hev-socks5-tunnel, 纯 C tun2socks）。
  *
- * 对应 v2rayNG Android 侧 libv2ray aar（AndroidLibXrayLite / gomobile）：
- *   Libv2ray.initCoreEnv / checkVersionX / measureOutboundDelay
- *   CoreController.startLoop(config, tunFd) / stopLoop()
- * 鸿蒙侧由 ohos-go(https://github.com/star4277/ohos-go) 将同一 Go 源码
- * 编译为 libxray_ohos.so，本文件通过 entry/src/main/cpp/napi_init.cpp 调用。
+ * 数据面（对应 v2rayNG Android 侧 libv2ray aar + hev-socks5-tunnel）：
+ *   VPN TUN fd -> libhevsocks5tun.so -> 127.0.0.1:10808 (SOCKS5)
+ *              -> libxray.so (runXrayFromJson 启动的本地 SOCKS 入站)
+ *
+ * 两个库均由 CI 交叉编译（GOOS=openharmony + TLSDESC / OHOS clang），
+ * 运行期由 entry/src/main/cpp/napi_init.cpp dlopen 加载。
  */
 export class LibXray {
   /** 初始化核心环境（asset 路径存放 geoip/geosite.dat） */
@@ -25,7 +27,7 @@ export class LibXray {
     return Number(native.measureOutboundDelay(config, testUrl));
   }
 
-  /** 启动核心循环：传入 Xray 配置 JSON 与 VPN 虚拟网卡 fd（内部完成 tun 读写 + tun2socks + Xray 出站） */
+  /** 启动隧道：传入 Xray 配置 JSON 与 VPN 虚拟网卡 fd（native 侧启动 Xray SOCKS 入站 + hev tun2socks） */
   static startLoop(config: string, tunFd: number): boolean {
     return Boolean(native.startLoop(config, tunFd));
   }

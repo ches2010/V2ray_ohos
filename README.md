@@ -56,7 +56,11 @@ geoip.dat / geosite.dat 请放到应用沙箱 `filesDir/assets/` 下（首次启
 
 - **CI**（push / PR 触发）：
   - `verify`：结构校验（必需文件、json5/json 语法、VPN extension 与 INTERNET 权限声明、页面路由注册，见 `scripts/ci_check.py`）+ 源码 zip 打包上传 artifact；
-  - `build-libxray`（尽力而为，`continue-on-error`）：源码构建 [star4277/ohos-go](https://github.com/star4277/ohos-go) v1.26.5-beta1 工具链，下载 OpenHarmony 6.1.1-LTS Native SDK 的 ohos clang，按 `GOOS=openharmony GOARCH=arm64 -buildmode=c-shared`（TLSDESC，musl 可 dlopen）交叉编译 [libXray](https://github.com/XTLS/libXray) v26.7.28，并校验 PT_TLS / TLSDESC / CGo 导出后上传 artifact。配方参考 [popsiclelmlm/Hey](https://github.com/popsiclelmlm/Hey) 的公开构建脚本与文档。
+  - `build-libxray`（尽力而为，`continue-on-error`）：
+    - 源码构建 [star4277/ohos-go](https://github.com/star4277/ohos-go) v1.26.5-beta1 工具链，下载 OpenHarmony 6.1.1-LTS Native SDK 的 ohos clang；
+    - 按 `GOOS=openharmony GOARCH=arm64 -buildmode=c-shared`（TLSDESC，musl 可 dlopen）交叉编译 [libXray](https://github.com/XTLS/libXray) v26.7.28 → `libxray.so`；
+    - 交叉编译 [hev-socks5-tunnel](https://github.com/heiher/hev-socks5-tunnel) 2.9.0（纯 C，tun2socks 数据面）→ `libhevsocks5tun.so`；
+    - 校验 PT_TLS / TLSDESC / 导出符号后上传 artifact，并组装放入两个 .so 的完整工程包 `V2ray_ohos-with-cores.zip`。配方参考 [popsiclelmlm/Hey](https://github.com/popsiclelmlm/Hey) 的公开构建脚本与文档。
 - **Release**（推送 `v*` tag 触发）：打包源码 zip 并创建 GitHub Release。
 
 > 注：`build-libxray` 产出的是 libXray `cgo_bridge` 形态（`CGoInvoke`/`CGoFree` 分发入口）；
