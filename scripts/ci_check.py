@@ -21,7 +21,7 @@ REQUIRED = [
     "entry/hvigorfile.ts",
     "entry/oh-package.json5",
     "entry/src/main/module.json5",
-    "entry/src/main/profile/main_pages.json",
+    "entry/src/main/resources/base/profile/main_pages.json",
     "entry/src/main/ets/entryability/EntryAbility.ets",
     "entry/src/main/ets/vpnability/VpnTunnelAbility.ets",
     "entry/src/main/ets/core/ConfigBuilder.ets",
@@ -42,7 +42,7 @@ for rel in REQUIRED:
         errors.append(f"missing file: {rel}")
 
 for p in sorted(ROOT.rglob("*.json5")):
-    if ".git" in p.parts:
+    if ".git" in p.parts or "node_modules" in p.parts:
         continue
     try:
         json5.loads(p.read_text(encoding="utf-8"))
@@ -50,7 +50,7 @@ for p in sorted(ROOT.rglob("*.json5")):
         errors.append(f"invalid json5: {p.relative_to(ROOT)}: {e}")
 
 for p in sorted(ROOT.rglob("*.json")):
-    if ".git" in p.parts:
+    if ".git" in p.parts or "node_modules" in p.parts:
         continue
     try:
         json.loads(p.read_text(encoding="utf-8"))
@@ -72,7 +72,7 @@ if module_path.is_file():
     if "ohos.permission.INTERNET" not in perms:
         errors.append("module.json5: ohos.permission.INTERNET not declared")
 
-pages_path = ROOT / "entry/src/main/profile/main_pages.json"
+pages_path = ROOT / "entry/src/main/resources/base/profile/main_pages.json"
 if pages_path.is_file():
     try:
         pages = json.loads(pages_path.read_text(encoding="utf-8")).get("src", [])
