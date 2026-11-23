@@ -63,6 +63,7 @@ static std::string g_workDir;   // 可写目录（ping 临时配置文件）
 static std::mutex g_assetMutex;
 static bool g_assetEnvSet = false;
 static std::string g_lastError; // 最近一次数据面错误（供日志诊断页展示）
+static std::string g_coreVersion; // Xray 核心版本（startLoop 成功后缓存）
 static std::atomic_bool g_hevExited(false);
 static std::atomic_int g_hevRc(-1);
 static std::string g_socksSelfTest; // startLoop 后对 127.0.0.1:10808 的连通性自检
@@ -610,6 +611,12 @@ static napi_value StartLoop(napi_env env, napi_callback_info info) {
         return ok;
     }
     g_xrayStarted.store(true);
+    {
+        std::string verResp, verErr;
+        if (InvokeXray("xrayVersion", "{}", verResp, verErr)) {
+            g_coreVersion = ExtractStringField(verResp, "version");
+        }
+    }
 
     // 2) 启动 hev tun2socks：把 VPN TUN fd 的流量转发到本地 SOCKS 入站。
     //    hev 的 main 阻塞到 quit，放独立线程。yaml 字段见 hev-socks5-tunnel README。
@@ -618,12 +625,21 @@ static napi_value StartLoop(napi_env env, napi_callback_info info) {
         napi_get_boolean(env, false, &ok);
         return ok;
     }
+    std::string hevLog;
+    {
+        std::lock_guard<std::mutex> lock(g_assetMutex);
+        hevLog = g_workDir + "/hev.log";
+    }
     std::string yaml = std::string("tunnel:\n") +
                        "  mtu: 1500\n" +
                        "socks5:\n" +
                        "  address: 127.0.0.1\n" +
                        "  port: " + std::to_string(kVpnSocksPort) + "\n" +
-                       "  udp: 'udp'\n";
+                       "  udp: 'udp'\n" +
+                       "misc:\n" +
+                       "  log-file: " + hevLog + "\n" +
+                       "  log-level: info\n" +
+                       "  connect-timeout: 15000\n";
     if (g_hevThread.joinable()) {
         g_hevThread.join();
     }
@@ -739,6 +755,7 @@ static napi_value GetCoreStatus(napi_env env, napi_callback_info info) {
                        ",\"tunTxBytes\":" + std::to_string(tunTxBytes) +
                        ",\"tunRxPackets\":" + std::to_string(tunRxPackets) +
                        ",\"tunRxBytes\":" + std::to_string(tunRxBytes) +
+                       ",\"coreVersion\":\"" + JsonEscape(g_coreVersion) + "\"" +
                        ",\"xrayLibLoaded\":" + (g_xrayLib != nullptr ? "true" : "false") +
                        ",\"hevLibLoaded\":" + (g_hevLib != nullptr ? "true" : "false") +
                        ",\"xrayStarted\":" + (g_xrayStarted.load() ? "true" : "false") +

@@ -8,6 +8,7 @@ import { LibXray } from '../native/libxray';
 import { Profile, sanitizeProfile } from '../model/Profile';
 import { NativeStatus, RuntimeSnapshot } from '../core/RuntimeSnapshot';
 import { RuntimeStore } from '../core/RuntimeStore';
+import { util } from '@kit.ArkTS';
 import { BUNDLE_NAME } from '../core/VpnController';
 
 /** VPN 进程持有 TUN 和 native；UI 读取它发布的唯一运行快照。 */
@@ -16,6 +17,20 @@ export default class VpnTunnelAbility extends VpnExtensionAbility {
   private snapshot: RuntimeSnapshot = new RuntimeSnapshot();
   private heartbeat: number = -1;
   private closing: boolean = false;
+
+  /** 仅当快照文件仍归属本会话时写入，避免与系统重新拉起的新实例互相覆盖。 */
+  private publishIfOwner(): void {
+    try {
+      let cur: RuntimeSnapshot | null = RuntimeStore.read(this.context);
+      if (cur !== null && cur.sessionId !== this.snapshot.sessionId
+        && cur.sessionId !== '' && cur.state === 'running' && cur.active) {
+        return; // 另一个会话已在运行，本实例让位，不覆盖它的运行快照
+      }
+      RuntimeStore.write(this.context, this.snapshot);
+    } catch (e) {
+      hilog.error(0, 'V2ray', '%{public}s', 'VPN 状态快照写入失败');
+    }
+  }
 
   onCreate(want: Want): void {
     this.startTunnel(want).catch((e: BusinessError) => {
@@ -35,6 +50,10 @@ export default class VpnTunnelAbility extends VpnExtensionAbility {
     RuntimeStore.init(this.context);
     let params: Record<string, Object> = want.parameters as Record<string, Object>;
     this.snapshot.sessionId = String(params?.['sessionId'] ?? '');
+    if (this.snapshot.sessionId === '') {
+      // 系统重新拉起扩展时可能没有 sessionId，补一个以便区分新旧实例。
+      this.snapshot.sessionId = util.generateRandomUUID(true);
+    }
     this.snapshot.state = 'starting';
     this.snapshot.stage = 'profile';
     this.publish();
@@ -117,7 +136,7 @@ export default class VpnTunnelAbility extends VpnExtensionAbility {
         this.fail('native-exit', this.snapshot.native.lastError || 'tun2socks 已退出');
         return;
       }
-      this.publish();
+      this.publishIfOwner();
     } catch (e) {
       this.fail('runtime', '读取核心运行状态失败');
     }
@@ -165,11 +184,11 @@ export default class VpnTunnelAbility extends VpnExtensionAbility {
     this.closing = true;
     this.snapshot.state = 'stopping';
     this.snapshot.stage = 'stopping';
-    this.publish();
+    this.publishIfOwner();
     this.cleanup().then(() => {
       this.snapshot.state = 'stopped';
       this.snapshot.stage = 'stopped';
-      this.publish();
+      this.publishIfOwner();
     });
   }
 }

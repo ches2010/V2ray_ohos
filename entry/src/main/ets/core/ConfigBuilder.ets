@@ -158,11 +158,10 @@ export class ConfigBuilder {
       'tag': 'socks', 'port': 10808, 'listen': '127.0.0.1',
       'protocol': 'socks', 'settings': socksSettings
     };
-    if (st.enableSniffing) {
-      let destOverride: Array<string> = ['http', 'tls', 'quic'];
-      let sniffing: JsonObj = { 'enabled': true, 'destOverride': destOverride };
-      socksInbound['sniffing'] = sniffing;
-    }
+    // FakeDNS 依赖嗅探把假 IP 还原成真实域名（v2rayNG 同款机制），因此嗅探必须常开。
+    let destOverride: Array<string> = ['fakedns', 'http', 'tls', 'quic'];
+    let sniffing: JsonObj = { 'enabled': true, 'destOverride': destOverride };
+    socksInbound['sniffing'] = sniffing;
     let inbounds: Array<Object> = [socksInbound];
 
     // 路由规则（对应 v2rayNG routing）。
@@ -200,7 +199,11 @@ export class ConfigBuilder {
     // DNS 查询在代理里改走 TCP，避免依赖节点的公网 UDP DNS 转发能力。
     // 内置 DNS 只处理由 dns-out 捕获的查询；它不会自动拦截系统 DNS。
     let dnsServers: Array<string> = ['tcp://1.1.1.1', 'tcp://8.8.8.8'];
-    let dns: JsonObj = { 'servers': dnsServers, 'tag': 'dns-internal', 'queryStrategy': 'UseIPv4' };
+    // FakeDNS：虚拟 DNS 的 A/AAAA 查询由本地假 IP 池应答，不出网；
+    // 真实域名在后续连接里经嗅探还原后交给代理端解析。
+    // 真机日志显示上游 tcp://1.1.1.1 直连被重置（app/dns closed pipe），FakeDNS 可彻底绕开。
+    let fakeDns: Array<JsonObj> = [{ 'ipPool': '198.18.0.0/15', 'poolSize': 10000 }];
+    let dns: JsonObj = { 'servers': dnsServers, 'tag': 'dns-internal', 'queryStrategy': 'UseIPv4', 'fakedns': fakeDns };
 
     let config: JsonObj = {
       'log': log, 'dns': dns, 'inbounds': inbounds, 'outbounds': outbounds, 'routing': routing

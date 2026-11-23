@@ -50,17 +50,29 @@ export class VpnController {
     let want: Want = { bundleName: BUNDLE_NAME, abilityName: VPN_ABILITY_NAME };
     try {
       await vpnExtension.stopVpnExtensionAbility(want);
-      state.state = 'stopped';
-      state.stage = 'stopped';
-      state.active = false;
-      state.native.running = false;
-      state.native.xrayStarted = false;
-      RuntimeStore.write(context, state);
     } catch (e) {
       state.state = 'error';
       state.errorText = RuntimeStore.redact(String(e));
       RuntimeStore.write(context, state);
       throw new Error(String(e));
     }
+    // 等待 VPN 进程自行发布 stopped。UI 立刻覆盖会与仍在新旧实例之间
+    // 交替写入的运行快照竞争，造成“启动中/异常”与“隧道已启动”来回跳动。
+    for (let i = 0; i < 20; i++) {
+      await new Promise<void>((resolve: () => void) => { setTimeout(resolve, 300); });
+      let cur: RuntimeSnapshot | null = RuntimeStore.read(context);
+      if (cur !== null && (cur.state === 'stopped' || cur.state === 'error') && !cur.active) {
+        return;
+      }
+    }
+    // 兜底：VPN 进程未能发布（例如被系统强杀）时，由 UI 落一个确定的停止态。
+    let cur: RuntimeSnapshot | null = RuntimeStore.read(context);
+    let final: RuntimeSnapshot = cur ?? state;
+    final.state = 'stopped';
+    final.stage = 'stopped';
+    final.active = false;
+    final.native.running = false;
+    final.native.xrayStarted = false;
+    RuntimeStore.write(context, final);
   }
 }
