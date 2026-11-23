@@ -28,12 +28,11 @@ export class RuntimeStore {
       fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE | fs.OpenMode.TRUNC);
     try {
       let encoded: buffer.Buffer = buffer.from(JSON.stringify(snapshot), 'utf-8');
-      let bytes: ArrayBuffer = encoded.buffer.slice(encoded.byteOffset, encoded.byteOffset + encoded.byteLength);
+      let bytes: ArrayBuffer = encoded.buffer.slice(encoded.byteOffset, encoded.byteOffset + encoded.length);
       // writeSync 的返回值不保证一次写完，循环写入防止截断状态文件。
-      let view: Uint8Array = new Uint8Array(bytes);
       let offset: number = 0;
-      while (offset < view.byteLength) {
-        let rest: ArrayBuffer = view.slice(offset).buffer;
+      while (offset < bytes.byteLength) {
+        let rest: ArrayBuffer = bytes.slice(offset);
         let count: number = fs.writeSync(file.fd, rest);
         if (count <= 0) {
           throw new Error('运行状态文件写入失败');

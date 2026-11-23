@@ -12,6 +12,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/select.h>
+#include <poll.h>
 #include <sys/time.h>
 #include <fcntl.h>
 #include <cerrno>
@@ -68,6 +69,7 @@ static std::string g_socksSelfTest; // startLoop 后对 127.0.0.1:10808 的连�
 static std::string g_fullSelfTest;  // 通过 SOCKS5 代理的完整链路自检（独立线程执行）
 static std::mutex g_selfTestMutex;
 static std::atomic_bool g_selfTestRunning(false);
+static std::atomic_bool g_stopping(false); // 全局停止标记（自检/隧道共享）
 
 static const int kVpnSocksPort = 10808; // 与 entry/src/main/ets/core/ConfigBuilder.ets 对齐
 
@@ -350,6 +352,78 @@ static ssize_t RecvSome(int fd, char *buf, size_t len, int timeoutMs) {
     return recv(fd, buf, len, 0);
 }
 
+
+// ---------------------------------------------------------------------------
+// SOCKS5 应答分片安全读取（供全链路自检与 CI native 回归复用）
+// ---------------------------------------------------------------------------
+static long long NowMs() {
+  return std::chrono::duration_cast<std::chrono::milliseconds>(
+             std::chrono::steady_clock::now().time_since_epoch()).count();
+}
+
+static bool RecvExact(int fd, unsigned char *buf, size_t len, long long deadline) {
+  size_t off = 0;
+  while (off < len) {
+    if (g_stopping.load()) {
+      return false;
+    }
+    long long remain = deadline - NowMs();
+    if (remain <= 0) {
+      return false;
+    }
+    pollfd p;
+    p.fd = fd;
+    p.events = POLLIN;
+    p.revents = 0;
+    int r = poll(&p, 1, static_cast<int>(std::min<long long>(remain, 50)));
+    if (r <= 0) {
+      continue; // 短片轮询：继续判断 deadline 与 g_stopping
+    }
+    ssize_t n = recv(fd, buf + off, len - off, 0);
+    if (n <= 0) {
+      return false;
+    }
+    off += static_cast<size_t>(n);
+  }
+  return true;
+}
+
+// SOCKS5 CONNECT 应答：VER REP RSV ATYP + (IPv4:6 | domain:1+len+2 | IPv6:18)
+static bool ReadSocksReply(int fd, long long deadline) {
+  unsigned char head[4];
+  if (!RecvExact(fd, head, 4, deadline)) {
+    return false;
+  }
+  if (head[0] != 0x05 || head[1] != 0x00) {
+    return false;
+  }
+  size_t need = 0;
+  if (head[3] == 1) {
+    need = 6;
+  } else if (head[3] == 4) {
+    need = 18;
+  } else if (head[3] == 3) {
+    unsigned char l = 0;
+    if (!RecvExact(fd, &l, 1, deadline)) {
+      return false;
+    }
+    unsigned char rest[256];
+    return RecvExact(fd, rest, static_cast<size_t>(l) + 2, deadline);
+  } else {
+    return false;
+  }
+  unsigned char tail[32];
+  return RecvExact(fd, tail, need, deadline);
+}
+
+static void SetProbeResult(const std::string &full) {
+  std::lock_guard<std::mutex> lock(g_selfTestMutex);
+  g_fullSelfTest = full;
+  if (full.find("http:ok") == std::string::npos) {
+    g_lastError = "selftest: " + full;
+  }
+}
+
 static void RunFullSelfTest() {
     std::string r1 = "inbound:fail";
     std::string r2 = "handshake:fail";
@@ -381,8 +455,7 @@ static void RunFullSelfTest() {
             // SOCKS5 request: VER=5 CMD=1(connect) RSV=0 ATYP=1(IPv4) 1.1.1.1:80
             const unsigned char req[10] = {0x05, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x50};
             if (SendAll(fd, reinterpret_cast<const char *>(req), 10, 2000)) {
-                ssize_t m = RecvSome(fd, buf, sizeof(buf), 4000);
-                if (m >= 10 && buf[1] == 0x00) {
+                if (ReadSocksReply(fd, NowMs() + 4000)) {
                     r3 = "tcp:ok";
                     const char *httpReq = "GET / HTTP/1.1\r\nHost: 1.1.1.1\r\nConnection: close\r\n\r\n";
                     if (SendAll(fd, httpReq, strlen(httpReq), 2000)) {
@@ -396,11 +469,7 @@ static void RunFullSelfTest() {
         }
     }
     close(fd);
-    std::lock_guard<std::mutex> lock(g_selfTestMutex);
-    g_fullSelfTest = r1 + " " + r2 + " " + r3 + " " + r4;
-    if (r4 != "http:ok") {
-        g_lastError = "selftest: " + g_fullSelfTest;
-    }
+    SetProbeResult(r1 + " " + r2 + " " + r3 + " " + r4);
 }
 
 static napi_value GetSelfTest(napi_env env, napi_callback_info info) {

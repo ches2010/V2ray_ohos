@@ -38,7 +38,7 @@ export class VpnController {
       state.stage = 'authorization';
       state.errorText = RuntimeStore.redact(String(e));
       RuntimeStore.write(context, state);
-      throw e;
+      throw new Error(String(e));
     }
   }
 
@@ -60,7 +60,7 @@ export class VpnController {
       state.state = 'error';
       state.errorText = RuntimeStore.redact(String(e));
       RuntimeStore.write(context, state);
-      throw e;
+      throw new Error(String(e));
     }
   }
 }
