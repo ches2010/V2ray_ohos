@@ -55,6 +55,7 @@ static void *g_hevLib = nullptr;
 static HevStartFunc g_hevStart = nullptr;
 static HevQuitFunc g_hevQuit = nullptr;
 static std::thread g_hevThread;
+static HevStatsFunc g_hevStats = nullptr;
 
 static std::string g_assetDir;  // geoip/geosite.dat 资源目录
 static std::string g_workDir;   // 可写目录（ping 临时配置文件）
@@ -673,39 +674,6 @@ static napi_value GetCoreStatus(napi_env env, napi_callback_info info) {
     return result;
 }
 
-// 保留真实 libXray 延迟接口；UI 不在主线程上调用此同步函数。
-static napi_value MeasureOutboundDelay(napi_env env, napi_callback_info info) {
-    size_t count = 2; napi_value args[2];
-    napi_get_cb_info(env, info, &count, args, nullptr, nullptr);
-    double delay = -1;
-    std::string directory;
-    { std::lock_guard<std::mutex> lock(g_stateMutex); directory = g_workDir; }
-    if (count >= 2 && !directory.empty()) {
-        std::string config = StringArg(env, args[0]);
-        std::string url = StringArg(env, args[1]);
-        std::string path = directory + "/v2ray-ping-config.json";
-        FILE *file = fopen(path.c_str(), "wb");
-        if (file) {
-            size_t size = fwrite(config.data(), 1, config.size(), file);
-            fclose(file);
-            std::string response;
-            std::string payload = "{\"configPath\":\"" + JsonEscape(path) + "\",\"timeout\":5,\"url\":\""
-                + JsonEscape(url) + "\",\"proxy\":\"\"}";
-            if (size == config.size() && InvokeXray("ping", payload, response)) {
-                size_t pos = response.find("\"delay\":");
-                if (pos != std::string::npos) {
-                    long long ms = strtoll(response.c_str() + pos + 8, nullptr, 10);
-                    if (ms >= 0 && ms < 10000) delay = static_cast<double>(ms);
-                }
-            }
-            unlink(path.c_str());
-        }
-    }
-    napi_value value;
-    napi_create_double(env, delay, &value);
-    return value;
-}
-
 EXTERN_C_START
 static napi_value Init(napi_env env, napi_value exports) {
     napi_property_descriptor desc[] = {
@@ -716,7 +684,6 @@ static napi_value Init(napi_env env, napi_value exports) {
         {"stopLoop", nullptr, StopLoop, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"isRunning", nullptr, IsRunning, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"getCoreStatus", nullptr, GetCoreStatus, nullptr, nullptr, nullptr, napi_default, nullptr},
-        {"measureOutboundDelay", nullptr, MeasureOutboundDelay, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"getSelfTest", nullptr, GetSelfTest, nullptr, nullptr, nullptr, napi_default, nullptr},
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
