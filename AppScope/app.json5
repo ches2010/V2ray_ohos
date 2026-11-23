@@ -1,10 +1,1 @@
-{
-  "app": {
-    "bundleName": "com.v2ray.harmony",
-    "vendor": "v2rayng-port",
-    "versionCode": 1003002,
-    "versionName": "1.3.2",
-    "icon": "$media:app_icon",
-    "label": "$string:app_name"
-  }
-}
+ewogICJhcHAiOiB7CiAgICAiYnVuZGxlTmFtZSI6ICJjb20udjJyYXkuaGFybW9ueSIsCiAgICAidmVuZG9yIjogInYycmF5bmctcG9ydCIsCiAgICAidmVyc2lvbkNvZGUiOiAxMDAzMDAyLAogICAgInZlcnNpb25OYW1lIjogIjEuMy4yIiwKICAgICJpY29uIjogIiRtZWRpYTphcHBfaWNvbiIsCiAgICAibGFiZWwiOiAiJHN0cmluZzphcHBfbmFtZSIKICB9Cn0K

@@ -1,14 +1,1 @@
-/** 只把更高的语义版本视为升级；不能因版本字符串不同就提示降级。 */
-export function isNewerVersion(current: string, candidate: string): boolean {
-  let a: RegExpMatchArray | null = current.match(/^v?(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?$/);
-  let b: RegExpMatchArray | null = candidate.match(/^v?(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?$/);
-  if (a === null || b === null) return false;
-  for (let i: number = 1; i <= 3; i++) {
-    let left: number = Number(a[i]);
-    let right: number = Number(b[i]);
-    if (right > left) return true;
-    if (right < left) return false;
-  }
-  // GitHub latest 不返回预发布；同版本的正式版高于本地预发布版。
-  return Boolean(a[4]) && !Boolean(b[4]);
-}
+LyoqIOWPquaKiuabtOmrmOeahOivreS5ieeJiOacrOinhuS4uuWNh+e6p++8m+S4jeiDveWboOeJiOacrOWtl+espuS4suS4jeWQjOWwseaPkOekuumZjee6p+OAgiAqLwpleHBvcnQgZnVuY3Rpb24gaXNOZXdlclZlcnNpb24oY3VycmVudDogc3RyaW5nLCBjYW5kaWRhdGU6IHN0cmluZyk6IGJvb2xlYW4gewogIGxldCBhOiBSZWdFeHBNYXRjaEFycmF5IHwgbnVsbCA9IGN1cnJlbnQubWF0Y2goL152PyhcZCspXC4oXGQrKVwuKFxkKykoPzotKFswLTlBLVphLXouLV0rKSk/JC8pOwogIGxldCBiOiBSZWdFeHBNYXRjaEFycmF5IHwgbnVsbCA9IGNhbmRpZGF0ZS5tYXRjaCgvXnY/KFxkKylcLihcZCspXC4oXGQrKSg/Oi0oWzAtOUEtWmEtei4tXSspKT8kLyk7CiAgaWYgKGEgPT09IG51bGwgfHwgYiA9PT0gbnVsbCkgcmV0dXJuIGZhbHNlOwogIGZvciAobGV0IGk6IG51bWJlciA9IDE7IGkgPD0gMzsgaSsrKSB7CiAgICBsZXQgbGVmdDogbnVtYmVyID0gTnVtYmVyKGFbaV0pOwogICAgbGV0IHJpZ2h0OiBudW1iZXIgPSBOdW1iZXIoYltpXSk7CiAgICBpZiAocmlnaHQgPiBsZWZ0KSByZXR1cm4gdHJ1ZTsKICAgIGlmIChyaWdodCA8IGxlZnQpIHJldHVybiBmYWxzZTsKICB9CiAgLy8gR2l0SHViIGxhdGVzdCDkuI3ov5Tlm57pooTlj5HluIPvvJvlkIzniYjmnKznmoTmraPlvI/niYjpq5jkuo7mnKzlnLDpooTlj5HluIPniYjjgIIKICByZXR1cm4gQm9vbGVhbihhWzRdKSAmJiAhQm9vbGVhbihiWzRdKTsKfQo=
