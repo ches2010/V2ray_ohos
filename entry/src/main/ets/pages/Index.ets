@@ -1,6 +1,8 @@
 import { router, promptAction } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { common } from '@kit.AbilityKit';
+import { buffer } from '@kit.ArkTS';
+import { fs } from '@ohos.file.fs';
 import { scanBarcode, scanCore, generateBarcode } from '@kit.ScanKit';
 import { image } from '@kit.ImageKit';
 import pasteboard from '@ohos.pasteboard';
@@ -99,6 +101,7 @@ struct Index {
   @State qrPixmap: image.PixelMap | null = null;
   @StorageProp('sysBarHeightPx') sysBarPx: number = 0;
   @StorageProp('navBarHeightPx') navBarPx: number = 0;
+  @State connected: boolean = false;
   dialogController: CustomDialogController = new CustomDialogController({
     builder: LinkDialog({
       inputText: $dialogText,
@@ -118,6 +121,7 @@ struct Index {
     if (!this.vpnRunning) {
       this.latency = -1;
     }
+    this.connected = this.vpnRunning;
   }
 
   aboutToAppear(): void {
@@ -202,6 +206,60 @@ struct Index {
     });
   }
 
+  private readDiag(): Record<string, Object> {
+    try {
+      let ctx = getContext(this) as common.Context;
+      let file = fs.openSync(ctx.filesDir + '/diag.json', fs.OpenMode.READ_ONLY);
+      let stat = fs.statSync(file.fd);
+      let buf = new ArrayBuffer(stat.size);
+      fs.readSync(file.fd, buf);
+      fs.closeSync(file.fd);
+      return JSON.parse(buffer.from(buf).toString('utf-8')) as Record<string, Object>;
+    } catch (e) {
+      return {};
+    }
+  }
+
+  private resetDiag(): void {
+    try {
+      let ctx = getContext(this) as common.Context;
+      let file = fs.openSync(ctx.filesDir + '/diag.json',
+        fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE | fs.OpenMode.TRUNC);
+      fs.writeSync(file.fd, '{"stage":"starting"}');
+      fs.closeSync(file.fd);
+    } catch (e) {
+    }
+  }
+
+  /** 连接后轮询 VPN 进程诊断：startLoop 成功/失败才更新连接状态 */
+  private pollTunnel(count: number): void {
+    if (count > 24) {
+      this.busy = false;
+      this.connected = false;
+      AppStorage.setOrCreate('vpnRunning', false);
+      promptAction.showToast({ message: '启动超时，请到 设置-日志诊断 查看原因' });
+      return;
+    }
+    let diag = this.readDiag();
+    let stage = String(diag['stage'] ?? '');
+    if (stage === 'startLoop') {
+      let ok = String(diag['ok'] ?? 'false') === 'true';
+      let detail = String(diag['detail'] ?? '');
+      this.busy = false;
+      this.connected = ok;
+      AppStorage.setOrCreate('vpnRunning', ok);
+      if (ok) {
+        promptAction.showToast({ message: '已连接（隧道运行中）' });
+      } else {
+        promptAction.showToast({ message: '启动失败：' + detail });
+      }
+      return;
+    }
+    setTimeout(() => {
+      this.pollTunnel(count + 1);
+    }, 1200);
+  }
+
   toggleVpn(): void {
     if (this.busy) {
       return;
@@ -211,16 +269,19 @@ struct Index {
       return;
     }
     this.busy = true;
-    if (this.vpnRunning) {
+    if (this.connected || this.vpnRunning) {
       VpnController.stop().then(() => {
         this.busy = false;
+        this.connected = false;
+        AppStorage.setOrCreate('vpnRunning', false);
       }).catch(() => {
         this.busy = false;
       });
     } else {
+      this.resetDiag();
       VpnController.start(this.selectedId).then(() => {
-        this.busy = false;
-        promptAction.showToast({ message: 'VPN 已启动（首次使用需在系统弹窗中授权）' });
+        // 按钮状态由轮询 diag.json 决定（VPN 进程独立，AppStorage 不跨进程）
+        this.pollTunnel(0);
       }).catch(() => {
         this.busy = false;
         promptAction.showToast({ message: '启动失败，请到 设置-日志诊断 查看原因' });
@@ -377,25 +438,25 @@ struct Index {
       Row() {
         Text('V2ray').fontSize(22).fontWeight(FontWeight.Bold).fontColor('#E5EDFF')
         Blank()
-        Text(this.vpnRunning ? '已连接' : '未连接')
+        Text(this.connected ? '已连接' : '未连接')
           .fontSize(13)
-          .fontColor(this.vpnRunning ? '#22C55E' : '#8A94A8')
+          .fontColor(this.connected ? '#22C55E' : '#8A94A8')
           .padding({ left: 10, right: 10, top: 4, bottom: 4 })
           .borderRadius(10)
-          .backgroundColor(this.vpnRunning ? 'rgba(34,197,94,0.15)' : 'rgba(138,148,168,0.15)')
+          .backgroundColor(this.connected ? 'rgba(34,197,94,0.15)' : 'rgba(138,148,168,0.15)')
       }
       .width('100%')
       .padding({ left: 16, right: 16, top: px2vp(this.sysBarPx) + 12, bottom: 8 })
 
       // 连接按钮
       Column() {
-        Button(this.busy ? '切换中...' : (this.vpnRunning ? '断开连接' : '连接'))
+        Button(this.busy ? '切换中...' : (this.connected ? '断开连接' : '连接'))
           .width(140).height(48)
           .fontSize(17)
           .type(ButtonType.Circle)
-          .backgroundColor(this.vpnRunning ? '#7F1D1D' : '#3B82F6')
+          .backgroundColor(this.connected ? '#7F1D1D' : '#3B82F6')
           .onClick(() => { this.toggleVpn(); })
-        Text(this.vpnRunning ? (this.latency >= 0 ? '延迟 ' + this.latency + ' ms' : '隧道运行中') : '点击连接选中的节点')
+        Text(this.connected ? (this.latency >= 0 ? '延迟 ' + this.latency + ' ms' : '隧道运行中') : '点击连接选中的节点')
           .fontSize(12).fontColor('#8A94A8').margin({ top: 8 })
       }
       .width('100%')
