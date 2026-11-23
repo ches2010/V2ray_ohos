@@ -88,3 +88,7 @@ if errors:
     sys.exit(1)
 
 print(f"OK: {len(REQUIRED)} required files present, json5/json valid, vpn extension + INTERNET permission declared")
+
+# 可复现的源码/原生协议回归必须成功；不以工作流整体 success 掩盖 build-hap job 失败。
+import subprocess
+subprocess.run([sys.executable, str(ROOT / 'scripts/runtime_contract_test.py')], check=True)
