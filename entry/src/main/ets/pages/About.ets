@@ -3,6 +3,7 @@ import { promptAction } from '@kit.ArkUI';
 import { http } from '@kit.NetworkKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { common, bundleManager, Want } from '@kit.AbilityKit';
+import { isNewerVersion } from '../core/UpdateVersion';
 
 const RELEASE_API = 'https://api.github.com/repos/ches2010/V2ray_ohos/releases/latest';
 const RELEASE_PAGE = 'https://github.com/ches2010/V2ray_ohos/releases/latest';
@@ -43,11 +44,17 @@ struct AboutPage {
       connectTimeout: 15000,
       readTimeout: 15000
     }).then((res: http.HttpResponse) => {
+      if (res.responseCode !== 200) {
+        this.hasUpdate = false;
+        this.checkResult = '检查失败（HTTP ' + res.responseCode + '）';
+        this.checking = false;
+        return;
+      }
       let obj = JSON.parse(String(res.result)) as Record<string, Object>;
       let tag = String(obj['tag_name'] ?? '');
       this.latestTag = tag;
       let latest = tag.replace(/^v/, '');
-      if (latest !== '' && latest !== this.versionName) {
+      if (latest !== '' && isNewerVersion(this.versionName, latest)) {
         this.hasUpdate = true;
         this.checkResult = '发现新版本 ' + tag + '（当前 ' + this.versionName + '），可前往 Release 页下载。';
       } else {

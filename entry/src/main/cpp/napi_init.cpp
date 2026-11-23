@@ -728,7 +728,18 @@ static napi_value IsRunning(napi_env env, napi_callback_info info) {
 // 诊断信息：核心库加载状态 + 最近错误（供日志页展示）
 static napi_value GetCoreStatus(napi_env env, napi_callback_info info) {
     (void)info;
-    std::string json = std::string("{\"xrayLibLoaded\":") + (g_xrayLib != nullptr ? "true" : "false") +
+    // 构建标记：verify_hap.py 校验 HAP 内 libentry.so 必含此字符串，防止旧包改名冒充。
+    static const char *kBuildSignature = "vpn-runtime-v2-self-excluded";
+    size_t tunTxPackets = 0, tunTxBytes = 0, tunRxPackets = 0, tunRxBytes = 0;
+    if (g_hevLib != nullptr && g_hevStats != nullptr) {
+        g_hevStats(&tunTxPackets, &tunTxBytes, &tunRxPackets, &tunRxBytes);
+    }
+    std::string json = std::string("{\"buildSignature\":\"") + kBuildSignature + "\","
+                       + "\"tunTxPackets\":" + std::to_string(tunTxPackets) +
+                       ",\"tunTxBytes\":" + std::to_string(tunTxBytes) +
+                       ",\"tunRxPackets\":" + std::to_string(tunRxPackets) +
+                       ",\"tunRxBytes\":" + std::to_string(tunRxBytes) +
+                       ",\"xrayLibLoaded\":" + (g_xrayLib != nullptr ? "true" : "false") +
                        ",\"hevLibLoaded\":" + (g_hevLib != nullptr ? "true" : "false") +
                        ",\"xrayStarted\":" + (g_xrayStarted.load() ? "true" : "false") +
                        ",\"running\":" + (g_running.load() ? "true" : "false") +
