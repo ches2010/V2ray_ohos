@@ -3,6 +3,7 @@ import { http } from '@kit.NetworkKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import fs from '@ohos.file.fs';
 import { ProfileStore, XraySettings } from '../core/ProfileStore';
+import { RuntimeStore } from '../core/RuntimeStore';
 
 const LOG_LEVELS: string[] = ['debug', 'info', 'warning', 'error'];
 const LOG_LABELS: string[] = ['debug（最详细）', 'info', 'warning（推荐）', 'error（最简）'];
@@ -41,8 +42,8 @@ struct SettingsPage {
 
   private checkGeo(): void {
     try {
-      this.geoIpExists = fs.accessSync(this.assetsDir() + '/geoip.dat');
-      this.geoSiteExists = fs.accessSync(this.assetsDir() + '/geosite.dat');
+      this.geoIpExists = RuntimeStore.fileReady(this.assetsDir() + '/geoip.dat');
+      this.geoSiteExists = RuntimeStore.fileReady(this.assetsDir() + '/geosite.dat');
     } catch (e) {
       this.geoIpExists = false;
       this.geoSiteExists = false;
@@ -76,6 +77,9 @@ struct SettingsPage {
       readTimeout: 180000
     }).then((res: http.HttpResponse) => {
       let buf = res.result as ArrayBuffer;
+      if (res.responseCode !== 200 || typeof res.result === 'string' || buf.byteLength < 1024) {
+        throw new Error('Geo 下载返回错误或空数据，不覆盖现有文件');
+      }
       let dir = this.assetsDir();
       try {
         if (!fs.accessSync(dir)) {
@@ -84,10 +88,19 @@ struct SettingsPage {
       } catch (e) {
         fs.mkdirSync(dir, true);
       }
-      let file = fs.openSync(dir + '/' + name,
+      let temporary: string = dir + '/' + name + '.part';
+      let file: fs.File = fs.openSync(temporary,
         fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE | fs.OpenMode.TRUNC);
-      fs.writeSync(file.fd, buf);
-      fs.closeSync(file.fd);
+      try {
+        let count: number = fs.writeSync(file.fd, buf);
+        if (count !== buf.byteLength) {
+          throw new Error('Geo 数据未完整写入');
+        }
+        fs.fsyncSync(file.fd);
+      } finally {
+        fs.closeSync(file.fd);
+      }
+      fs.renameSync(temporary, dir + '/' + name);
       promptAction.showToast({ message: name + ' 下载完成（' + Math.round(buf.byteLength / 1024) + ' KB）' });
       this.downloading = '';
       this.checkGeo();

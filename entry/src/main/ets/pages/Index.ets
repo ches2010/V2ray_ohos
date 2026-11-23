@@ -8,6 +8,9 @@ import { Profile, toShareLink } from '../model/Profile';
 import { ProfileStore } from '../core/ProfileStore';
 import { VpnController } from '../core/VpnController';
 import { SpeedTest, TestResult } from '../core/SpeedTest';
+import { XraySettings } from '../core/ProfileStore';
+import { RuntimeStore } from '../core/RuntimeStore';
+import { RuntimeSnapshot, isRuntimeRunning } from '../core/RuntimeSnapshot';
 
 @CustomDialog
 struct LinkDialog {
@@ -86,7 +89,12 @@ export class NodeGroup {
 @Entry
 @Component
 struct Index {
-  @StorageProp('vpnRunning') @Watch('onRunningChanged') vpnRunning: boolean = false;
+  @State vpnRunning: boolean = false;
+  @State vpnActive: boolean = false;
+  @State connectionState: string = 'stopped';
+  @State errorText: string = '';
+  private stateTimer: number = -1;
+  private requestStartedAt: number = 0;
   @State profiles: Profile[] = [];
   @State selectedId: string = '';
   @State latency: number = -1;
@@ -114,28 +122,71 @@ struct Index {
     customStyle: false
   });
 
-  onRunningChanged(): void {
-    if (!this.vpnRunning) {
-      this.latency = -1;
+  aboutToAppear(): void {
+    this.refresh();
+    this.startStateReader();
+  }
+
+  onPageShow(): void {
+    this.refresh();
+    this.startStateReader();
+  }
+
+  onPageHide(): void {
+    this.stopStateReader();
+  }
+
+  aboutToDisappear(): void {
+    this.stopStateReader();
+  }
+
+  private startStateReader(): void {
+    this.syncRuntime();
+    if (this.stateTimer < 0) {
+      this.stateTimer = setInterval(() => { this.syncRuntime(); }, 1000);
     }
   }
 
-  aboutToAppear(): void {
-    this.refresh();
+  private stopStateReader(): void {
+    if (this.stateTimer >= 0) {
+      clearInterval(this.stateTimer);
+      this.stateTimer = -1;
+    }
   }
 
-  // 返回本页时（订阅管理/设置/节点编辑后）强制刷新列表
-  onPageShow(): void {
-    this.refresh();
+  private syncRuntime(): void {
+    let context: common.Context = getContext(this) as common.Context;
+    let state: RuntimeSnapshot | null = RuntimeStore.read(context);
+    if (state === null) {
+      this.vpnRunning = false;
+      return;
+    }
+    this.vpnRunning = isRuntimeRunning(state);
+    this.vpnActive = state.active || state.state === 'starting' || state.state === 'stopping';
+    this.connectionState = state.state;
+    this.errorText = state.errorText;
+    if (state.state !== 'starting' && state.state !== 'stopping') {
+      this.busy = false;
+      this.requestStartedAt = 0;
+    }
+    if (this.requestStartedAt > 0 && Date.now() - this.requestStartedAt > 30000) {
+      this.requestStartedAt = 0;
+      this.errorText = '启动超时，正在回收 VPN；请查看日志诊断';
+      VpnController.stop(context).catch(() => {}).then(() => {
+        this.busy = false;
+        this.syncRuntime();
+      });
+    }
   }
 
-  refresh(): void {
-    ProfileStore.loadProfiles().then((list: Profile[]) => {
-      this.profiles = list;
-    });
-    ProfileStore.loadSelectedId().then((id: string) => {
-      this.selectedId = id;
-    });
+  async refresh(): Promise<void> {
+    try {
+      await ProfileStore.init(getContext(this) as common.Context);
+      this.profiles = await ProfileStore.loadProfiles();
+      this.selectedId = await ProfileStore.loadSelectedId();
+    } catch (e) {
+      this.errorText = '读取节点数据失败';
+    }
   }
 
   doImportLink(text: string): void {
@@ -202,29 +253,48 @@ struct Index {
     });
   }
 
-  toggleVpn(): void {
-    if (this.busy) {
+  async toggleVpn(): Promise<void> {
+    let context: common.Context = getContext(this) as common.Context;
+    this.syncRuntime();
+    // 即使节点被删掉、核心退出或正在启动，也必须能停止系统 VPN。
+    if (this.vpnActive || this.vpnRunning || this.busy) {
+      this.busy = true;
+      this.connectionState = 'stopping';
+      try {
+        await VpnController.stop(context);
+      } catch (e) {
+        promptAction.showToast({ message: '断开失败，请在系统设置中断开 VPN' });
+      }
+      this.busy = false;
+      this.syncRuntime();
       return;
     }
-    if (this.selectedId === '') {
+    let selected: Profile | null = null;
+    for (let p of this.profiles) {
+      if (p.id === this.selectedId) {
+        selected = p;
+        break;
+      }
+    }
+    if (selected === null) {
       promptAction.showToast({ message: '请先选择一个节点' });
       return;
     }
     this.busy = true;
-    if (this.vpnRunning) {
-      VpnController.stop().then(() => {
-        this.busy = false;
-      }).catch(() => {
-        this.busy = false;
-      });
-    } else {
-      VpnController.start(this.selectedId).then(() => {
-        this.busy = false;
-        promptAction.showToast({ message: 'VPN 已启动（首次使用需在系统弹窗中授权）' });
-      }).catch(() => {
-        this.busy = false;
-        promptAction.showToast({ message: '启动失败，请到 设置-日志诊断 查看原因' });
-      });
+    this.errorText = '';
+    this.connectionState = 'starting';
+    this.requestStartedAt = Date.now();
+    try {
+      await ProfileStore.saveSelectedId(selected.id);
+      let settings: XraySettings = await ProfileStore.loadSettings();
+      await VpnController.start(context, selected, settings);
+      // 仅表示系统接受启动请求，必须等待 VPN 进程的运行心跳。
+      this.syncRuntime();
+    } catch (e) {
+      this.busy = false;
+      this.requestStartedAt = 0;
+      this.syncRuntime();
+      promptAction.showToast({ message: 'VPN 启动失败，请查看日志诊断' });
     }
   }
 
@@ -377,7 +447,7 @@ struct Index {
       Row() {
         Text('V2ray').fontSize(22).fontWeight(FontWeight.Bold).fontColor('#E5EDFF')
         Blank()
-        Text(this.vpnRunning ? '已连接' : '未连接')
+        Text(this.vpnRunning ? '隧道已启动' : (this.vpnActive ? '启动中 / 异常' : '未连接'))
           .fontSize(13)
           .fontColor(this.vpnRunning ? '#22C55E' : '#8A94A8')
           .padding({ left: 10, right: 10, top: 4, bottom: 4 })
@@ -389,7 +459,8 @@ struct Index {
 
       // 连接按钮
       Column() {
-        Button(this.busy ? '切换中...' : (this.vpnRunning ? '断开连接' : '连接'))
+        Button(this.connectionState === 'starting' ? '启动中 · 取消' :
+          (this.connectionState === 'stopping' ? '断开中...' : (this.vpnActive ? '断开 VPN' : '连接')))
           .width(140).height(48)
           .fontSize(17)
           .type(ButtonType.Circle)

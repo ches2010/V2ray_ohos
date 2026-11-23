@@ -1,255 +1,147 @@
-import { router } from '@kit.ArkUI';
-import { buffer } from '@kit.ArkTS';
-import fs from '@ohos.file.fs';
+import { router, promptAction } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
-import { Profile } from '../model/Profile';
-import { ProfileStore, XraySettings } from '../core/ProfileStore';
-import { LibXray } from '../native/libxray';
+import pasteboard from '@ohos.pasteboard';
+import { RuntimeSnapshot, isRuntimeRunning } from '../core/RuntimeSnapshot';
+import { RuntimeStore } from '../core/RuntimeStore';
 
-/** 日志/诊断页：核心库加载状态、运行状态、最近错误与当前生效配置 */
+class DiagnosticLine {
+  label: string;
+  value: string;
+  color: string;
+  constructor(label: string, value: string, color: string = '#E5EDFF') {
+    this.label = label;
+    this.value = value;
+    this.color = color;
+  }
+}
+
+/** 所有核心状态来自 VPN 进程快照；查看日志不会在 UI 进程 dlopen 核心。 */
 @Entry
 @Component
 struct LogsPage {
-  @State statusJson: string = '';
-  @State diagJson: string = '';
-  @State selftestJson: string = '';
-  @State coreVersion: string = '';
-  @State nodeName: string = '';
-  @State routeLabel: string = '';
-  @State muxLabel: string = '';
-  @State sniffLabel: string = '';
-  @State refreshing: boolean = false;
-  @StorageProp('vpnRunning') vpnRunning: boolean = false;
+  @State snapshot: RuntimeSnapshot = new RuntimeSnapshot();
+  @State lines: DiagnosticLine[] = [];
+  @State logText: string = '';
+  @State errorText: string = '';
+  @State hasSnapshot: boolean = false;
   @StorageProp('sysBarHeightPx') sysBarPx: number = 0;
   @StorageProp('navBarHeightPx') navBarPx: number = 0;
+  private timer: number = -1;
 
-  aboutToAppear(): void {
+  aboutToAppear(): void { this.startReader(); }
+  onPageShow(): void { this.startReader(); }
+  onPageHide(): void { this.stopReader(); }
+  aboutToDisappear(): void { this.stopReader(); }
+
+  private startReader(): void {
     this.collect();
+    if (this.timer < 0) this.timer = setInterval(() => { this.collect(); }, 1500);
   }
 
-  async collect(): Promise<void> {
-    this.refreshing = true;
-    // VPN 进程（VpnExtensionAbility 独立进程）会把阶段状态写入 files/diag.json
-    try {
-      let ctx = getContext(this) as common.Context;
-      let file = fs.openSync(ctx.filesDir + '/diag.json', fs.OpenMode.READ_ONLY);
-      let stat = fs.statSync(file.fd);
-      let buf = new ArrayBuffer(stat.size);
-      fs.readSync(file.fd, buf);
-      fs.closeSync(file.fd);
-      this.diagJson = buffer.from(buf).toString('utf-8');
-      // 从 VPN 进程诊断里带出的自检结果（selftest 阶段的 detail）
-      let d = JSON.parse(this.diagJson) as Record<string, Object>;
-      let detail = String(d['detail'] ?? '');
-      this.selftestJson = detail.indexOf('inbound:') >= 0 ? detail : '';
-    } catch (e) {
-      this.diagJson = '';
-      this.selftestJson = '';
+  private stopReader(): void {
+    if (this.timer >= 0) {
+      clearInterval(this.timer);
+      this.timer = -1;
     }
-    // UI 进程视角的核心状态（仅参考）
-    try {
-      this.statusJson = LibXray.getCoreStatus();
-    } catch (e) {
-      this.statusJson = '';
-    }
-    try {
-      this.coreVersion = LibXray.checkVersion();
-    } catch (e) {
-      this.coreVersion = '未知';
-    }
-    let profiles: Profile[] = await ProfileStore.loadProfiles();
-    let id: string = await ProfileStore.loadSelectedId();
-    this.nodeName = '未选择节点';
-    for (let i = 0; i < profiles.length; i++) {
-      if (profiles[i].id === id) {
-        this.nodeName = profiles[i].name + '（' + profiles[i].configType.toUpperCase()
-          + ' ' + profiles[i].server + ':' + profiles[i].serverPort + '）';
-        break;
+  }
+
+  private probePart(key: string, text: string): string {
+    for (let part of text.split(' ')) {
+      if (part.startsWith(key + ':')) {
+        let value: string = part.substring(key.length + 1);
+        if (value === 'ok') return '已完成';
+        if (value === 'accepted') return '请求已接受（不等于联网）';
+        if (value === 'fail') return '失败 / 超时';
+        if (value === 'pending') return '尚未完成';
+        return '已收到 HTTP ' + value;
       }
     }
-    let s: XraySettings = await ProfileStore.loadSettings();
-    this.routeLabel = s.routeMode === 0 ? '全局代理' : '绕过局域网及大陆';
-    this.muxLabel = s.enableMux ? '开启' : '关闭';
-    this.sniffLabel = s.enableSniffing ? '开启' : '关闭';
-    this.refreshing = false;
+    return '尚未运行';
   }
 
-  selftestPart(key: string): string {
-    if (this.selftestJson === '') {
-      return '未运行';
-    }
-    let idx = this.selftestJson.indexOf(key + ':');
-    if (idx < 0) {
-      return '未运行';
-    }
-    let rest = this.selftestJson.substring(idx + key.length + 1);
-    let end = rest.indexOf(' ');
-    let val = end < 0 ? rest : rest.substring(0, end);
-    return val === 'ok' ? '通过' : '失败';
+  collect(): void {
+    let context: common.Context = getContext(this) as common.Context;
+    let value: RuntimeSnapshot | null = RuntimeStore.read(context);
+    this.hasSnapshot = value !== null;
+    let s: RuntimeSnapshot = value ?? new RuntimeSnapshot();
+    this.snapshot = s;
+    let alive: boolean = isRuntimeRunning(value);
+    let rows: DiagnosticLine[] = [];
+    rows.push(new DiagnosticLine('状态来源', 'VPN 进程（统一快照）'));
+    rows.push(new DiagnosticLine('VPN 状态', alive ? '核心运行中' : s.state, alive ? '#22C55E' : '#EAB308'));
+    rows.push(new DiagnosticLine('系统 TUN', s.active ? '本会话仍持有' : '未持有'));
+    rows.push(new DiagnosticLine('当前阶段', s.stage));
+    rows.push(new DiagnosticLine('心跳时间', s.updatedAt > 0 ? new Date(s.updatedAt).toLocaleTimeString() : '无'));
+    rows.push(new DiagnosticLine('Xray 库', s.native.xrayLibLoaded ? '已加载' : '未加载'));
+    rows.push(new DiagnosticLine('tun2socks 库', s.native.hevLibLoaded ? '已加载' : '未加载'));
+    rows.push(new DiagnosticLine('Xray 已启动', s.native.xrayStarted ? '是' : '否'));
+    rows.push(new DiagnosticLine('hev 线程', s.native.hevExited ? '已退出，rc=' + s.native.hevRc : (alive ? '运行中' : '未启动')));
+    rows.push(new DiagnosticLine('Xray 版本', s.native.coreVersion || '尚未读取'));
+    rows.push(new DiagnosticLine('运行包标记', s.native.buildSignature || '尚未启动新包'));
+    rows.push(new DiagnosticLine('TUN 发包 / 字节', s.native.tunTxPackets + ' / ' + s.native.tunTxBytes));
+    rows.push(new DiagnosticLine('TUN 收包 / 字节', s.native.tunRxPackets + ' / ' + s.native.tunRxBytes));
+    rows.push(new DiagnosticLine('防 VPN 回环', s.excludedBundle || '未配置'));
+    rows.push(new DiagnosticLine('geoip.dat 当前文件', RuntimeStore.fileReady(context.filesDir + '/assets/geoip.dat') ? '已就绪' : '未下载'));
+    rows.push(new DiagnosticLine('geosite.dat 当前文件', RuntimeStore.fileReady(context.filesDir + '/assets/geosite.dat') ? '已就绪' : '未下载'));
+    rows.push(new DiagnosticLine('启动时 Geo 分流', s.geoRulesEnabled ? '已启用' : '未启用（下载后需重启 VPN）'));
+    rows.push(new DiagnosticLine('启动节点', s.nodeName || '未选择'));
+    rows.push(new DiagnosticLine('协议 / 传输 / TLS', s.protocol + ' / ' + s.transport + ' / ' + s.tls));
+    rows.push(new DiagnosticLine('实际路由', s.routeMode === 1 ? '绕过局域网及大陆' : '全局代理'));
+    rows.push(new DiagnosticLine('Mux / 嗅探', (s.muxEnabled ? '开' : '关') + ' / ' + (s.sniffingEnabled ? '开' : '关')));
+    rows.push(new DiagnosticLine('探测状态', s.native.probeRunning ? '进行中' : '已结束 / 未运行'));
+    rows.push(new DiagnosticLine('SOCKS 入站', this.probePart('inbound', s.native.fullSelfTest)));
+    rows.push(new DiagnosticLine('SOCKS 握手', this.probePart('handshake', s.native.fullSelfTest)));
+    rows.push(new DiagnosticLine('CONNECT 回复', this.probePart('connect', s.native.fullSelfTest)));
+    rows.push(new DiagnosticLine('代理 HTTP 往返', this.probePart('http', s.native.fullSelfTest)));
+    this.lines = rows;
+    this.errorText = RuntimeStore.redact(s.errorText || s.native.lastError || '未记录核心错误；探测失败请查看下方日志');
+    let xray: string = RuntimeStore.readTail(context.filesDir + '/xray-error.log', 12000);
+    let hev: string = RuntimeStore.readTail(context.filesDir + '/hev.log', 8000);
+    this.logText = RuntimeStore.redact(s.native.events + '\n--- Xray 错误日志 ---\n' + xray + '\n--- hev 日志 ---\n' + hev);
   }
 
-  selftestOk(key: string): string {
-    return this.selftestPart(key) === '通过' ? '#22C55E' : '#EF4444';
-  }
-
-  diagValue(key: string): string {
-    if (this.diagJson === '') {
-      return '（VPN 进程尚未写入诊断）';
-    }
-    try {
-      let obj = JSON.parse(this.diagJson) as Record<string, Object>;
-      let v = obj[key];
-      if (v === undefined || v === null) {
-        return '-';
-      }
-      return String(v);
-    } catch (e) {
-      return '-';
-    }
-  }
-
-  statusValue(key: string): string {
-    if (this.statusJson === '') {
-      return '未知';
-    }
-    try {
-      let obj = JSON.parse(this.statusJson) as Record<string, Object>;
-      let v = obj[key];
-      if (v === undefined || v === null) {
-        return '未知';
-      }
-      if (typeof v === 'boolean') {
-        let b = v as boolean;
-        return b ? '正常' : '否';
-      }
-      let s = String(v);
-      return s === '' ? '无' : s;
-    } catch (e) {
-      return '未知';
-    }
-  }
-
-  @Builder
-  row(label: string, value: string, valueColor: string) {
-    Row({ space: 10 }) {
-      Text(label).fontSize(14).fontColor('#8A94A8')
-      Blank()
-      Text(value).fontSize(14).fontColor(valueColor)
-        .maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-        .textAlign(TextAlign.End)
-    }
-    .width('100%')
-    .padding({ left: 12, right: 12, top: 9, bottom: 9 })
+  private copyLog(): void {
+    let text: string = RuntimeStore.redact(JSON.stringify(this.snapshot, null, 2) + '\n' + this.logText);
+    let data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, text);
+    pasteboard.getSystemPasteboard().setData(data).then(() => {
+      promptAction.showToast({ message: '已复制本地诊断（UUID/常见凭据字段已隐藏）' });
+    }).catch(() => { promptAction.showToast({ message: '复制失败' }); });
   }
 
   build() {
     Column() {
       Row({ space: 12 }) {
-        Text('←').fontSize(22).fontColor('#E5EDFF')
-          .onClick(() => { router.back(); })
+        Text('←').fontSize(22).fontColor('#E5EDFF').onClick(() => { router.back(); })
         Text('日志诊断').fontSize(20).fontWeight(FontWeight.Bold).fontColor('#E5EDFF')
         Blank()
-        Button(this.refreshing ? '...' : '刷新')
-          .fontSize(13).height(32).backgroundColor('#1D2A44')
-          .onClick(() => { this.collect(); })
+        Button('刷新').fontSize(12).height(32).backgroundColor('#1D2A44').onClick(() => { this.collect(); })
+        Button('复制').fontSize(12).height(32).backgroundColor('#1D2A44').onClick(() => { this.copyLog(); })
       }
-      .width('100%')
-      .padding({ left: 16, right: 16, top: px2vp(this.sysBarPx) + 12, bottom: 8 })
-
+      .width('100%').padding({ left: 16, right: 16, top: px2vp(this.sysBarPx) + 12, bottom: 8 })
       Scroll() {
-        Column() {
-          Text('核心状态').fontSize(13).fontColor('#94A3B8')
-            .width('100%').padding({ left: 4, right: 4, top: 6, bottom: 4 })
-          Column({ space: 2 }) {
-            this.row('Xray 核心库 (libxray.so)', this.statusValue('xrayLibLoaded'),
-              this.statusValue('xrayLibLoaded') === '正常' ? '#22C55E' : '#EF4444')
-            this.row('tun2socks 库 (libhevsocks5tun.so)', this.statusValue('hevLibLoaded'),
-              this.statusValue('hevLibLoaded') === '正常' ? '#22C55E' : '#EF4444')
-            this.row('Xray 已启动', this.statusValue('xrayStarted'),
-              this.statusValue('xrayStarted') === '正常' ? '#22C55E' : '#8A94A8')
-            this.row('隧道转发中', this.vpnRunning ? '是' : '否',
-              this.vpnRunning ? '#22C55E' : '#8A94A8')
-            this.row('Geo 资源目录就绪', this.statusValue('assetDirSet'),
-              this.statusValue('assetDirSet') === '正常' ? '#22C55E' : '#EAB308')
-          }
-          .width('100%')
-          .borderRadius(10)
-          .backgroundColor('#151E31')
-
-          Text('VPN 进程阶段状态').fontSize(13).fontColor('#94A3B8')
-            .width('100%').padding({ left: 4, right: 4, top: 14, bottom: 4 })
-          Column({ space: 2 }) {
-            this.row('阶段', this.diagValue('stage'), '#E5EDFF')
-            this.row('结果', this.diagValue('ok') === 'true' ? '成功' : this.diagValue('ok'),
-              this.diagValue('ok') === 'true' ? '#22C55E' : '#EF4444')
-            this.row('详情', this.diagValue('detail'), '#E5EDFF')
-          }
-          .width('100%')
-          .borderRadius(10)
-          .backgroundColor('#151E31')
-
-          Text('全链路自检（经代理连 1.1.1.1:80）').fontSize(13).fontColor('#94A3B8')
-            .width('100%').padding({ left: 4, right: 4, top: 14, bottom: 4 })
-          Column({ space: 2 }) {
-            this.row('SOCKS 入站 (10808)', this.selftestPart('inbound'), this.selftestOk('inbound'))
-            this.row('SOCKS5 握手', this.selftestPart('handshake'), this.selftestOk('handshake'))
-            this.row('经代理 TCP 连接', this.selftestPart('tcp'), this.selftestOk('tcp'))
-            this.row('HTTP 请求', this.selftestPart('http'), this.selftestOk('http'))
-          }
-          .width('100%')
-          .borderRadius(10)
-          .backgroundColor('#151E31')
-
-          Text('最近错误').fontSize(13).fontColor('#94A3B8')
-            .width('100%').padding({ left: 4, right: 4, top: 14, bottom: 4 })
-          Column() {
-            Text(this.statusValue('lastError'))
-              .fontSize(13).fontColor(this.statusValue('lastError') === '无' ? '#22C55E' : '#F87171')
-              .width('100%')
-          }
-          .width('100%')
-          .padding(12)
-          .borderRadius(10)
-          .backgroundColor('#151E31')
-
-          Text('核心版本').fontSize(13).fontColor('#94A3B8')
-            .width('100%').padding({ left: 4, right: 4, top: 14, bottom: 4 })
-          Column() {
-            Text(this.coreVersion === '' ? '读取中...' : this.coreVersion)
-              .fontSize(13).fontColor('#E5EDFF')
-          }
-          .width('100%')
-          .padding(12)
-          .borderRadius(10)
-          .backgroundColor('#151E31')
-
-          Text('当前生效配置').fontSize(13).fontColor('#94A3B8')
-            .width('100%').padding({ left: 4, right: 4, top: 14, bottom: 4 })
-          Column({ space: 2 }) {
-            this.row('选中节点', this.nodeName, '#E5EDFF')
-            this.row('路由模式', this.routeLabel, '#E5EDFF')
-            this.row('Mux 多路复用', this.muxLabel, '#E5EDFF')
-            this.row('流量嗅探', this.sniffLabel, '#E5EDFF')
-          }
-          .width('100%')
-          .borderRadius(10)
-          .backgroundColor('#151E31')
-
-          Text('提示：若核心库显示「否」，说明安装包未包含核心库，请使用带 cores 的构建；'
-            + '若 Xray 已启动仍无法上网，请检查节点是否可用，并尝试在设置中下载 Geo 数据。')
-            .fontSize(11).fontColor('#64748B')
-            .width('100%')
-            .padding({ left: 4, right: 4, top: 12, bottom: px2vp(this.navBarPx) + 24 })
+        Column({ space: 8 }) {
+          Text(this.hasSnapshot ? '以下为 VPN 进程的实时状态，不混用 UI 进程状态。' : '尚未收到新协议的 VPN 会话，请启动连接。')
+            .fontSize(12).fontColor('#94A3B8').width('100%')
+          ForEach(this.lines, (row: DiagnosticLine) => {
+            Row({ space: 8 }) {
+              Text(row.label).fontSize(12).fontColor('#8A94A8').width('44%')
+              Text(row.value).fontSize(12).fontColor(row.color).layoutWeight(1)
+                .textAlign(TextAlign.End).maxLines(4)
+            }
+            .width('100%').padding(10).borderRadius(8).backgroundColor('#151E31')
+          }, (row: DiagnosticLine) => row.label + ':' + row.value)
+          Text('最近核心错误').fontSize(14).fontColor('#94A3B8').width('100%')
+          Text(this.errorText).fontSize(12).fontColor('#F87171').width('100%').copyOption(CopyOptions.InApp)
+          Text('本地日志（末尾片段）').fontSize(14).fontColor('#94A3B8').width('100%')
+          Text(this.logText || '暂无日志').fontSize(11).fontColor('#E5EDFF').width('100%').copyOption(CopyOptions.InApp)
+          Text('SOCKS 探测不包含 TUN 和系统 DNS。CONNECT 成功只表示请求被接受，只有 HTTP 回复才代表数据往返。请结合 TUN 收发字节判断真实浏览器流量。')
+            .fontSize(11).fontColor('#64748B').width('100%')
         }
-        .width('100%')
+        .padding({ left: 16, right: 16, bottom: px2vp(this.navBarPx) + 20 }).width('100%')
       }
-      .layoutWeight(1)
-      .width('100%')
-      .scrollBar(BarState.Off)
+      .layoutWeight(1).width('100%').scrollBar(BarState.Off)
     }
-    .width('100%')
-    .height('100%')
-    .backgroundColor('#0B1220')
+    .width('100%').height('100%').backgroundColor('#0B1220')
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
   }
 }

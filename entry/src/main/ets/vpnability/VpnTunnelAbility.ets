@@ -2,138 +2,174 @@ import { VpnExtensionAbility, vpnExtension } from '@kit.NetworkKit';
 import { Want } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import fs from '@ohos.file.fs';
 import { ProfileStore, XraySettings } from '../core/ProfileStore';
 import { ConfigBuilder } from '../core/ConfigBuilder';
 import { LibXray } from '../native/libxray';
-import { Profile } from '../model/Profile';
+import { Profile, sanitizeProfile } from '../model/Profile';
+import { NativeStatus, RuntimeSnapshot } from '../core/RuntimeSnapshot';
+import { RuntimeStore } from '../core/RuntimeStore';
+import { BUNDLE_NAME } from '../core/VpnController';
 
-/**
- * VPN 隧道扩展（移植自 v2rayNG CoreVpnService）。
- * 运行于独立进程：选中节点经 want.parameters 传入（preferences 跨进程不保证同步），
- * 各阶段状态写入 files/diag.json 供日志诊断页（UI 进程）查看。
- */
+/** VPN 进程持有 TUN 和 native；UI 读取它发布的唯一运行快照。 */
 export default class VpnTunnelAbility extends VpnExtensionAbility {
   private vpnConnection: vpnExtension.VpnConnection | null = null;
-  private tunFd: number = -1;
-
-  private writeDiag(stage: string, ok: boolean, detail: string): void {
-    try {
-      let safeDetail = detail.replace(/"/g, "'");
-      let diag = '{"stage":"' + stage + '","ok":' + (ok ? 'true' : 'false')
-        + ',"detail":"' + safeDetail + '","time":' + Date.now() + '}';
-      let file = fs.openSync(this.context.filesDir + '/diag.json',
-        fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE | fs.OpenMode.TRUNC);
-      fs.writeSync(file.fd, diag);
-      fs.closeSync(file.fd);
-    } catch (e) {
-      hilog.error(0x0000, 'V2RayNG', '%{public}s', 'writeDiag failed');
-    }
-  }
+  private snapshot: RuntimeSnapshot = new RuntimeSnapshot();
+  private heartbeat: number = -1;
+  private closing: boolean = false;
 
   onCreate(want: Want): void {
-    hilog.info(0x0000, 'V2RayNG', '%{public}s', 'VpnTunnelAbility onCreate');
-    this.writeDiag('onCreate', true, '');
-    let selectedId = '';
-    try {
-      let p = want.parameters as Record<string, Object>;
-      if (p !== undefined && p !== null) {
-        selectedId = String(p['selectedId'] ?? '');
-      }
-    } catch (e) {
-      selectedId = '';
-    }
-    this.startTunnel(selectedId);
+    this.startTunnel(want).catch((e: BusinessError) => {
+      this.fail('startup', e.code + ': ' + e.message);
+    });
   }
 
-  private async startTunnel(selectedId: string): Promise<void> {
+  private publish(): void {
     try {
-      await ProfileStore.init(this.context);
-      let profiles: Profile[] = await ProfileStore.loadProfiles();
-      if (selectedId === '') {
-        selectedId = await ProfileStore.loadSelectedId();
+      RuntimeStore.write(this.context, this.snapshot);
+    } catch (e) {
+      hilog.error(0, 'V2ray', '%{public}s', 'VPN 状态快照写入失败');
+    }
+  }
+
+  private async startTunnel(want: Want): Promise<void> {
+    RuntimeStore.init(this.context);
+    let params: Record<string, Object> = want.parameters as Record<string, Object>;
+    this.snapshot.sessionId = String(params?.['sessionId'] ?? '');
+    this.snapshot.state = 'starting';
+    this.snapshot.stage = 'profile';
+    this.publish();
+
+    let selected: Profile | null = null;
+    let settings: XraySettings = new XraySettings();
+    let profileJson: string = String(params?.['profileJson'] ?? '');
+    let settingsJson: string = String(params?.['settingsJson'] ?? '');
+    if (profileJson !== '') {
+      selected = sanitizeProfile(JSON.parse(profileJson) as Profile);
+      if (settingsJson !== '') {
+        settings = JSON.parse(settingsJson) as XraySettings;
       }
-      let selected: Profile | null = null;
-      for (let i = 0; i < profiles.length; i++) {
-        if (profiles[i].id === selectedId) {
-          selected = profiles[i];
+    } else {
+      // 兼容系统重新拉起扩展；主动连接优先使用 Want 中的完整配置快照。
+      await ProfileStore.init(this.context);
+      let list: Profile[] = await ProfileStore.loadProfiles();
+      let id: string = String(params?.['selectedId'] ?? await ProfileStore.loadSelectedId());
+      for (let p of list) {
+        if (p.id === id) {
+          selected = p;
           break;
         }
       }
-      if (selected === null) {
-        hilog.error(0x0000, 'V2RayNG', '%{public}s', 'no selected profile, abort tunnel');
-        this.writeDiag('select', false, 'no selected profile');
-        AppStorage.setOrCreate('vpnRunning', false);
+      settings = await ProfileStore.loadSettings();
+    }
+    if (selected === null || selected.server === '' || this.closing) {
+      await this.fail('profile', '未找到有效节点，未建立 VPN');
+      return;
+    }
+    this.snapshot.nodeName = selected.name;
+    this.snapshot.protocol = selected.configType;
+    this.snapshot.transport = selected.network;
+    this.snapshot.tls = selected.tls;
+    this.snapshot.muxEnabled = settings.enableMux;
+    this.snapshot.sniffingEnabled = settings.enableSniffing;
+    this.snapshot.geoIpReady = RuntimeStore.fileReady(this.context.filesDir + '/assets/geoip.dat');
+    this.snapshot.geoSiteReady = RuntimeStore.fileReady(this.context.filesDir + '/assets/geosite.dat');
+    this.snapshot.geoRulesEnabled = this.snapshot.geoIpReady && this.snapshot.geoSiteReady;
+    this.snapshot.routeMode = this.snapshot.geoRulesEnabled ? settings.routeMode : 0;
+    this.snapshot.excludedBundle = BUNDLE_NAME;
+    this.snapshot.stage = 'tun';
+    this.publish();
+
+    this.vpnConnection = vpnExtension.createVpnConnection(this.context);
+    // 鸿蒙官方 blockedApplications：自身应用的 Xray/DNS/socket 走物理网络，
+    // 防止出站再次进入 TUN 的循环。其他应用仍按 VPN routes 被代理。
+    let config: vpnExtension.VpnConfig = ConfigBuilder.buildVpnConfig(1500, this.snapshot.excludedBundle);
+    let fd: number = await this.vpnConnection.create(config);
+    this.snapshot.active = true;
+    if (this.closing) {
+      await this.cleanup();
+      return;
+    }
+    this.snapshot.stage = 'native-start';
+    this.publish();
+    LibXray.initCoreEnv(this.context.filesDir + '/assets', 'harmonyos');
+    let xrayConfig: string = ConfigBuilder.buildXrayConfig(selected, settings,
+      this.snapshot.geoRulesEnabled, this.context.filesDir);
+    let ok: boolean = LibXray.startLoop(xrayConfig, fd);
+    this.snapshot.native = JSON.parse(LibXray.getCoreStatus()) as NativeStatus;
+    if (!ok || !this.snapshot.native.running) {
+      await this.fail('native-start', this.snapshot.native.lastError || '核心未成功启动');
+      return;
+    }
+    this.snapshot.state = 'running';
+    this.snapshot.stage = 'running';
+    this.publish();
+    // 一直发布 native 存活及探测结果，不让 selftest 覆盖连接状态。
+    this.heartbeat = setInterval(() => { this.updateRuntime(); }, 1000);
+  }
+
+  private updateRuntime(): void {
+    if (this.closing) {
+      return;
+    }
+    try {
+      this.snapshot.native = JSON.parse(LibXray.getCoreStatus()) as NativeStatus;
+      if (!this.snapshot.native.running || this.snapshot.native.hevExited) {
+        this.fail('native-exit', this.snapshot.native.lastError || 'tun2socks 已退出');
         return;
       }
-      this.writeDiag('select', true, selected.name);
-
-      this.vpnConnection = vpnExtension.createVpnConnection(this.context);
-      let vpnConfig = ConfigBuilder.buildVpnConfig(1500);
-      let fd: number = await this.vpnConnection.create(vpnConfig);
-      this.tunFd = fd;
-      hilog.info(0x0000, 'V2RayNG', 'vpn tun fd: %{public}d', fd);
-      this.writeDiag('tun', true, 'fd=' + fd);
-
-      // 初始化核心环境（asset 目录存放 geoip/geosite.dat；设备标识用于 XUDP）
-      LibXray.initCoreEnv(this.context.filesDir + '/assets', 'harmonyos-' + this.context.applicationInfo.uid);
-      this.writeDiag('initCore', true, this.context.filesDir + '/assets');
-
-      // geo 数据是否已下载（决定路由规则能否引用 geoip:/geosite:）
-      let hasGeo = false;
-      try {
-        hasGeo = fs.accessSync(this.context.filesDir + '/assets/geoip.dat')
-          && fs.accessSync(this.context.filesDir + '/assets/geosite.dat');
-      } catch (e) {
-        hasGeo = false;
-      }
-
-      let settings: XraySettings = await ProfileStore.loadSettings();
-      let xrayConfig = ConfigBuilder.buildXrayConfig(selected, settings, hasGeo);
-      this.writeDiag('config', true, hasGeo ? 'geo rules enabled' : 'geo rules off (dat missing)');
-
-      let ok: boolean = LibXray.startLoop(xrayConfig, fd);
-      this.writeDiag('startLoop', ok, ok ? 'xray + hev running' : 'startLoop failed (see hilog)');
-      hilog.info(0x0000, 'V2RayNG', 'core startLoop: %{public}s', ok ? 'ok' : 'failed');
-      AppStorage.setOrCreate('vpnRunning', ok);
-      if (ok) {
-        // 6 秒后落盘全链路自检结果（inbound/握手/TCP/HTTP），供日志诊断页定位故障段
-        setTimeout(() => {
-          try {
-            let st = LibXray.getCoreStatus();
-            let stTest = LibXray.getSelfTest();
-            this.writeDiag('selftest', stTest.indexOf('http:ok') >= 0,
-              stTest + ' | core: ' + st);
-          } catch (e) {
-            this.writeDiag('selftest', false, 'selftest failed');
-          }
-        }, 6000);
-      }
-    } catch (err) {
-      let e = err as BusinessError;
-      hilog.error(0x0000, 'V2RayNG', 'startTunnel fail: %{public}s', JSON.stringify(e));
-      this.writeDiag('exception', false, JSON.stringify(e));
-      AppStorage.setOrCreate('vpnRunning', false);
+      this.publish();
+    } catch (e) {
+      this.fail('runtime', '读取核心运行状态失败');
     }
   }
 
-  onDestroy(): void {
-    hilog.info(0x0000, 'V2RayNG', '%{public}s', 'VpnTunnelAbility onDestroy');
-    this.writeDiag('stop', true, '');
+  private async cleanup(): Promise<void> {
+    if (this.heartbeat >= 0) {
+      clearInterval(this.heartbeat);
+      this.heartbeat = -1;
+    }
     try {
       LibXray.stopLoop();
     } catch (e) {
-      hilog.error(0x0000, 'V2RayNG', 'stopLoop fail: %{public}s', JSON.stringify(e));
+      hilog.error(0, 'V2ray', '%{public}s', '核心停止失败');
     }
-    if (this.vpnConnection !== null && this.tunFd >= 0) {
-      this.vpnConnection.destroy().then(() => {
-        hilog.info(0x0000, 'V2RayNG', '%{public}s', 'vpn destroyed');
-      }).catch((err: BusinessError) => {
-        hilog.error(0x0000, 'V2RayNG', 'vpn destroy fail: %{public}s', JSON.stringify(err));
-      });
-      this.tunFd = -1;
-      this.vpnConnection = null;
+    let conn: vpnExtension.VpnConnection | null = this.vpnConnection;
+    this.vpnConnection = null;
+    if (conn !== null) {
+      try {
+        await conn.destroy();
+      } catch (e) {
+        this.snapshot.errorText += '；系统 VPN 销毁失败，请在系统设置断开 VPN';
+        this.snapshot.native.running = false;
+        this.snapshot.native.xrayStarted = false;
+        // 销毁未成功时保留 active，让 UI 继续提供断开入口，不伪装成已断开。
+        this.publish();
+        return;
+      }
     }
-    AppStorage.setOrCreate('vpnRunning', false);
+    this.snapshot.active = false;
+    this.snapshot.native.running = false;
+    this.snapshot.native.xrayStarted = false;
+  }
+
+  private async fail(stage: string, message: string): Promise<void> {
+    this.closing = true;
+    this.snapshot.state = 'error';
+    this.snapshot.stage = stage;
+    this.snapshot.errorText = RuntimeStore.redact(message);
+    await this.cleanup(); // 失败即回收 TUN，不能留一个无出口的系统 VPN
+    this.publish();
+  }
+
+  onDestroy(): void {
+    this.closing = true;
+    this.snapshot.state = 'stopping';
+    this.snapshot.stage = 'stopping';
+    this.publish();
+    this.cleanup().then(() => {
+      this.snapshot.state = 'stopped';
+      this.snapshot.stage = 'stopped';
+      this.publish();
+    });
   }
 }
