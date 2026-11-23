@@ -1,1 +1,147 @@
-aW1wb3J0IHsgcm91dGVyLCBwcm9tcHRBY3Rpb24gfSBmcm9tICdAa2l0LkFya1VJJzsKaW1wb3J0IHsgY29tbW9uIH0gZnJvbSAnQGtpdC5BYmlsaXR5S2l0JzsKaW1wb3J0IHBhc3RlYm9hcmQgZnJvbSAnQG9ob3MucGFzdGVib2FyZCc7CmltcG9ydCB7IFJ1bnRpbWVTbmFwc2hvdCwgaXNSdW50aW1lUnVubmluZyB9IGZyb20gJy4uL2NvcmUvUnVudGltZVNuYXBzaG90JzsKaW1wb3J0IHsgUnVudGltZVN0b3JlIH0gZnJvbSAnLi4vY29yZS9SdW50aW1lU3RvcmUnOwoKY2xhc3MgRGlhZ25vc3RpY0xpbmUgewogIGxhYmVsOiBzdHJpbmc7CiAgdmFsdWU6IHN0cmluZzsKICBjb2xvcjogc3RyaW5nOwogIGNvbnN0cnVjdG9yKGxhYmVsOiBzdHJpbmcsIHZhbHVlOiBzdHJpbmcsIGNvbG9yOiBzdHJpbmcgPSAnI0U1RURGRicpIHsKICAgIHRoaXMubGFiZWwgPSBsYWJlbDsKICAgIHRoaXMudmFsdWUgPSB2YWx1ZTsKICAgIHRoaXMuY29sb3IgPSBjb2xvcjsKICB9Cn0KCi8qKiDmiYDmnInmoLjlv4PnirbmgIHmnaXoh6ogVlBOIOi/m+eoi+W/q+eFp++8m+afpeeci+aXpeW/l+S4jeS8muWcqCBVSSDov5vnqIsgZGxvcGVuIOaguOW/g+OAgiAqLwpARW50cnkKQENvbXBvbmVudApzdHJ1Y3QgTG9nc1BhZ2UgewogIEBTdGF0ZSBzbmFwc2hvdDogUnVudGltZVNuYXBzaG90ID0gbmV3IFJ1bnRpbWVTbmFwc2hvdCgpOwogIEBTdGF0ZSBsaW5lczogRGlhZ25vc3RpY0xpbmVbXSA9IFtdOwogIEBTdGF0ZSBsb2dUZXh0OiBzdHJpbmcgPSAnJzsKICBAU3RhdGUgZXJyb3JUZXh0OiBzdHJpbmcgPSAnJzsKICBAU3RhdGUgaGFzU25hcHNob3Q6IGJvb2xlYW4gPSBmYWxzZTsKICBAU3RvcmFnZVByb3AoJ3N5c0JhckhlaWdodFB4Jykgc3lzQmFyUHg6IG51bWJlciA9IDA7CiAgQFN0b3JhZ2VQcm9wKCduYXZCYXJIZWlnaHRQeCcpIG5hdkJhclB4OiBudW1iZXIgPSAwOwogIHByaXZhdGUgdGltZXI6IG51bWJlciA9IC0xOwoKICBhYm91dFRvQXBwZWFyKCk6IHZvaWQgeyB0aGlzLnN0YXJ0UmVhZGVyKCk7IH0KICBvblBhZ2VTaG93KCk6IHZvaWQgeyB0aGlzLnN0YXJ0UmVhZGVyKCk7IH0KICBvblBhZ2VIaWRlKCk6IHZvaWQgeyB0aGlzLnN0b3BSZWFkZXIoKTsgfQogIGFib3V0VG9EaXNhcHBlYXIoKTogdm9pZCB7IHRoaXMuc3RvcFJlYWRlcigpOyB9CgogIHByaXZhdGUgc3RhcnRSZWFkZXIoKTogdm9pZCB7CiAgICB0aGlzLmNvbGxlY3QoKTsKICAgIGlmICh0aGlzLnRpbWVyIDwgMCkgdGhpcy50aW1lciA9IHNldEludGVydmFsKCgpID0+IHsgdGhpcy5jb2xsZWN0KCk7IH0sIDE1MDApOwogIH0KCiAgcHJpdmF0ZSBzdG9wUmVhZGVyKCk6IHZvaWQgewogICAgaWYgKHRoaXMudGltZXIgPj0gMCkgewogICAgICBjbGVhckludGVydmFsKHRoaXMudGltZXIpOwogICAgICB0aGlzLnRpbWVyID0gLTE7CiAgICB9CiAgfQoKICBwcml2YXRlIHByb2JlUGFydChrZXk6IHN0cmluZywgdGV4dDogc3RyaW5nKTogc3RyaW5nIHsKICAgIGZvciAobGV0IHBhcnQgb2YgdGV4dC5zcGxpdCgnICcpKSB7CiAgICAgIGlmIChwYXJ0LnN0YXJ0c1dpdGgoa2V5ICsgJzonKSkgewogICAgICAgIGxldCB2YWx1ZTogc3RyaW5nID0gcGFydC5zdWJzdHJpbmcoa2V5Lmxlbmd0aCArIDEpOwogICAgICAgIGlmICh2YWx1ZSA9PT0gJ29rJykgcmV0dXJuICflt7LlrozmiJAnOwogICAgICAgIGlmICh2YWx1ZSA9PT0gJ2FjY2VwdGVkJykgcmV0dXJuICfor7fmsYLlt7LmjqXlj5fvvIjkuI3nrYnkuo7ogZTnvZHvvIknOwogICAgICAgIGlmICh2YWx1ZSA9PT0gJ2ZhaWwnKSByZXR1cm4gJ+Wksei0pSAvIOi2heaXtic7CiAgICAgICAgaWYgKHZhbHVlID09PSAncGVuZGluZycpIHJldHVybiAn5bCa5pyq5a6M5oiQJzsKICAgICAgICByZXR1cm4gJ+W3suaUtuWIsCBIVFRQICcgKyB2YWx1ZTsKICAgICAgfQogICAgfQogICAgcmV0dXJuICflsJrmnKrov5DooYwnOwogIH0KCiAgY29sbGVjdCgpOiB2b2lkIHsKICAgIGxldCBjb250ZXh0OiBjb21tb24uQ29udGV4dCA9IGdldENvbnRleHQodGhpcykgYXMgY29tbW9uLkNvbnRleHQ7CiAgICBsZXQgdmFsdWU6IFJ1bnRpbWVTbmFwc2hvdCB8IG51bGwgPSBSdW50aW1lU3RvcmUucmVhZChjb250ZXh0KTsKICAgIHRoaXMuaGFzU25hcHNob3QgPSB2YWx1ZSAhPT0gbnVsbDsKICAgIGxldCBzOiBSdW50aW1lU25hcHNob3QgPSB2YWx1ZSA/PyBuZXcgUnVudGltZVNuYXBzaG90KCk7CiAgICB0aGlzLnNuYXBzaG90ID0gczsKICAgIGxldCBhbGl2ZTogYm9vbGVhbiA9IGlzUnVudGltZVJ1bm5pbmcodmFsdWUpOwogICAgbGV0IHJvd3M6IERpYWdub3N0aWNMaW5lW10gPSBbXTsKICAgIHJvd3MucHVzaChuZXcgRGlhZ25vc3RpY0xpbmUoJ+eKtuaAgeadpea6kCcsICdWUE4g6L+b56iL77yI57uf5LiA5b+r54Wn77yJJykpOwogICAgcm93cy5wdXNoKG5ldyBEaWFnbm9zdGljTGluZSgnVlBOIOeKtuaAgScsIGFsaXZlID8gJ+aguOW/g+i/kOihjOS4rScgOiBzLnN0YXRlLCBhbGl2ZSA/ICcjMjJDNTVFJyA6ICcjRUFCMzA4JykpOwogICAgcm93cy5wdXNoKG5ldyBEaWFnbm9zdGljTGluZSgn57O757ufIFRVTicsIHMuYWN0aXZlID8gJ+acrOS8muivneS7jeaMgeaciScgOiAn5pyq5oyB5pyJJykpOwogICAgcm93cy5wdXNoKG5ldyBEaWFnbm9zdGljTGluZSgn5b2T5YmN6Zi25q61Jywgcy5zdGFnZSkpOwogICAgcm93cy5wdXNoKG5ldyBEaWFnbm9zdGljTGluZSgn5b+D6Lez5pe26Ze0Jywgcy51cGRhdGVkQXQgPiAwID8gbmV3IERhdGUocy51cGRhdGVkQXQpLnRvTG9jYWxlVGltZVN0cmluZygpIDogJ+aXoCcpKTsKICAgIHJvd3MucHVzaChuZXcgRGlhZ25vc3RpY0xpbmUoJ1hyYXkg5bqTJywgcy5uYXRpdmUueHJheUxpYkxvYWRlZCA/ICflt7LliqDovb0nIDogJ+acquWKoOi9vScpKTsKICAgIHJvd3MucHVzaChuZXcgRGlhZ25vc3RpY0xpbmUoJ3R1bjJzb2NrcyDlupMnLCBzLm5hdGl2ZS5oZXZMaWJMb2FkZWQgPyAn5bey5Yqg6L29JyA6ICfmnKrliqDovb0nKSk7CiAgICByb3dzLnB1c2gobmV3IERpYWdub3N0aWNMaW5lKCdYcmF5IOW3suWQr+WKqCcsIHMubmF0aXZlLnhyYXlTdGFydGVkID8gJ+aYrycgOiAn5ZCmJykpOwogICAgcm93cy5wdXNoKG5ldyBEaWFnbm9zdGljTGluZSgnaGV2IOe6v+eoiycsIHMubmF0aXZlLmhldkV4aXRlZCA/ICflt7LpgIDlh7rvvIxyYz0nICsgcy5uYXRpdmUuaGV2UmMgOiAoYWxpdmUgPyAn6L+Q6KGM5LitJyA6ICfmnKrlkK/liqgnKSkpOwogICAgcm93cy5wdXNoKG5ldyBEaWFnbm9zdGljTGluZSgnWHJheSDniYjmnKwnLCBzLm5hdGl2ZS5jb3JlVmVyc2lvbiB8fCAn5bCa5pyq6K+75Y+WJykpOwogICAgcm93cy5wdXNoKG5ldyBEaWFnbm9zdGljTGluZSgn6L+Q6KGM5YyF5qCH6K6wJywgcy5uYXRpdmUuYnVpbGRTaWduYXR1cmUgfHwgJ+WwmuacquWQr+WKqOaWsOWMhScpKTsKICAgIHJvd3MucHVzaChuZXcgRGlhZ25vc3RpY0xpbmUoJ1RVTiDlj5HljIUgLyDlrZfoioInLCBzLm5hdGl2ZS50dW5UeFBhY2tldHMgKyAnIC8gJyArIHMubmF0aXZlLnR1blR4Qnl0ZXMpKTsKICAgIHJvd3MucHVzaChuZXcgRGlhZ25vc3RpY0xpbmUoJ1RVTiDmlLbljIUgLyDlrZfoioInLCBzLm5hdGl2ZS50dW5SeFBhY2tldHMgKyAnIC8gJyArIHMubmF0aXZlLnR1blJ4Qnl0ZXMpKTsKICAgIHJvd3MucHVzaChuZXcgRGlhZ25vc3RpY0xpbmUoJ+mYsiBWUE4g5Zue546vJywgcy5leGNsdWRlZEJ1bmRsZSB8fCAn5pyq6YWN572uJykpOwogICAgcm93cy5wdXNoKG5ldyBEaWFnbm9zdGljTGluZSgnZ2VvaXAuZGF0IOW9k+WJjeaWh+S7ticsIFJ1bnRpbWVTdG9yZS5maWxlUmVhZHkoY29udGV4dC5maWxlc0RpciArICcvYXNzZXRzL2dlb2lwLmRhdCcpID8gJ+W3suWwsee7qicgOiAn5pyq5LiL6L29JykpOwogICAgcm93cy5wdXNoKG5ldyBEaWFnbm9zdGljTGluZSgnZ2Vvc2l0ZS5kYXQg5b2T5YmN5paH5Lu2JywgUnVudGltZVN0b3JlLmZpbGVSZWFkeShjb250ZXh0LmZpbGVzRGlyICsgJy9hc3NldHMvZ2Vvc2l0ZS5kYXQnKSA/ICflt7LlsLHnu6onIDogJ+acquS4i+i9vScpKTsKICAgIHJvd3MucHVzaChuZXcgRGlhZ25vc3RpY0xpbmUoJ+WQr+WKqOaXtiBHZW8g5YiG5rWBJywgcy5nZW9SdWxlc0VuYWJsZWQgPyAn5bey5ZCv55SoJyA6ICfmnKrlkK/nlKjvvIjkuIvovb3lkI7pnIDph43lkK8gVlBO77yJJykpOwogICAgcm93cy5wdXNoKG5ldyBEaWFnbm9zdGljTGluZSgn5ZCv5Yqo6IqC54K5Jywgcy5ub2RlTmFtZSB8fCAn5pyq6YCJ5oupJykpOwogICAgcm93cy5wdXNoKG5ldyBEaWFnbm9zdGljTGluZSgn5Y2P6K6uIC8g5Lyg6L6TIC8gVExTJywgcy5wcm90b2NvbCArICcgLyAnICsgcy50cmFuc3BvcnQgKyAnIC8gJyArIHMudGxzKSk7CiAgICByb3dzLnB1c2gobmV3IERpYWdub3N0aWNMaW5lKCflrp7pmYXot6/nlLEnLCBzLnJvdXRlTW9kZSA9PT0gMSA/ICfnu5Xov4flsYDln5/nvZHlj4rlpKfpmYYnIDogJ+WFqOWxgOS7o+eQhicpKTsKICAgIHJvd3MucHVzaChuZXcgRGlhZ25vc3RpY0xpbmUoJ011eCAvIOWXheaOoicsIChzLm11eEVuYWJsZWQgPyAn5byAJyA6ICflhbMnKSArICcgLyAnICsgKHMuc25pZmZpbmdFbmFibGVkID8gJ+W8gCcgOiAn5YWzJykpKTsKICAgIHJvd3MucHVzaChuZXcgRGlhZ25vc3RpY0xpbmUoJ+aOoua1i+eKtuaAgScsIHMubmF0aXZlLnByb2JlUnVubmluZyA/ICfov5vooYzkuK0nIDogJ+W3sue7k+adnyAvIOacqui/kOihjCcpKTsKICAgIHJvd3MucHVzaChuZXcgRGlhZ25vc3RpY0xpbmUoJ1NPQ0tTIOWFpeermScsIHRoaXMucHJvYmVQYXJ0KCdpbmJvdW5kJywgcy5uYXRpdmUuZnVsbFNlbGZUZXN0KSkpOwogICAgcm93cy5wdXNoKG5ldyBEaWFnbm9zdGljTGluZSgnU09DS1Mg5o+h5omLJywgdGhpcy5wcm9iZVBhcnQoJ2hhbmRzaGFrZScsIHMubmF0aXZlLmZ1bGxTZWxmVGVzdCkpKTsKICAgIHJvd3MucHVzaChuZXcgRGlhZ25vc3RpY0xpbmUoJ0NPTk5FQ1Qg5Zue5aSNJywgdGhpcy5wcm9iZVBhcnQoJ2Nvbm5lY3QnLCBzLm5hdGl2ZS5mdWxsU2VsZlRlc3QpKSk7CiAgICByb3dzLnB1c2gobmV3IERpYWdub3N0aWNMaW5lKCfku6PnkIYgSFRUUCDlvoDov5QnLCB0aGlzLnByb2JlUGFydCgnaHR0cCcsIHMubmF0aXZlLmZ1bGxTZWxmVGVzdCkpKTsKICAgIHRoaXMubGluZXMgPSByb3dzOwogICAgdGhpcy5lcnJvclRleHQgPSBSdW50aW1lU3RvcmUucmVkYWN0KHMuZXJyb3JUZXh0IHx8IHMubmF0aXZlLmxhc3RFcnJvciB8fCAn5pyq6K6w5b2V5qC45b+D6ZSZ6K+v77yb5o6i5rWL5aSx6LSl6K+35p+l55yL5LiL5pa55pel5b+XJyk7CiAgICBsZXQgeHJheTogc3RyaW5nID0gUnVudGltZVN0b3JlLnJlYWRUYWlsKGNvbnRleHQuZmlsZXNEaXIgKyAnL3hyYXktZXJyb3IubG9nJywgMTIwMDApOwogICAgbGV0IGhldjogc3RyaW5nID0gUnVudGltZVN0b3JlLnJlYWRUYWlsKGNvbnRleHQuZmlsZXNEaXIgKyAnL2hldi5sb2cnLCA4MDAwKTsKICAgIHRoaXMubG9nVGV4dCA9IFJ1bnRpbWVTdG9yZS5yZWRhY3Qocy5uYXRpdmUuZXZlbnRzICsgJ1xuLS0tIFhyYXkg6ZSZ6K+v5pel5b+XIC0tLVxuJyArIHhyYXkgKyAnXG4tLS0gaGV2IOaXpeW/lyAtLS1cbicgKyBoZXYpOwogIH0KCiAgcHJpdmF0ZSBjb3B5TG9nKCk6IHZvaWQgewogICAgbGV0IHRleHQ6IHN0cmluZyA9IFJ1bnRpbWVTdG9yZS5yZWRhY3QoSlNPTi5zdHJpbmdpZnkodGhpcy5zbmFwc2hvdCwgbnVsbCwgMikgKyAnXG4nICsgdGhpcy5sb2dUZXh0KTsKICAgIGxldCBkYXRhID0gcGFzdGVib2FyZC5jcmVhdGVEYXRhKHBhc3RlYm9hcmQuTUlNRVRZUEVfVEVYVF9QTEFJTiwgdGV4dCk7CiAgICBwYXN0ZWJvYXJkLmdldFN5c3RlbVBhc3RlYm9hcmQoKS5zZXREYXRhKGRhdGEpLnRoZW4oKCkgPT4gewogICAgICBwcm9tcHRBY3Rpb24uc2hvd1RvYXN0KHsgbWVzc2FnZTogJ+W3suWkjeWItuacrOWcsOiviuaWre+8iFVVSUQv5bi46KeB5Yet5o2u5a2X5q615bey6ZqQ6JeP77yJJyB9KTsKICAgIH0pLmNhdGNoKCgpID0+IHsgcHJvbXB0QWN0aW9uLnNob3dUb2FzdCh7IG1lc3NhZ2U6ICflpI3liLblpLHotKUnIH0pOyB9KTsKICB9CgogIGJ1aWxkKCkgewogICAgQ29sdW1uKCkgewogICAgICBSb3coeyBzcGFjZTogMTIgfSkgewogICAgICAgIFRleHQoJ+KGkCcpLmZvbnRTaXplKDIyKS5mb250Q29sb3IoJyNFNUVERkYnKS5vbkNsaWNrKCgpID0+IHsgcm91dGVyLmJhY2soKTsgfSkKICAgICAgICBUZXh0KCfml6Xlv5for4rmlq0nKS5mb250U2l6ZSgyMCkuZm9udFdlaWdodChGb250V2VpZ2h0LkJvbGQpLmZvbnRDb2xvcignI0U1RURGRicpCiAgICAgICAgQmxhbmsoKQogICAgICAgIEJ1dHRvbign5Yi35pawJykuZm9udFNpemUoMTIpLmhlaWdodCgzMikuYmFja2dyb3VuZENvbG9yKCcjMUQyQTQ0Jykub25DbGljaygoKSA9PiB7IHRoaXMuY29sbGVjdCgpOyB9KQogICAgICAgIEJ1dHRvbign5aSN5Yi2JykuZm9udFNpemUoMTIpLmhlaWdodCgzMikuYmFja2dyb3VuZENvbG9yKCcjMUQyQTQ0Jykub25DbGljaygoKSA9PiB7IHRoaXMuY29weUxvZygpOyB9KQogICAgICB9CiAgICAgIC53aWR0aCgnMTAwJScpLnBhZGRpbmcoeyBsZWZ0OiAxNiwgcmlnaHQ6IDE2LCB0b3A6IHB4MnZwKHRoaXMuc3lzQmFyUHgpICsgMTIsIGJvdHRvbTogOCB9KQogICAgICBTY3JvbGwoKSB7CiAgICAgICAgQ29sdW1uKHsgc3BhY2U6IDggfSkgewogICAgICAgICAgVGV4dCh0aGlzLmhhc1NuYXBzaG90ID8gJ+S7peS4i+S4uiBWUE4g6L+b56iL55qE5a6e5pe254q25oCB77yM5LiN5re355SoIFVJIOi/m+eoi+eKtuaAgeOAgicgOiAn5bCa5pyq5pS25Yiw5paw5Y2P6K6u55qEIFZQTiDkvJror53vvIzor7flkK/liqjov57mjqXjgIInKQogICAgICAgICAgICAuZm9udFNpemUoMTIpLmZvbnRDb2xvcignIzk0QTNCOCcpLndpZHRoKCcxMDAlJykKICAgICAgICAgIEZvckVhY2godGhpcy5saW5lcywgKHJvdzogRGlhZ25vc3RpY0xpbmUpID0+IHsKICAgICAgICAgICAgUm93KHsgc3BhY2U6IDggfSkgewogICAgICAgICAgICAgIFRleHQocm93LmxhYmVsKS5mb250U2l6ZSgxMikuZm9udENvbG9yKCcjOEE5NEE4Jykud2lkdGgoJzQ0JScpCiAgICAgICAgICAgICAgVGV4dChyb3cudmFsdWUpLmZvbnRTaXplKDEyKS5mb250Q29sb3Iocm93LmNvbG9yKS5sYXlvdXRXZWlnaHQoMSkKICAgICAgICAgICAgICAgIC50ZXh0QWxpZ24oVGV4dEFsaWduLkVuZCkubWF4TGluZXMoNCkKICAgICAgICAgICAgfQogICAgICAgICAgICAud2lkdGgoJzEwMCUnKS5wYWRkaW5nKDEwKS5ib3JkZXJSYWRpdXMoOCkuYmFja2dyb3VuZENvbG9yKCcjMTUxRTMxJykKICAgICAgICAgIH0sIChyb3c6IERpYWdub3N0aWNMaW5lKSA9PiByb3cubGFiZWwgKyAnOicgKyByb3cudmFsdWUpCiAgICAgICAgICBUZXh0KCfmnIDov5HmoLjlv4PplJnor68nKS5mb250U2l6ZSgxNCkuZm9udENvbG9yKCcjOTRBM0I4Jykud2lkdGgoJzEwMCUnKQogICAgICAgICAgVGV4dCh0aGlzLmVycm9yVGV4dCkuZm9udFNpemUoMTIpLmZvbnRDb2xvcignI0Y4NzE3MScpLndpZHRoKCcxMDAlJykuY29weU9wdGlvbihDb3B5T3B0aW9ucy5JbkFwcCkKICAgICAgICAgIFRleHQoJ+acrOWcsOaXpeW/l++8iOacq+WwvueJh+aute+8iScpLmZvbnRTaXplKDE0KS5mb250Q29sb3IoJyM5NEEzQjgnKS53aWR0aCgnMTAwJScpCiAgICAgICAgICBUZXh0KHRoaXMubG9nVGV4dCB8fCAn5pqC5peg5pel5b+XJykuZm9udFNpemUoMTEpLmZvbnRDb2xvcignI0U1RURGRicpLndpZHRoKCcxMDAlJykuY29weU9wdGlvbihDb3B5T3B0aW9ucy5JbkFwcCkKICAgICAgICAgIFRleHQoJ1NPQ0tTIOaOoua1i+S4jeWMheWQqyBUVU4g5ZKM57O757ufIEROU+OAgkNPTk5FQ1Qg5oiQ5Yqf5Y+q6KGo56S66K+35rGC6KKr5o6l5Y+X77yM5Y+q5pyJIEhUVFAg5Zue5aSN5omN5Luj6KGo5pWw5o2u5b6A6L+U44CC6K+357uT5ZCIIFRVTiDmlLblj5HlrZfoioLliKTmlq3nnJ/lrp7mtY/op4jlmajmtYHph4/jgIInKQogICAgICAgICAgICAuZm9udFNpemUoMTEpLmZvbnRDb2xvcignIzY0NzQ4QicpLndpZHRoKCcxMDAlJykKICAgICAgICB9CiAgICAgICAgLnBhZGRpbmcoeyBsZWZ0OiAxNiwgcmlnaHQ6IDE2LCBib3R0b206IHB4MnZwKHRoaXMubmF2QmFyUHgpICsgMjAgfSkud2lkdGgoJzEwMCUnKQogICAgICB9CiAgICAgIC5sYXlvdXRXZWlnaHQoMSkud2lkdGgoJzEwMCUnKS5zY3JvbGxCYXIoQmFyU3RhdGUuT2ZmKQogICAgfQogICAgLndpZHRoKCcxMDAlJykuaGVpZ2h0KCcxMDAlJykuYmFja2dyb3VuZENvbG9yKCcjMEIxMjIwJykKICAgIC5leHBhbmRTYWZlQXJlYShbU2FmZUFyZWFUeXBlLlNZU1RFTV0sIFtTYWZlQXJlYUVkZ2UuVE9QLCBTYWZlQXJlYUVkZ2UuQk9UVE9NXSkKICB9Cn0K
+import { router, promptAction } from '@kit.ArkUI';
+import { common } from '@kit.AbilityKit';
+import pasteboard from '@ohos.pasteboard';
+import { RuntimeSnapshot, isRuntimeRunning } from '../core/RuntimeSnapshot';
+import { RuntimeStore } from '../core/RuntimeStore';
+
+class DiagnosticLine {
+  label: string;
+  value: string;
+  color: string;
+  constructor(label: string, value: string, color: string = '#E5EDFF') {
+    this.label = label;
+    this.value = value;
+    this.color = color;
+  }
+}
+
+/** 所有核心状态来自 VPN 进程快照；查看日志不会在 UI 进程 dlopen 核心。 */
+@Entry
+@Component
+struct LogsPage {
+  @State snapshot: RuntimeSnapshot = new RuntimeSnapshot();
+  @State lines: DiagnosticLine[] = [];
+  @State logText: string = '';
+  @State errorText: string = '';
+  @State hasSnapshot: boolean = false;
+  @StorageProp('sysBarHeightPx') sysBarPx: number = 0;
+  @StorageProp('navBarHeightPx') navBarPx: number = 0;
+  private timer: number = -1;
+
+  aboutToAppear(): void { this.startReader(); }
+  onPageShow(): void { this.startReader(); }
+  onPageHide(): void { this.stopReader(); }
+  aboutToDisappear(): void { this.stopReader(); }
+
+  private startReader(): void {
+    this.collect();
+    if (this.timer < 0) this.timer = setInterval(() => { this.collect(); }, 1500);
+  }
+
+  private stopReader(): void {
+    if (this.timer >= 0) {
+      clearInterval(this.timer);
+      this.timer = -1;
+    }
+  }
+
+  private probePart(key: string, text: string): string {
+    for (let part of text.split(' ')) {
+      if (part.startsWith(key + ':')) {
+        let value: string = part.substring(key.length + 1);
+        if (value === 'ok') return '已完成';
+        if (value === 'accepted') return '请求已接受（不等于联网）';
+        if (value === 'fail') return '失败 / 超时';
+        if (value === 'pending') return '尚未完成';
+        return '已收到 HTTP ' + value;
+      }
+    }
+    return '尚未运行';
+  }
+
+  collect(): void {
+    let context: common.Context = getContext(this) as common.Context;
+    let value: RuntimeSnapshot | null = RuntimeStore.read(context);
+    this.hasSnapshot = value !== null;
+    let s: RuntimeSnapshot = value ?? new RuntimeSnapshot();
+    this.snapshot = s;
+    let alive: boolean = isRuntimeRunning(value);
+    let rows: DiagnosticLine[] = [];
+    rows.push(new DiagnosticLine('状态来源', 'VPN 进程（统一快照）'));
+    rows.push(new DiagnosticLine('VPN 状态', alive ? '核心运行中' : s.state, alive ? '#22C55E' : '#EAB308'));
+    rows.push(new DiagnosticLine('系统 TUN', s.active ? '本会话仍持有' : '未持有'));
+    rows.push(new DiagnosticLine('当前阶段', s.stage));
+    rows.push(new DiagnosticLine('心跳时间', s.updatedAt > 0 ? new Date(s.updatedAt).toLocaleTimeString() : '无'));
+    rows.push(new DiagnosticLine('Xray 库', s.native.xrayLibLoaded ? '已加载' : '未加载'));
+    rows.push(new DiagnosticLine('tun2socks 库', s.native.hevLibLoaded ? '已加载' : '未加载'));
+    rows.push(new DiagnosticLine('Xray 已启动', s.native.xrayStarted ? '是' : '否'));
+    rows.push(new DiagnosticLine('hev 线程', s.native.hevExited ? '已退出，rc=' + s.native.hevRc : (alive ? '运行中' : '未启动')));
+    rows.push(new DiagnosticLine('Xray 版本', s.native.coreVersion || '尚未读取'));
+    rows.push(new DiagnosticLine('运行包标记', s.native.buildSignature || '尚未启动新包'));
+    rows.push(new DiagnosticLine('TUN 发包 / 字节', s.native.tunTxPackets + ' / ' + s.native.tunTxBytes));
+    rows.push(new DiagnosticLine('TUN 收包 / 字节', s.native.tunRxPackets + ' / ' + s.native.tunRxBytes));
+    rows.push(new DiagnosticLine('防 VPN 回环', s.excludedBundle || '未配置'));
+    rows.push(new DiagnosticLine('geoip.dat 当前文件', RuntimeStore.fileReady(context.filesDir + '/assets/geoip.dat') ? '已就绪' : '未下载'));
+    rows.push(new DiagnosticLine('geosite.dat 当前文件', RuntimeStore.fileReady(context.filesDir + '/assets/geosite.dat') ? '已就绪' : '未下载'));
+    rows.push(new DiagnosticLine('启动时 Geo 分流', s.geoRulesEnabled ? '已启用' : '未启用（下载后需重启 VPN）'));
+    rows.push(new DiagnosticLine('启动节点', s.nodeName || '未选择'));
+    rows.push(new DiagnosticLine('协议 / 传输 / TLS', s.protocol + ' / ' + s.transport + ' / ' + s.tls));
+    rows.push(new DiagnosticLine('实际路由', s.routeMode === 1 ? '绕过局域网及大陆' : '全局代理'));
+    rows.push(new DiagnosticLine('Mux / 嗅探', (s.muxEnabled ? '开' : '关') + ' / ' + (s.sniffingEnabled ? '开' : '关')));
+    rows.push(new DiagnosticLine('探测状态', s.native.probeRunning ? '进行中' : '已结束 / 未运行'));
+    rows.push(new DiagnosticLine('SOCKS 入站', this.probePart('inbound', s.native.fullSelfTest)));
+    rows.push(new DiagnosticLine('SOCKS 握手', this.probePart('handshake', s.native.fullSelfTest)));
+    rows.push(new DiagnosticLine('CONNECT 回复', this.probePart('connect', s.native.fullSelfTest)));
+    rows.push(new DiagnosticLine('代理 HTTP 往返', this.probePart('http', s.native.fullSelfTest)));
+    this.lines = rows;
+    this.errorText = RuntimeStore.redact(s.errorText || s.native.lastError || '未记录核心错误；探测失败请查看下方日志');
+    let xray: string = RuntimeStore.readTail(context.filesDir + '/xray-error.log', 12000);
+    let hev: string = RuntimeStore.readTail(context.filesDir + '/hev.log', 8000);
+    this.logText = RuntimeStore.redact(s.native.events + '\n--- Xray 错误日志 ---\n' + xray + '\n--- hev 日志 ---\n' + hev);
+  }
+
+  private copyLog(): void {
+    let text: string = RuntimeStore.redact(JSON.stringify(this.snapshot, null, 2) + '\n' + this.logText);
+    let data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, text);
+    pasteboard.getSystemPasteboard().setData(data).then(() => {
+      promptAction.showToast({ message: '已复制本地诊断（UUID/常见凭据字段已隐藏）' });
+    }).catch(() => { promptAction.showToast({ message: '复制失败' }); });
+  }
+
+  build() {
+    Column() {
+      Row({ space: 12 }) {
+        Text('←').fontSize(22).fontColor('#E5EDFF').onClick(() => { router.back(); })
+        Text('日志诊断').fontSize(20).fontWeight(FontWeight.Bold).fontColor('#E5EDFF')
+        Blank()
+        Button('刷新').fontSize(12).height(32).backgroundColor('#1D2A44').onClick(() => { this.collect(); })
+        Button('复制').fontSize(12).height(32).backgroundColor('#1D2A44').onClick(() => { this.copyLog(); })
+      }
+      .width('100%').padding({ left: 16, right: 16, top: px2vp(this.sysBarPx) + 12, bottom: 8 })
+      Scroll() {
+        Column({ space: 8 }) {
+          Text(this.hasSnapshot ? '以下为 VPN 进程的实时状态，不混用 UI 进程状态。' : '尚未收到新协议的 VPN 会话，请启动连接。')
+            .fontSize(12).fontColor('#94A3B8').width('100%')
+          ForEach(this.lines, (row: DiagnosticLine) => {
+            Row({ space: 8 }) {
+              Text(row.label).fontSize(12).fontColor('#8A94A8').width('44%')
+              Text(row.value).fontSize(12).fontColor(row.color).layoutWeight(1)
+                .textAlign(TextAlign.End).maxLines(4)
+            }
+            .width('100%').padding(10).borderRadius(8).backgroundColor('#151E31')
+          }, (row: DiagnosticLine) => row.label + ':' + row.value)
+          Text('最近核心错误').fontSize(14).fontColor('#94A3B8').width('100%')
+          Text(this.errorText).fontSize(12).fontColor('#F87171').width('100%').copyOption(CopyOptions.InApp)
+          Text('本地日志（末尾片段）').fontSize(14).fontColor('#94A3B8').width('100%')
+          Text(this.logText || '暂无日志').fontSize(11).fontColor('#E5EDFF').width('100%').copyOption(CopyOptions.InApp)
+          Text('SOCKS 探测不包含 TUN 和系统 DNS。CONNECT 成功只表示请求被接受，只有 HTTP 回复才代表数据往返。请结合 TUN 收发字节判断真实浏览器流量。')
+            .fontSize(11).fontColor('#64748B').width('100%')
+        }
+        .padding({ left: 16, right: 16, bottom: px2vp(this.navBarPx) + 20 }).width('100%')
+      }
+      .layoutWeight(1).width('100%').scrollBar(BarState.Off)
+    }
+    .width('100%').height('100%').backgroundColor('#0B1220')
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+  }
+}

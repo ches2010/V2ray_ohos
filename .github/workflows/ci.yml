@@ -1,1 +1,219 @@
-bmFtZTogQ0kKCm9uOgogIHB1c2g6CiAgICBicmFuY2hlczogW21haW5dCiAgcHVsbF9yZXF1ZXN0OgogIHdvcmtmbG93X2Rpc3BhdGNoOgoKam9iczoKICAjIOeos+WumuajgOafpe+8muW3peeoi+e7k+aehCArIGpzb241L2pzb24g6K+t5rOVICsgVlBOIOWjsOaYjiArIOa6kOeggeaJk+WMhQogIHZlcmlmeToKICAgIHJ1bnMtb246IHVidW50dS1sYXRlc3QKICAgIHN0ZXBzOgogICAgICAtIHVzZXM6IGFjdGlvbnMvY2hlY2tvdXRAdjQKCiAgICAgIC0gdXNlczogYWN0aW9ucy9zZXR1cC1weXRob25AdjUKICAgICAgICB3aXRoOgogICAgICAgICAgcHl0aG9uLXZlcnNpb246ICIzLjEyIgoKICAgICAgLSBuYW1lOiBJbnN0YWxsIGpzb241IHBhcnNlcgogICAgICAgIHJ1bjogcGlwIGluc3RhbGwganNvbjUKCiAgICAgIC0gbmFtZTogU3RydWN0dXJlICYgc3ludGF4IGNoZWNrCiAgICAgICAgcnVuOiBweXRob24zIHNjcmlwdHMvY2lfY2hlY2sucHkKCiAgICAgIC0gbmFtZTogUGFja2FnZSBzb3VyY2UgemlwCiAgICAgICAgcnVuOiB6aXAgLXIgc291cmNlLXBhY2thZ2UuemlwIC4gLXggIi5naXQvKiIgIm5vZGVfbW9kdWxlcy8qIgoKICAgICAgLSB1c2VzOiBhY3Rpb25zL3VwbG9hZC1hcnRpZmFjdEB2NAogICAgICAgIHdpdGg6CiAgICAgICAgICBuYW1lOiBzb3VyY2UtcGFja2FnZQogICAgICAgICAgcGF0aDogc291cmNlLXBhY2thZ2UuemlwCgogICMg5bC95Yqb6ICM5Li677ya5p6E5bu6IE9IT1MgR28g5bel5YW36ZO+5bm25Lqk5Y+J57yW6K+RIFhyYXkg5qC45b+D77yIR09PUz1vcGVuaGFybW9ueSArIFRMU0RFU0PvvInjgIIKICAjIOWPguiAgyBwb3BzaWNsZWxtbG0vSGV5IOeahOWFrOW8gOmFjeaWue+8iHNjcmlwdHMvYnVpbGRfbGlieHJheV9vaG9zLnNoIC8gZG9jcy9oYXJtb255b3MtZ28tdGxzLXdhbGwubWTvvInjgIIKICAjIOWksei0peS4jeW6lOmYu+WhnuWQiOW5tuKAlOKAlOS6p+eJqeS7heS9nOS4uuWQjue7reaOpeWFpSBlbnRyeS9zcmMvbWFpbi9jcHAg55qE5YCZ6YCJIC5zb+OAggogIGJ1aWxkLWxpYnhyYXk6CiAgICBydW5zLW9uOiB1YnVudHUtbGF0ZXN0CiAgICBjb250aW51ZS1vbi1lcnJvcjogdHJ1ZQogICAgdGltZW91dC1taW51dGVzOiA2MAogICAgc3RlcHM6CiAgICAgIC0gdXNlczogYWN0aW9ucy9jaGVja291dEB2NAoKICAgICAgLSB1c2VzOiBhY3Rpb25zL3NldHVwLWdvQHY1CiAgICAgICAgd2l0aDoKICAgICAgICAgIGdvLXZlcnNpb246ICIxLjI2LngiCgogICAgICAtIG5hbWU6IEJ1aWxkIE9IT1MgR28gdG9vbGNoYWluIChzdGFyNDI3Ny9vaG9zLWdvIHYxLjI2LjUtYmV0YTEpCiAgICAgICAgcnVuOiB8CiAgICAgICAgICBnaXQgY2xvbmUgLS1kZXB0aCAxIC0tYnJhbmNoIHYxLjI2LjUtYmV0YTEgaHR0cHM6Ly9naXRodWIuY29tL3N0YXI0Mjc3L29ob3MtZ28uZ2l0ICIkSE9NRS9vaG9zLWdvIgogICAgICAgICAgY2QgIiRIT01FL29ob3MtZ28vc3JjIgogICAgICAgICAgR09ST09UX0JPT1RTVFJBUD0iJChnbyBlbnYgR09ST09UKSIgR09UT09MQ0hBSU49bG9jYWwgYmFzaCAuL21ha2UuYmFzaAoKICAgICAgLSBuYW1lOiBGZXRjaCBPcGVuSGFybW9ueSBOYXRpdmUgU0RLIChvaG9zIGxsdm0vY2xhbmcpCiAgICAgICAgcnVuOiB8CiAgICAgICAgICBjdXJsIC1mTCAtLXJldHJ5IDMgLW8gL3RtcC9vaG9zLXNkay50YXIuZ3ogXAogICAgICAgICAgICBodHRwczovL3JlcG8uaHVhd2VpY2xvdWQuY29tL29wZW5oYXJtb255L29zLzYuMS4xLUxUUy9vaG9zLXNkay13aW5kb3dzX2xpbnV4LXB1YmxpYy50YXIuZ3oKICAgICAgICAgIG1rZGlyIC1wICIkSE9NRS9vaG9zLXNkayIgJiYgdGFyIHh6ZiAvdG1wL29ob3Mtc2RrLnRhci5neiAtQyAiJEhPTUUvb2hvcy1zZGsiCiAgICAgICAgICBlY2hvICItLS0gc2RrIGxheW91dCAodG9wKSAtLS0iCiAgICAgICAgICBmaW5kICIkSE9NRS9vaG9zLXNkayIgLW1heGRlcHRoIDMgfCBoZWFkIC00MAogICAgICAgICAgIyBTREsg5YyF6Kej5byA5ZCOIGxpbnV4LyDnm67lvZXkuIvmmK/lkITnu4Tku7bljovnvKnljIXvvIhuYXRpdmUg5Li6IHppcC90YXIuZ3rvvInvvIzpnIDkuozmrKHop6PljosKICAgICAgICAgIENMQU5HPSQoZmluZCAiJEhPTUUvb2hvcy1zZGsiIC1uYW1lICJhYXJjaDY0LXVua25vd24tbGludXgtb2hvcy1jbGFuZyIgfCBoZWFkIC0xKQogICAgICAgICAgaWYgWyAteiAiJENMQU5HIiBdOyB0aGVuCiAgICAgICAgICAgICMg5b+F6aG76YCJIGxpbnV4IOebruW9leS4i+eahCBuYXRpdmUg5YyF77ybd2luZG93cyDljIXph4znmoQgY2xhbmcg5YyF6KOF6ISa5pys5ZyoIExpbnV4IOS4iuS4jeWPr+aJp+ihjAogICAgICAgICAgICBOQVRJVkVfUEtHPSQoZmluZCAiJEhPTUUvb2hvcy1zZGsiIFwoIC1uYW1lICJuYXRpdmUtbGludXgqLnppcCIgLW8gLW5hbWUgIm5hdGl2ZS1saW51eCoudGFyLmd6IiBcKSB8IGhlYWQgLTEpCiAgICAgICAgICAgIGVjaG8gIm5hdGl2ZSBzZGsgcGFja2FnZTogJE5BVElWRV9QS0ciCiAgICAgICAgICAgIHRlc3QgLW4gIiROQVRJVkVfUEtHIgogICAgICAgICAgICBta2RpciAtcCAiJEhPTUUvb2hvcy1uYXRpdmUiCiAgICAgICAgICAgIGNhc2UgIiROQVRJVkVfUEtHIiBpbgogICAgICAgICAgICAgICouemlwKSB1bnppcCAtcSAiJE5BVElWRV9QS0ciIC1kICIkSE9NRS9vaG9zLW5hdGl2ZSIgOzsKICAgICAgICAgICAgICAqLnRhci5neikgdGFyIHh6ZiAiJE5BVElWRV9QS0ciIC1DICIkSE9NRS9vaG9zLW5hdGl2ZSIgOzsKICAgICAgICAgICAgZXNhYwogICAgICAgICAgICBDTEFORz0kKGZpbmQgIiRIT01FL29ob3MtbmF0aXZlIiAtbmFtZSAiYWFyY2g2NC11bmtub3duLWxpbnV4LW9ob3MtY2xhbmciIHwgaGVhZCAtMSkKICAgICAgICAgIGZpCiAgICAgICAgICBlY2hvICJjbGFuZzogJENMQU5HIgogICAgICAgICAgdGVzdCAtbiAiJENMQU5HIgogICAgICAgICAgIyDnm7TmjqXlr7zlh7rnvJbor5Hlmajnu53lr7not6/lvoTvvIzpgb/lhY0gSE9NRSDmi7zmjqXlsYLnuqflh7rplJkKICAgICAgICAgIGVjaG8gIk9IT1NfQ0xBTkc9JENMQU5HIiA+PiAiJEdJVEhVQl9FTlYiCiAgICAgICAgICBlY2hvICJPSE9TX0NMQU5HWFg9JHtDTEFOR30rKyIgPj4gIiRHSVRIVUJfRU5WIgoKICAgICAgLSBuYW1lOiBCdWlsZCBsaWJ4cmF5LnNvIChHT09TPW9wZW5oYXJtb255IEdPQVJDSD1hcm02NCwgYy1zaGFyZWQpCiAgICAgICAgcnVuOiB8CiAgICAgICAgICBleHBvcnQgUEFUSD0iJEhPTUUvb2hvcy1nby9iaW46JFBBVEgiCiAgICAgICAgICBleHBvcnQgR09UT09MQ0hBSU49bG9jYWwKICAgICAgICAgIGdpdCBjbG9uZSAtLWRlcHRoIDEgLS1icmFuY2ggdjI2LjcuMjggaHR0cHM6Ly9naXRodWIuY29tL1hUTFMvbGliWHJheS5naXQgIiRIT01FL2xpYlhyYXkiCiAgICAgICAgICBjZCAiJEhPTUUvbGliWHJheSIKICAgICAgICAgIENDPSIkT0hPU19DTEFORyIgXAogICAgICAgICAgQ1hYPSIkT0hPU19DTEFOR1hYIiBcCiAgICAgICAgICBDR09fRU5BQkxFRD0xIEdPT1M9b3Blbmhhcm1vbnkgR09BUkNIPWFybTY0IFwKICAgICAgICAgIENHT19DRkxBR1M9Ii1mdGxzLW1vZGVsPWdsb2JhbC1keW5hbWljIiBcCiAgICAgICAgICBnbyBidWlsZCAtdHJpbXBhdGggLWJ1aWxkbW9kZT1jLXNoYXJlZCAtbyAiJEdJVEhVQl9XT1JLU1BBQ0UvbGlieHJheS5zbyIgLi9jZ29fYnJpZGdlCgogICAgICAtIG5hbWU6IEJ1aWxkIGxpYmhldnNvY2tzNXR1bi5zbyAoaGV2LXNvY2tzNS10dW5uZWwgMi45LjAsIHB1cmUgQykKICAgICAgICBydW46IHwKICAgICAgICAgIExMVk1fQklOPSQoZGlybmFtZSAiJE9IT1NfQ0xBTkciKQogICAgICAgICAgU1lTUk9PVD0kKGZpbmQgIiRIT01FL29ob3MtbmF0aXZlIiAtbWF4ZGVwdGggNCAtbmFtZSBzeXNyb290IC10eXBlIGQgfCBoZWFkIC0xKQogICAgICAgICAgZWNobyAic3lzcm9vdDogJFNZU1JPT1QiCiAgICAgICAgICB0ZXN0IC1uICIkU1lTUk9PVCIKICAgICAgICAgIGdpdCBjbG9uZSAtLXJlY3Vyc2l2ZSAtLWRlcHRoIDEgLS1icmFuY2ggMi45LjAgaHR0cHM6Ly9naXRodWIuY29tL2hlaWhlci9oZXYtc29ja3M1LXR1bm5lbC5naXQgIiRIT01FL2hldiIKICAgICAgICAgIGNkICIkSE9NRS9oZXYiCiAgICAgICAgICBtYWtlIGNsZWFuID4vZGV2L251bGwgMj4mMSB8fCB0cnVlCiAgICAgICAgICBtYWtlIC1qNCBDQz0iJE9IT1NfQ0xBTkciIEFSPSIkTExWTV9CSU4vbGx2bS1hciIgUkFOTElCPSIkTExWTV9CSU4vbGx2bS1yYW5saWIiIFwKICAgICAgICAgICAgQ0ZMQUdTPSItLXRhcmdldD1hYXJjaDY0LWxpbnV4LW9ob3MgLS1zeXNyb290PSRTWVNST09UIC1mUElDIC1PMiIgc3RhdGljCiAgICAgICAgICBNQUlOX0xJQj0kKGZpbmQgLiAtbmFtZSAnbGliaGV2LXNvY2tzNS10dW5uZWwuYScgfCBoZWFkIC0xKQogICAgICAgICAgZWNobyAibWFpbiBsaWI6ICRNQUlOX0xJQiIKICAgICAgICAgIHRlc3QgLW4gIiRNQUlOX0xJQiIKICAgICAgICAgIE9USEVSX0xJQlM9JChmaW5kIC4gLW5hbWUgJyouYScgISAtbmFtZSAnbGliaGV2LXNvY2tzNS10dW5uZWwuYScgfCB0ciAnXG4nICcgJykKICAgICAgICAgICIkT0hPU19DTEFORyIgLS10YXJnZXQ9YWFyY2g2NC1saW51eC1vaG9zIC0tc3lzcm9vdD0kU1lTUk9PVCAtZlBJQyAtc2hhcmVkIFwKICAgICAgICAgICAgLW8gIiRHSVRIVUJfV09SS1NQQUNFL2xpYmhldnNvY2tzNXR1bi5zbyIgXAogICAgICAgICAgICAtV2wsLS13aG9sZS1hcmNoaXZlICIkTUFJTl9MSUIiIC1XbCwtLW5vLXdob2xlLWFyY2hpdmUgJE9USEVSX0xJQlMgLWxwdGhyZWFkCgogICAgICAtIG5hbWU6IFNhbml0eS1jaGVjayBwcm9kdWNlZCBsaWJyYXJpZXMgKFBUX1RMUyAvIFRMU0RFU0MgLyBleHBvcnRzKQogICAgICAgIHJ1bjogfAogICAgICAgICAgZmlsZSBsaWJ4cmF5LnNvIGxpYmhldnNvY2tzNXR1bi5zbwogICAgICAgICAgcmVhZGVsZiAtbCBsaWJ4cmF5LnNvIHwgZ3JlcCAtaSBUTFMgfHwgZWNobyAiV0FSTjogbm8gUFRfVExTIgogICAgICAgICAgcmVhZGVsZiAtciBsaWJ4cmF5LnNvIHwgZ3JlcCAtaSBUTFNERVNDIHx8IGVjaG8gIldBUk46IG5vIFRMU0RFU0MgcmVsb2NzIgogICAgICAgICAgbm0gLUQgbGlieHJheS5zbyB8IGdyZXAgLUUgIkNHb0ludm9rZXxDR29GcmVlIiB8fCBlY2hvICJXQVJOOiBDR28gZXhwb3J0cyBub3QgZm91bmQiCiAgICAgICAgICBubSAtRCBsaWJoZXZzb2NrczV0dW4uc28gfCBncmVwIGhldl9zb2NrczVfdHVubmVsIHx8IGVjaG8gIldBUk46IGhldiBleHBvcnRzIG5vdCBmb3VuZCIKCiAgICAgIC0gbmFtZTogQXNzZW1ibGUgcHJvamVjdCBwYWNrYWdlIHdpdGggcHJlYnVpbHQgY29yZXMKICAgICAgICBydW46IHwKICAgICAgICAgIG1rZGlyIC1wIGVudHJ5L2xpYnMvYXJtNjQtdjhhCiAgICAgICAgICBjcCBsaWJ4cmF5LnNvIGxpYmhldnNvY2tzNXR1bi5zbyBlbnRyeS9saWJzL2FybTY0LXY4YS8KICAgICAgICAgIHppcCAtciBWMnJheV9vaG9zLXdpdGgtY29yZXMuemlwIC4gLXggIi5naXQvKiIgIm5vZGVfbW9kdWxlcy8qIgoKICAgICAgLSB1c2VzOiBhY3Rpb25zL3VwbG9hZC1hcnRpZmFjdEB2NAogICAgICAgIHdpdGg6CiAgICAgICAgICBuYW1lOiBvaG9zLW5hdGl2ZS1saWJzLWFybTY0CiAgICAgICAgICBwYXRoOiB8CiAgICAgICAgICAgIGxpYnhyYXkuc28KICAgICAgICAgICAgbGliaGV2c29ja3M1dHVuLnNvCgogICAgICAtIHVzZXM6IGFjdGlvbnMvdXBsb2FkLWFydGlmYWN0QHY0CiAgICAgICAgd2l0aDoKICAgICAgICAgIG5hbWU6IFYycmF5X29ob3Mtd2l0aC1jb3JlcwogICAgICAgICAgcGF0aDogVjJyYXlfb2hvcy13aXRoLWNvcmVzLnppcAoKICAjIOS9v+eUqOWNjuS4uuWumOaWuSBIYXJtb255T1MgY29tbWFuZC1saW5lLXRvb2xzIOaehOW7uiBIQVDjgIIKICAjIOivpeW3peWFt+WMheWGheW1jCBIYXJtb255T1MgU0RL77yI5ZCrICd2cG4nIOaJqeWxleexu+Wei+aUr+aMge+8ie+8jOaXoOmcgOWGjeWBmiBzdHJpcC12cG4g6YCC6YWN77ybCiAgIyDmnoTlu7rkuqfniankuLogSGFybW9ueU9TIOebruagh+eahOacquetvuWQjSBkZWJ1ZyBIQVDjgIIKICAjIOW3peWFt+WMheadpeiHqiBPa3lzdS9oYXJtb255LWF1dG8tYnVpbGQg55qEIHJlbGVhc2Ug6ZWc5YOP77yIY29tbWFuZGxpbmUtdG9vbHMtbGludXgteDY0LTYuMS4wLjgxNu+8jOe6piAyLjVHQu+8ieOAggogIGJ1aWxkLWhhcDoKICAgIG5lZWRzOiBidWlsZC1saWJ4cmF5CiAgICBydW5zLW9uOiB1YnVudHUtbGF0ZXN0CiAgICBjb250aW51ZS1vbi1lcnJvcjogdHJ1ZQogICAgdGltZW91dC1taW51dGVzOiA2MAogICAgc3RlcHM6CiAgICAgIC0gdXNlczogYWN0aW9ucy9jaGVja291dEB2NAoKICAgICAgIyDlhbPplK7vvJrmiorkuqTlj4nnvJbor5Hlh7rnmoTmoLjlv4PlupPmiZPov5sgSEFQ77yI6L+Q6KGM5pyfIG5hcGkgZGxvcGVuIOWKoOi9ve+8ieOAggogICAgICAjIOe8uuWwkei/meS4pOS4qiAuc28g5pe26Zqn6YGT5peg5rOV6L2s5Y+R5Lu75L2V5rWB6YeP77yIRE5TIOS5n+S8muWksei0pe+8ieOAggogICAgICAtIG5hbWU6IERvd25sb2FkIHByZWJ1aWx0IGNvcmVzIGludG8gam5pTGlicwogICAgICAgIHVzZXM6IGFjdGlvbnMvZG93bmxvYWQtYXJ0aWZhY3RAdjQKICAgICAgICB3aXRoOgogICAgICAgICAgbmFtZTogb2hvcy1uYXRpdmUtbGlicy1hcm02NAogICAgICAgICAgcGF0aDogZW50cnkvbGlicy9hcm02NC12OGEKCiAgICAgIC0gbmFtZTogVmVyaWZ5IGNvcmVzIHByZXNlbnQKICAgICAgICBydW46IHwKICAgICAgICAgIGxzIC1sYSBlbnRyeS9saWJzL2FybTY0LXY4YQogICAgICAgICAgdGVzdCAtZiBlbnRyeS9saWJzL2FybTY0LXY4YS9saWJ4cmF5LnNvCiAgICAgICAgICB0ZXN0IC1mIGVudHJ5L2xpYnMvYXJtNjQtdjhhL2xpYmhldnNvY2tzNXR1bi5zbwoKICAgICAgLSB1c2VzOiBhY3Rpb25zL3NldHVwLW5vZGVAdjQKICAgICAgICB3aXRoOgogICAgICAgICAgbm9kZS12ZXJzaW9uOiAiMTgiCgogICAgICAtIG5hbWU6IENhY2hlIEhhcm1vbnlPUyBjb21tYW5kLWxpbmUtdG9vbHMKICAgICAgICBpZDogY2FjaGUtdG9vbHMKICAgICAgICB1c2VzOiBhY3Rpb25zL2NhY2hlQHY0CiAgICAgICAgd2l0aDoKICAgICAgICAgIHBhdGg6IC4vY29tbWFuZC1saW5lLXRvb2xzCiAgICAgICAgICBrZXk6ICR7eyBydW5uZXIub3MgfX0taG1vcy1jb21tYW5kbGluZS10b29scy02LjEuMC44MTYKCiAgICAgIC0gbmFtZTogRG93bmxvYWQgSGFybW9ueU9TIGNvbW1hbmQtbGluZS10b29scyAobGludXgteDY0KQogICAgICAgIGlmOiBzdGVwcy5jYWNoZS10b29scy5vdXRwdXRzLmNhY2hlLWhpdCAhPSAndHJ1ZScKICAgICAgICBydW46IHwKICAgICAgICAgIGN1cmwgLWZMIC0tcmV0cnkgMyAtbyB0b29scy56aXAgXAogICAgICAgICAgICBodHRwczovL2dpdGh1Yi5jb20vT2t5c3UvaGFybW9ueS1hdXRvLWJ1aWxkL3JlbGVhc2VzL2Rvd25sb2FkL2NvbW1hbmRsaW5lLXRvb2xzLWxpbnV4LXg2NC02LjEuMC44MTYvY29tbWFuZGxpbmUtdG9vbHMtbGludXgteDY0LTYuMS4wLjgxNi56aXAKICAgICAgICAgIHVuemlwIC1xIHRvb2xzLnppcAogICAgICAgICAgcm0gdG9vbHMuemlwCiAgICAgICAgICB0ZXN0IC1kIGNvbW1hbmQtbGluZS10b29scwogICAgICAgICAgZWNobyAiLS0tIGNvbW1hbmQtbGluZS10b29scyBsYXlvdXQgLS0tIgogICAgICAgICAgbHMgY29tbWFuZC1saW5lLXRvb2xzCgogICAgICAtIG5hbWU6IFNldHVwIGJ1aWxkIGVudmlyb25tZW50CiAgICAgICAgcnVuOiB8CiAgICAgICAgICBUT09MU19ESVI9IiQocHdkKS9jb21tYW5kLWxpbmUtdG9vbHMiCiAgICAgICAgICAjIFNESyDot6/lvoTvvJpodmlnb3Ig5ZCM5pe26K+75Y+WIGxvY2FsLnByb3BlcnRpZXMg5LiO546v5aKD5Y+Y6YePCiAgICAgICAgICBlY2hvICJod3Nkay5kaXI9JFRPT0xTX0RJUi9zZGsiID4gbG9jYWwucHJvcGVydGllcwogICAgICAgICAgZWNobyAiREVWRUNPX1NES19IT01FPSRUT09MU19ESVIvc2RrIiA+PiAiJEdJVEhVQl9FTlYiCiAgICAgICAgICBlY2hvICJIT1NfU0RLX0hPTUU9JFRPT0xTX0RJUi9zZGsiID4+ICIkR0lUSFVCX0VOViIKICAgICAgICAgIGVjaG8gIk9IUE1fSE9NRT0kVE9PTFNfRElSL29ocG0iID4+ICIkR0lUSFVCX0VOViIKICAgICAgICAgIGVjaG8gIiRUT09MU19ESVIvYmluIiA+PiAiJEdJVEhVQl9QQVRIIgogICAgICAgICAgY2htb2QgLVIgK3ggIiRUT09MU19ESVIvYmluIgogICAgICAgICAgIyBHSVRIVUJfUEFUSCBvbmx5IHRha2VzIGVmZmVjdCBmb3IgbGF0ZXIgc3RlcHM7IGV4cG9ydCB3aXRoaW4gdGhpcyBzdGVwCiAgICAgICAgICBleHBvcnQgUEFUSD0iJFRPT0xTX0RJUi9iaW46JFBBVEgiCiAgICAgICAgICBodmlnb3J3IC0tdmVyc2lvbgoKICAgICAgLSBuYW1lOiBJbnN0YWxsIGRlcGVuZGVuY2llcyAob2hwbSkKICAgICAgICBydW46IG9ocG0gaW5zdGFsbAoKICAgICAgLSBuYW1lOiBCdWlsZCB1bnNpZ25lZCBIQVAgKGh2aWdvcncgYXNzZW1ibGVIYXAsIEhhcm1vbnlPUyBTREspCiAgICAgICAgcnVuOiB8CiAgICAgICAgICBodmlnb3J3IGFzc2VtYmxlSGFwIC0tbW9kZSBtb2R1bGUgLXAgbW9kdWxlPWVudHJ5QGRlZmF1bHQgLXAgcHJvZHVjdD1kZWZhdWx0IC1wIGJ1aWxkTW9kZT1kZWJ1ZyAtLW5vLWRhZW1vbgogICAgICAgICAgZWNobyAiLS0tIGhhcCBmaWxlcyAtLS0iCiAgICAgICAgICBmaW5kIGVudHJ5L2J1aWxkIC1uYW1lICIqLmhhcCIgfHwgdHJ1ZQoKICAgICAgLSBuYW1lOiBDb2xsZWN0IEhBUCBhcnRpZmFjdAogICAgICAgIHJ1bjogfAogICAgICAgICAgbWtkaXIgLXAgZGlzdAogICAgICAgICAgZmluZCBlbnRyeS9idWlsZCAtbmFtZSAiKi5oYXAiIC1leGVjIGNwIHt9IGRpc3QvIFw7CiAgICAgICAgICBscyAtbGEgZGlzdAogICAgICAgICAgdGVzdCAtbiAiJChscyBkaXN0IDI+L2Rldi9udWxsKSIKCiAgICAgIC0gdXNlczogYWN0aW9ucy91cGxvYWQtYXJ0aWZhY3RAdjQKICAgICAgICB3aXRoOgogICAgICAgICAgbmFtZTogZW50cnktaGFwLXVuc2lnbmVkCiAgICAgICAgICBwYXRoOiBkaXN0LyouaGFwCg==
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  # 稳定检查：工程结构 + json5/json 语法 + VPN 声明 + 源码打包
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install json5 parser
+        run: pip install json5
+
+      - name: Structure & syntax check
+        run: python3 scripts/ci_check.py
+
+      - name: Package source zip
+        run: zip -r source-package.zip . -x ".git/*" "node_modules/*"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source-package
+          path: source-package.zip
+
+  # 尽力而为：构建 OHOS Go 工具链并交叉编译 Xray 核心（GOOS=openharmony + TLSDESC）。
+  # 参考 popsiclelmlm/Hey 的公开配方（scripts/build_libxray_ohos.sh / docs/harmonyos-go-tls-wall.md）。
+  # 失败不应阻塞合并——产物仅作为后续接入 entry/src/main/cpp 的候选 .so。
+  build-libxray:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.x"
+
+      - name: Build OHOS Go toolchain (star4277/ohos-go v1.26.5-beta1)
+        run: |
+          git clone --depth 1 --branch v1.26.5-beta1 https://github.com/star4277/ohos-go.git "$HOME/ohos-go"
+          cd "$HOME/ohos-go/src"
+          GOROOT_BOOTSTRAP="$(go env GOROOT)" GOTOOLCHAIN=local bash ./make.bash
+
+      - name: Fetch OpenHarmony Native SDK (ohos llvm/clang)
+        run: |
+          curl -fL --retry 3 -o /tmp/ohos-sdk.tar.gz \
+            https://repo.huaweicloud.com/openharmony/os/6.1.1-LTS/ohos-sdk-windows_linux-public.tar.gz
+          mkdir -p "$HOME/ohos-sdk" && tar xzf /tmp/ohos-sdk.tar.gz -C "$HOME/ohos-sdk"
+          echo "--- sdk layout (top) ---"
+          find "$HOME/ohos-sdk" -maxdepth 3 | head -40
+          # SDK 包解开后 linux/ 目录下是各组件压缩包（native 为 zip/tar.gz），需二次解压
+          CLANG=$(find "$HOME/ohos-sdk" -name "aarch64-unknown-linux-ohos-clang" | head -1)
+          if [ -z "$CLANG" ]; then
+            # 必须选 linux 目录下的 native 包；windows 包里的 clang 包装脚本在 Linux 上不可执行
+            NATIVE_PKG=$(find "$HOME/ohos-sdk" \( -name "native-linux*.zip" -o -name "native-linux*.tar.gz" \) | head -1)
+            echo "native sdk package: $NATIVE_PKG"
+            test -n "$NATIVE_PKG"
+            mkdir -p "$HOME/ohos-native"
+            case "$NATIVE_PKG" in
+              *.zip) unzip -q "$NATIVE_PKG" -d "$HOME/ohos-native" ;;
+              *.tar.gz) tar xzf "$NATIVE_PKG" -C "$HOME/ohos-native" ;;
+            esac
+            CLANG=$(find "$HOME/ohos-native" -name "aarch64-unknown-linux-ohos-clang" | head -1)
+          fi
+          echo "clang: $CLANG"
+          test -n "$CLANG"
+          # 直接导出编译器绝对路径，避免 HOME 拼接层级出错
+          echo "OHOS_CLANG=$CLANG" >> "$GITHUB_ENV"
+          echo "OHOS_CLANGXX=${CLANG}++" >> "$GITHUB_ENV"
+
+      - name: Build libxray.so (GOOS=openharmony GOARCH=arm64, c-shared)
+        run: |
+          export PATH="$HOME/ohos-go/bin:$PATH"
+          export GOTOOLCHAIN=local
+          git clone --depth 1 --branch v26.7.28 https://github.com/XTLS/libXray.git "$HOME/libXray"
+          cd "$HOME/libXray"
+          CC="$OHOS_CLANG" \
+          CXX="$OHOS_CLANGXX" \
+          CGO_ENABLED=1 GOOS=openharmony GOARCH=arm64 \
+          CGO_CFLAGS="-ftls-model=global-dynamic" \
+          go build -trimpath -buildmode=c-shared -o "$GITHUB_WORKSPACE/libxray.so" ./cgo_bridge
+
+      - name: Build libhevsocks5tun.so (hev-socks5-tunnel 2.9.0, pure C)
+        run: |
+          LLVM_BIN=$(dirname "$OHOS_CLANG")
+          SYSROOT=$(find "$HOME/ohos-native" -maxdepth 4 -name sysroot -type d | head -1)
+          echo "sysroot: $SYSROOT"
+          test -n "$SYSROOT"
+          git clone --recursive --depth 1 --branch 2.9.0 https://github.com/heiher/hev-socks5-tunnel.git "$HOME/hev"
+          cd "$HOME/hev"
+          make clean >/dev/null 2>&1 || true
+          make -j4 CC="$OHOS_CLANG" AR="$LLVM_BIN/llvm-ar" RANLIB="$LLVM_BIN/llvm-ranlib" \
+            CFLAGS="--target=aarch64-linux-ohos --sysroot=$SYSROOT -fPIC -O2" static
+          MAIN_LIB=$(find . -name 'libhev-socks5-tunnel.a' | head -1)
+          echo "main lib: $MAIN_LIB"
+          test -n "$MAIN_LIB"
+          OTHER_LIBS=$(find . -name '*.a' ! -name 'libhev-socks5-tunnel.a' | tr '\n' ' ')
+          "$OHOS_CLANG" --target=aarch64-linux-ohos --sysroot=$SYSROOT -fPIC -shared \
+            -o "$GITHUB_WORKSPACE/libhevsocks5tun.so" \
+            -Wl,--whole-archive "$MAIN_LIB" -Wl,--no-whole-archive $OTHER_LIBS -lpthread
+
+      - name: Sanity-check produced libraries (PT_TLS / TLSDESC / exports)
+        run: |
+          file libxray.so libhevsocks5tun.so
+          readelf -l libxray.so | grep -i TLS || echo "WARN: no PT_TLS"
+          readelf -r libxray.so | grep -i TLSDESC || echo "WARN: no TLSDESC relocs"
+          nm -D libxray.so | grep -E "CGoInvoke|CGoFree" || echo "WARN: CGo exports not found"
+          nm -D libhevsocks5tun.so | grep hev_socks5_tunnel || echo "WARN: hev exports not found"
+
+      - name: Assemble project package with prebuilt cores
+        run: |
+          mkdir -p entry/libs/arm64-v8a
+          cp libxray.so libhevsocks5tun.so entry/libs/arm64-v8a/
+          zip -r V2ray_ohos-with-cores.zip . -x ".git/*" "node_modules/*"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ohos-native-libs-arm64
+          path: |
+            libxray.so
+            libhevsocks5tun.so
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: V2ray_ohos-with-cores
+          path: V2ray_ohos-with-cores.zip
+
+  # 使用华为官方 HarmonyOS command-line-tools 构建 HAP。
+  # 该工具包内嵌 HarmonyOS SDK（含 'vpn' 扩展类型支持），无需再做 strip-vpn 适配；
+  # 构建产物为 HarmonyOS 目标的未签名 debug HAP。
+  # 工具包来自 Okysu/harmony-auto-build 的 release 镜像（commandline-tools-linux-x64-6.1.0.816，约 2.5GB）。
+  build-hap:
+    needs: build-libxray
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      # 关键：把交叉编译出的核心库打进 HAP（运行期 napi dlopen 加载）。
+      # 缺少这两个 .so 时隧道无法转发任何流量（DNS 也会失败）。
+      - name: Download prebuilt cores into jniLibs
+        uses: actions/download-artifact@v4
+        with:
+          name: ohos-native-libs-arm64
+          path: entry/libs/arm64-v8a
+
+      - name: Verify cores present
+        run: |
+          ls -la entry/libs/arm64-v8a
+          test -f entry/libs/arm64-v8a/libxray.so
+          test -f entry/libs/arm64-v8a/libhevsocks5tun.so
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Cache HarmonyOS command-line-tools
+        id: cache-tools
+        uses: actions/cache@v4
+        with:
+          path: ./command-line-tools
+          key: ${{ runner.os }}-hmos-commandline-tools-6.1.0.816
+
+      - name: Download HarmonyOS command-line-tools (linux-x64)
+        if: steps.cache-tools.outputs.cache-hit != 'true'
+        run: |
+          curl -fL --retry 3 -o tools.zip \
+            https://github.com/Okysu/harmony-auto-build/releases/download/commandline-tools-linux-x64-6.1.0.816/commandline-tools-linux-x64-6.1.0.816.zip
+          unzip -q tools.zip
+          rm tools.zip
+          test -d command-line-tools
+          echo "--- command-line-tools layout ---"
+          ls command-line-tools
+
+      - name: Setup build environment
+        run: |
+          TOOLS_DIR="$(pwd)/command-line-tools"
+          # SDK 路径：hvigor 同时读取 local.properties 与环境变量
+          echo "hwsdk.dir=$TOOLS_DIR/sdk" > local.properties
+          echo "DEVECO_SDK_HOME=$TOOLS_DIR/sdk" >> "$GITHUB_ENV"
+          echo "HOS_SDK_HOME=$TOOLS_DIR/sdk" >> "$GITHUB_ENV"
+          echo "OHPM_HOME=$TOOLS_DIR/ohpm" >> "$GITHUB_ENV"
+          echo "$TOOLS_DIR/bin" >> "$GITHUB_PATH"
+          chmod -R +x "$TOOLS_DIR/bin"
+          # GITHUB_PATH only takes effect for later steps; export within this step
+          export PATH="$TOOLS_DIR/bin:$PATH"
+          hvigorw --version
+
+      - name: Install dependencies (ohpm)
+        run: ohpm install
+
+      - name: Build unsigned HAP (hvigorw assembleHap, HarmonyOS SDK)
+        run: |
+          hvigorw assembleHap --mode module -p module=entry@default -p product=default -p buildMode=debug --no-daemon
+          echo "--- hap files ---"
+          find entry/build -name "*.hap" || true
+
+      - name: Collect HAP artifact
+        run: |
+          mkdir -p dist
+          find entry/build -name "*.hap" -exec cp {} dist/ \;
+          ls -la dist
+          test -n "$(ls dist 2>/dev/null)"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: entry-hap-unsigned
+          path: dist/*.hap

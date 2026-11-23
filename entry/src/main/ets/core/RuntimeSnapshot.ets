@@ -1,1 +1,54 @@
-LyoqIOWUr+S4gOeahCBWUE4g6L+Q6KGM54q25oCB5Y2P6K6u77yb55SxIFZQTiDov5vnqIvlj5HluIPvvIxVSSDlj6ror7vlj5bvvIzkuI3oh6rooYzmjqLmtYsgbmF0aXZl44CCICovCmV4cG9ydCBjb25zdCBSVU5USU1FX1NDSEVNQTogbnVtYmVyID0gMjsKZXhwb3J0IGNvbnN0IEJVSUxEX1NJR05BVFVSRTogc3RyaW5nID0gJ3Zwbi1ydW50aW1lLXYyLXNlbGYtZXhjbHVkZWQnOwoKZXhwb3J0IGNsYXNzIE5hdGl2ZVN0YXR1cyB7CiAgeHJheUxpYkxvYWRlZDogYm9vbGVhbiA9IGZhbHNlOwogIGhldkxpYkxvYWRlZDogYm9vbGVhbiA9IGZhbHNlOwogIHhyYXlTdGFydGVkOiBib29sZWFuID0gZmFsc2U7CiAgcnVubmluZzogYm9vbGVhbiA9IGZhbHNlOwogIGhldkV4aXRlZDogYm9vbGVhbiA9IGZhbHNlOwogIGhldlJjOiBudW1iZXIgPSAtMTsKICBwcm9iZVJ1bm5pbmc6IGJvb2xlYW4gPSBmYWxzZTsKICBzb2Nrc1NlbGZUZXN0OiBzdHJpbmcgPSAnJzsKICBmdWxsU2VsZlRlc3Q6IHN0cmluZyA9ICcnOwogIGxhc3RFcnJvcjogc3RyaW5nID0gJyc7CiAgY29yZVZlcnNpb246IHN0cmluZyA9ICcnOwogIGJ1aWxkU2lnbmF0dXJlOiBzdHJpbmcgPSAnJzsKICB0dW5UeFBhY2tldHM6IG51bWJlciA9IDA7CiAgdHVuVHhCeXRlczogbnVtYmVyID0gMDsKICB0dW5SeFBhY2tldHM6IG51bWJlciA9IDA7CiAgdHVuUnhCeXRlczogbnVtYmVyID0gMDsKICBldmVudHM6IHN0cmluZyA9ICcnOwp9CgpleHBvcnQgY2xhc3MgUnVudGltZVNuYXBzaG90IHsKICBzY2hlbWE6IG51bWJlciA9IFJVTlRJTUVfU0NIRU1BOwogIHNlc3Npb25JZDogc3RyaW5nID0gJyc7CiAgc3RhdGU6IHN0cmluZyA9ICdzdG9wcGVkJzsgLy8gc3RhcnRpbmcgfCBydW5uaW5nIHwgc3RvcHBpbmcgfCBzdG9wcGVkIHwgZXJyb3IKICBzdGFnZTogc3RyaW5nID0gJ2lkbGUnOwogIHVwZGF0ZWRBdDogbnVtYmVyID0gMDsKICBhY3RpdmU6IGJvb2xlYW4gPSBmYWxzZTsgLy8g57O757ufIFRVTiDmmK/lkKbku43nlLHmnKzkvJror53mjIHmnInvvJvkuI4gSFRUUCDmjqLmtYvmmK/lkKbmiJDlip/liIblvIAKICBub2RlTmFtZTogc3RyaW5nID0gJyc7CiAgcHJvdG9jb2w6IHN0cmluZyA9ICcnOwogIHRyYW5zcG9ydDogc3RyaW5nID0gJyc7CiAgdGxzOiBzdHJpbmcgPSAnJzsKICByb3V0ZU1vZGU6IG51bWJlciA9IDA7CiAgZ2VvSXBSZWFkeTogYm9vbGVhbiA9IGZhbHNlOwogIGdlb1NpdGVSZWFkeTogYm9vbGVhbiA9IGZhbHNlOwogIGdlb1J1bGVzRW5hYmxlZDogYm9vbGVhbiA9IGZhbHNlOwogIG11eEVuYWJsZWQ6IGJvb2xlYW4gPSBmYWxzZTsKICBzbmlmZmluZ0VuYWJsZWQ6IGJvb2xlYW4gPSBmYWxzZTsKICBleGNsdWRlZEJ1bmRsZTogc3RyaW5nID0gJyc7CiAgZXJyb3JUZXh0OiBzdHJpbmcgPSAnJzsKICBuYXRpdmU6IE5hdGl2ZVN0YXR1cyA9IG5ldyBOYXRpdmVTdGF0dXMoKTsKfQoKLyoqIOWPquaciSBWUE4g6L+b56iL55qE5b+D6Lez5Y+KIG5hdGl2ZSDlrZjmtLvor4Hmja7og73ooajnpLrlt7LlkK/liqjvvJvmjqLmtYvmiJDlip/kuI3mmK/lhbblv4XopoHmnaHku7bjgIIgKi8KZXhwb3J0IGZ1bmN0aW9uIGlzUnVudGltZVJ1bm5pbmcoczogUnVudGltZVNuYXBzaG90IHwgbnVsbCk6IGJvb2xlYW4gewogIGlmIChzID09PSBudWxsIHx8IERhdGUubm93KCkgLSBzLnVwZGF0ZWRBdCA+IDEwMDAwKSB7CiAgICByZXR1cm4gZmFsc2U7CiAgfQogIHJldHVybiBzLnN0YXRlID09PSAncnVubmluZycgJiYgcy5hY3RpdmUgJiYgcy5uYXRpdmUucnVubmluZwogICAgJiYgcy5uYXRpdmUueHJheVN0YXJ0ZWQgJiYgIXMubmF0aXZlLmhldkV4aXRlZDsKfQo=
+/** 唯一的 VPN 运行状态协议；由 VPN 进程发布，UI 只读取，不自行探测 native。 */
+export const RUNTIME_SCHEMA: number = 2;
+export const BUILD_SIGNATURE: string = 'vpn-runtime-v2-self-excluded';
+
+export class NativeStatus {
+  xrayLibLoaded: boolean = false;
+  hevLibLoaded: boolean = false;
+  xrayStarted: boolean = false;
+  running: boolean = false;
+  hevExited: boolean = false;
+  hevRc: number = -1;
+  probeRunning: boolean = false;
+  socksSelfTest: string = '';
+  fullSelfTest: string = '';
+  lastError: string = '';
+  coreVersion: string = '';
+  buildSignature: string = '';
+  tunTxPackets: number = 0;
+  tunTxBytes: number = 0;
+  tunRxPackets: number = 0;
+  tunRxBytes: number = 0;
+  events: string = '';
+}
+
+export class RuntimeSnapshot {
+  schema: number = RUNTIME_SCHEMA;
+  sessionId: string = '';
+  state: string = 'stopped'; // starting | running | stopping | stopped | error
+  stage: string = 'idle';
+  updatedAt: number = 0;
+  active: boolean = false; // 系统 TUN 是否仍由本会话持有；与 HTTP 探测是否成功分开
+  nodeName: string = '';
+  protocol: string = '';
+  transport: string = '';
+  tls: string = '';
+  routeMode: number = 0;
+  geoIpReady: boolean = false;
+  geoSiteReady: boolean = false;
+  geoRulesEnabled: boolean = false;
+  muxEnabled: boolean = false;
+  sniffingEnabled: boolean = false;
+  excludedBundle: string = '';
+  errorText: string = '';
+  native: NativeStatus = new NativeStatus();
+}
+
+/** 只有 VPN 进程的心跳及 native 存活证据能表示已启动；探测成功不是其必要条件。 */
+export function isRuntimeRunning(s: RuntimeSnapshot | null): boolean {
+  if (s === null || Date.now() - s.updatedAt > 10000) {
+    return false;
+  }
+  return s.state === 'running' && s.active && s.native.running
+    && s.native.xrayStarted && !s.native.hevExited;
+}

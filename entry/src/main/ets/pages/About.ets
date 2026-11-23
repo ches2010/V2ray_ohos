@@ -1,1 +1,192 @@
-aW1wb3J0IHsgcm91dGVyIH0gZnJvbSAnQGtpdC5BcmtVSSc7CmltcG9ydCB7IHByb21wdEFjdGlvbiB9IGZyb20gJ0BraXQuQXJrVUknOwppbXBvcnQgeyBodHRwIH0gZnJvbSAnQGtpdC5OZXR3b3JrS2l0JzsKaW1wb3J0IHsgQnVzaW5lc3NFcnJvciB9IGZyb20gJ0BraXQuQmFzaWNTZXJ2aWNlc0tpdCc7CmltcG9ydCB7IGNvbW1vbiwgYnVuZGxlTWFuYWdlciwgV2FudCB9IGZyb20gJ0BraXQuQWJpbGl0eUtpdCc7Cgpjb25zdCBSRUxFQVNFX0FQSSA9ICdodHRwczovL2FwaS5naXRodWIuY29tL3JlcG9zL2NoZXMyMDEwL1YycmF5X29ob3MvcmVsZWFzZXMvbGF0ZXN0JzsKY29uc3QgUkVMRUFTRV9QQUdFID0gJ2h0dHBzOi8vZ2l0aHViLmNvbS9jaGVzMjAxMC9WMnJheV9vaG9zL3JlbGVhc2VzL2xhdGVzdCc7CmNvbnN0IFVQU1RSRUFNID0gJ2h0dHBzOi8vZ2l0aHViLmNvbS8yZHVzdC92MnJheU5HJzsKCi8qKiDlhbPkuo7pobXvvJrlupTnlKjkv6Hmga/jgIHmo4Dmn6Xmm7TmlrDjgIHkuIrmuLjpobnnm67kuI7orrjlj68gKi8KQEVudHJ5CkBDb21wb25lbnQKc3RydWN0IEFib3V0UGFnZSB7CiAgQFN0YXRlIHZlcnNpb25OYW1lOiBzdHJpbmcgPSAnJzsKICBAU3RhdGUgY2hlY2tpbmc6IGJvb2xlYW4gPSBmYWxzZTsKICBAU3RhdGUgY2hlY2tSZXN1bHQ6IHN0cmluZyA9ICcnOwogIEBTdGF0ZSBsYXRlc3RUYWc6IHN0cmluZyA9ICcnOwogIEBTdGF0ZSBoYXNVcGRhdGU6IGJvb2xlYW4gPSBmYWxzZTsKICBAU3RvcmFnZVByb3AoJ3N5c0JhckhlaWdodFB4Jykgc3lzQmFyUHg6IG51bWJlciA9IDA7CiAgQFN0b3JhZ2VQcm9wKCduYXZCYXJIZWlnaHRQeCcpIG5hdkJhclB4OiBudW1iZXIgPSAwOwoKICBhYm91dFRvQXBwZWFyKCk6IHZvaWQgewogICAgdHJ5IHsKICAgICAgbGV0IGluZm8gPSBidW5kbGVNYW5hZ2VyLmdldEJ1bmRsZUluZm9Gb3JTZWxmU3luYyhidW5kbGVNYW5hZ2VyLkJ1bmRsZUZsYWcuR0VUX0JVTkRMRV9JTkZPX0RFRkFVTFQpOwogICAgICB0aGlzLnZlcnNpb25OYW1lID0gaW5mby52ZXJzaW9uTmFtZTsKICAgIH0gY2F0Y2ggKGUpIHsKICAgICAgdGhpcy52ZXJzaW9uTmFtZSA9ICcnOwogICAgfQogIH0KCiAgLyoqIOajgOafpeabtOaWsO+8muWvueavlCBHaXRIdWIgbGF0ZXN0IHJlbGVhc2Ug5LiO5b2T5YmN54mI5pysICovCiAgY2hlY2tVcGRhdGUoKTogdm9pZCB7CiAgICBpZiAodGhpcy5jaGVja2luZykgewogICAgICByZXR1cm47CiAgICB9CiAgICB0aGlzLmNoZWNraW5nID0gdHJ1ZTsKICAgIHRoaXMuY2hlY2tSZXN1bHQgPSAnJzsKICAgIGxldCByZXEgPSBodHRwLmNyZWF0ZUh0dHAoKTsKICAgIHJlcS5yZXF1ZXN0KFJFTEVBU0VfQVBJLCB7CiAgICAgIG1ldGhvZDogaHR0cC5SZXF1ZXN0TWV0aG9kLkdFVCwKICAgICAgaGVhZGVyOiB7ICdVc2VyLUFnZW50JzogJ3YycmF5bmctcG9ydCcgfSwKICAgICAgY29ubmVjdFRpbWVvdXQ6IDE1MDAwLAogICAgICByZWFkVGltZW91dDogMTUwMDAKICAgIH0pLnRoZW4oKHJlczogaHR0cC5IdHRwUmVzcG9uc2UpID0+IHsKICAgICAgbGV0IG9iaiA9IEpTT04ucGFyc2UoU3RyaW5nKHJlcy5yZXN1bHQpKSBhcyBSZWNvcmQ8c3RyaW5nLCBPYmplY3Q+OwogICAgICBsZXQgdGFnID0gU3RyaW5nKG9ialsndGFnX25hbWUnXSA/PyAnJyk7CiAgICAgIHRoaXMubGF0ZXN0VGFnID0gdGFnOwogICAgICBsZXQgbGF0ZXN0ID0gdGFnLnJlcGxhY2UoL152LywgJycpOwogICAgICBpZiAobGF0ZXN0ICE9PSAnJyAmJiBsYXRlc3QgIT09IHRoaXMudmVyc2lvbk5hbWUpIHsKICAgICAgICB0aGlzLmhhc1VwZGF0ZSA9IHRydWU7CiAgICAgICAgdGhpcy5jaGVja1Jlc3VsdCA9ICflj5HnjrDmlrDniYjmnKwgJyArIHRhZyArICfvvIjlvZPliY0gJyArIHRoaXMudmVyc2lvbk5hbWUgKyAn77yJ77yM5Y+v5YmN5b6AIFJlbGVhc2Ug6aG15LiL6L2944CCJzsKICAgICAgfSBlbHNlIHsKICAgICAgICB0aGlzLmhhc1VwZGF0ZSA9IGZhbHNlOwogICAgICAgIHRoaXMuY2hlY2tSZXN1bHQgPSAn5b2T5YmN5bey5piv5pyA5paw54mI5pys77yIJyArIHRoaXMudmVyc2lvbk5hbWUgKyAn77yJ44CCJzsKICAgICAgfQogICAgICB0aGlzLmNoZWNraW5nID0gZmFsc2U7CiAgICB9KS5jYXRjaCgoZTogQnVzaW5lc3NFcnJvcikgPT4gewogICAgICB0aGlzLmNoZWNrUmVzdWx0ID0gJ+ajgOafpeWksei0pe+8iOe9kee7nOS4jeWPr+eUqOaIluWPl+mZkO+8ie+8micgKyBlLmNvZGU7CiAgICAgIHRoaXMuY2hlY2tpbmcgPSBmYWxzZTsKICAgIH0pOwogIH0KCiAgb3BlblVybCh1cmw6IHN0cmluZyk6IHZvaWQgewogICAgbGV0IGN0eCA9IGdldENvbnRleHQodGhpcykgYXMgY29tbW9uLlVJQWJpbGl0eUNvbnRleHQ7CiAgICBsZXQgd2FudDogV2FudCA9IHsgYWN0aW9uOiAnb2hvcy53YW50LmFjdGlvbi52aWV3RGF0YScsIHVyaTogdXJsIH07CiAgICBjdHguc3RhcnRBYmlsaXR5KHdhbnQpLmNhdGNoKCgpID0+IHsKICAgICAgcHJvbXB0QWN0aW9uLnNob3dUb2FzdCh7IG1lc3NhZ2U6ICfmiZPlvIDmtY/op4jlmajlpLHotKUnIH0pOwogICAgfSk7CiAgfQoKICBAQnVpbGRlcgogIGxpbmtSb3cobGFiZWw6IHN0cmluZywgZGVzYzogc3RyaW5nLCB1cmw6IHN0cmluZykgewogICAgUm93KHsgc3BhY2U6IDEwIH0pIHsKICAgICAgQ29sdW1uKHsgc3BhY2U6IDIgfSkgewogICAgICAgIFRleHQobGFiZWwpLmZvbnRTaXplKDE1KS5mb250Q29sb3IoJyNFNUVERkYnKQogICAgICAgIFRleHQoZGVzYykuZm9udFNpemUoMTEpLmZvbnRDb2xvcignIzhBOTRBOCcpCiAgICAgIH0KICAgICAgLmFsaWduSXRlbXMoSG9yaXpvbnRhbEFsaWduLlN0YXJ0KQogICAgICAubGF5b3V0V2VpZ2h0KDEpCiAgICAgIFRleHQoJ+WJjeW+gCDihpcnKS5mb250U2l6ZSgxMykuZm9udENvbG9yKCcjM0I4MkY2JykKICAgICAgICAub25DbGljaygoKSA9PiB7IHRoaXMub3BlblVybCh1cmwpOyB9KQogICAgfQogICAgLndpZHRoKCcxMDAlJykKICAgIC5wYWRkaW5nKDEyKQogICAgLmJvcmRlclJhZGl1cygxMCkKICAgIC5iYWNrZ3JvdW5kQ29sb3IoJyMxNTFFMzEnKQogICAgLm9uQ2xpY2soKCkgPT4geyB0aGlzLm9wZW5VcmwodXJsKTsgfSkKICB9CgogIGJ1aWxkKCkgewogICAgQ29sdW1uKCkgewogICAgICBSb3coeyBzcGFjZTogMTIgfSkgewogICAgICAgIFRleHQoJ+KGkCcpLmZvbnRTaXplKDIyKS5mb250Q29sb3IoJyNFNUVERkYnKQogICAgICAgICAgLm9uQ2xpY2soKCkgPT4geyByb3V0ZXIuYmFjaygpOyB9KQogICAgICAgIFRleHQoJ+WFs+S6jicpLmZvbnRTaXplKDIwKS5mb250V2VpZ2h0KEZvbnRXZWlnaHQuQm9sZCkuZm9udENvbG9yKCcjRTVFREZGJykKICAgICAgICBCbGFuaygpCiAgICAgIH0KICAgICAgLndpZHRoKCcxMDAlJykKICAgICAgLnBhZGRpbmcoeyBsZWZ0OiAxNiwgcmlnaHQ6IDE2LCB0b3A6IHB4MnZwKHRoaXMuc3lzQmFyUHgpICsgMTIsIGJvdHRvbTogOCB9KQoKICAgICAgU2Nyb2xsKCkgewogICAgICAgIENvbHVtbigpIHsKICAgICAgICAgIC8vIOW6lOeUqOagh+ivhgogICAgICAgICAgQ29sdW1uKHsgc3BhY2U6IDYgfSkgewogICAgICAgICAgICBUZXh0KCdWMnJheScpLmZvbnRTaXplKDI2KS5mb250V2VpZ2h0KEZvbnRXZWlnaHQuQm9sZCkuZm9udENvbG9yKCcjRTVFREZGJykKICAgICAgICAgICAgVGV4dCh0aGlzLnZlcnNpb25OYW1lID09PSAnJyA/ICfniYjmnKzkv6Hmga/or7vlj5bkuK0uLi4nIDogJ+eJiOacrCAnICsgdGhpcy52ZXJzaW9uTmFtZSkKICAgICAgICAgICAgICAuZm9udFNpemUoMTMpLmZvbnRDb2xvcignIzhBOTRBOCcpCiAgICAgICAgICAgIFRleHQoJ1YyUmF5Tkcg55qEIEhhcm1vbnlPUyBORVhUIOenu+akjeeJiO+8mkFya1RTICsgQXJrVUkg55WM6Z2i77yMWHJheSDmoLjlv4PvvIhvaG9zLWdvIOS6pOWPiee8luivke+8iSsgaGV2LXNvY2tzNS10dW5uZWzvvIznu48gTkFQSSBkbG9wZW4g5o6l5YWl44CCJykKICAgICAgICAgICAgICAuZm9udFNpemUoMTIpLmZvbnRDb2xvcignIzhBOTRBOCcpCiAgICAgICAgICAgICAgLnRleHRBbGlnbihUZXh0QWxpZ24uQ2VudGVyKQogICAgICAgICAgICAgIC5wYWRkaW5nKHsgdG9wOiA2IH0pCiAgICAgICAgICB9CiAgICAgICAgICAud2lkdGgoJzEwMCUnKQogICAgICAgICAgLnBhZGRpbmcoMTgpCiAgICAgICAgICAuYm9yZGVyUmFkaXVzKDEyKQogICAgICAgICAgLmJhY2tncm91bmRDb2xvcignIzE1MUUzMScpCgogICAgICAgICAgLy8g5qOA5p+l5pu05pawCiAgICAgICAgICBDb2x1bW4oeyBzcGFjZTogMTAgfSkgewogICAgICAgICAgICBSb3coeyBzcGFjZTogMTAgfSkgewogICAgICAgICAgICAgIENvbHVtbih7IHNwYWNlOiAyIH0pIHsKICAgICAgICAgICAgICAgIFRleHQoJ+ajgOafpeabtOaWsCcpLmZvbnRTaXplKDE1KS5mb250Q29sb3IoJyNFNUVERkYnKQogICAgICAgICAgICAgICAgVGV4dCgn5a+55q+UIEdpdEh1YiBSZWxlYXNlcyDnmoTmnIDmlrDniYjmnKwnKS5mb250U2l6ZSgxMSkuZm9udENvbG9yKCcjOEE5NEE4JykKICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgLmFsaWduSXRlbXMoSG9yaXpvbnRhbEFsaWduLlN0YXJ0KQogICAgICAgICAgICAgIC5sYXlvdXRXZWlnaHQoMSkKICAgICAgICAgICAgICBCdXR0b24odGhpcy5jaGVja2luZyA/ICfmo4Dmn6XkuK0uLi4nIDogJ+ajgOafpScpCiAgICAgICAgICAgICAgICAuZm9udFNpemUoMTIpLmhlaWdodCgzMCkuYmFja2dyb3VuZENvbG9yKCcjMUQyQTQ0JykKICAgICAgICAgICAgICAgIC5vbkNsaWNrKCgpID0+IHsgdGhpcy5jaGVja1VwZGF0ZSgpOyB9KQogICAgICAgICAgICB9CiAgICAgICAgICAgIC53aWR0aCgnMTAwJScpCgogICAgICAgICAgICBpZiAodGhpcy5jaGVja1Jlc3VsdCAhPT0gJycpIHsKICAgICAgICAgICAgICBUZXh0KHRoaXMuY2hlY2tSZXN1bHQpCiAgICAgICAgICAgICAgICAuZm9udFNpemUoMTIpCiAgICAgICAgICAgICAgICAuZm9udENvbG9yKHRoaXMuaGFzVXBkYXRlID8gJyNFQUIzMDgnIDogJyMyMkM1NUUnKQogICAgICAgICAgICAgICAgLndpZHRoKCcxMDAlJykKICAgICAgICAgICAgICBpZiAodGhpcy5oYXNVcGRhdGUpIHsKICAgICAgICAgICAgICAgIEJ1dHRvbign5YmN5b6A5LiL6L29ICcgKyB0aGlzLmxhdGVzdFRhZykKICAgICAgICAgICAgICAgICAgLmZvbnRTaXplKDEzKS5oZWlnaHQoMzYpLndpZHRoKCcxMDAlJykuYmFja2dyb3VuZENvbG9yKCcjM0I4MkY2JykKICAgICAgICAgICAgICAgICAgLm9uQ2xpY2soKCkgPT4geyB0aGlzLm9wZW5VcmwoUkVMRUFTRV9QQUdFKTsgfSkKICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICAgIH0KICAgICAgICAgIC53aWR0aCgnMTAwJScpCiAgICAgICAgICAucGFkZGluZygxMikKICAgICAgICAgIC5ib3JkZXJSYWRpdXMoMTApCiAgICAgICAgICAuYmFja2dyb3VuZENvbG9yKCcjMTUxRTMxJykKCiAgICAgICAgICAvLyDnm7jlhbPpk77mjqUKICAgICAgICAgIENvbHVtbih7IHNwYWNlOiAxMCB9KSB7CiAgICAgICAgICAgIHRoaXMubGlua1Jvdygn5LiK5ri46aG555uuIHYycmF5TkcnLCAn5pys56e75qSN55qEIEFuZHJvaWQg5Y6f54mI77yIR1BMLTMuMO+8iScsIFVQU1RSRUFNKQogICAgICAgICAgICB0aGlzLmxpbmtSb3coJ+acrOmhueebriBSZWxlYXNlcycsICfojrflj5bmnIDmlrAgSEFQIOS4juaguOW/g+W6kycsIFJFTEVBU0VfUEFHRSkKICAgICAgICAgIH0KICAgICAgICAgIC53aWR0aCgnMTAwJScpCiAgICAgICAgICAucGFkZGluZygxMikKICAgICAgICAgIC5ib3JkZXJSYWRpdXMoMTApCiAgICAgICAgICAuYmFja2dyb3VuZENvbG9yKCdyZ2JhKDIxLDMwLDQ5LDAuNSknKQoKICAgICAgICAgIC8vIOiuuOWPr+S4juWFjei0owogICAgICAgICAgQ29sdW1uKHsgc3BhY2U6IDYgfSkgewogICAgICAgICAgICBUZXh0KCflvIDmupDorrjlj68nKS5mb250U2l6ZSgxMykuZm9udENvbG9yKCcjOTRBM0I4Jykud2lkdGgoJzEwMCUnKQogICAgICAgICAgICBUZXh0KCfmnKzpobnnm67pgbXlvqogR1BMLTMuMCDljY/orq7lvIDmupDvvJtYcmF5LWNvcmUg5Li6IE1JVCDljY/orq7vvIxoZXYtc29ja3M1LXR1bm5lbCDkuLogTUlUIOWNj+iuruOAgicpCiAgICAgICAgICAgICAgLmZvbnRTaXplKDEyKS5mb250Q29sb3IoJyM4QTk0QTgnKS53aWR0aCgnMTAwJScpCiAgICAgICAgICAgIFRleHQoJ+WFjei0o+WjsOaYjicpLmZvbnRTaXplKDEzKS5mb250Q29sb3IoJyM5NEEzQjgnKS53aWR0aCgnMTAwJScpLnBhZGRpbmcoeyB0b3A6IDYgfSkKICAgICAgICAgICAgVGV4dCgn5pys5bqU55So5LuF55So5LqO572R57uc5oqA5pyv5a2m5Lmg5ZKM5Liq5Lq65ZCI6KeE5L2/55So77yM6K+36YG15a6I5omA5Zyo5Zyw5Yy65rOV5b6L5rOV6KeE77yb5L2/55So5pys5bqU55So5Lqn55Sf55qE5LiA5YiH5ZCO5p6c55Sx5L2/55So6ICF6Ieq6KGM5om/5ouF44CCJykKICAgICAgICAgICAgICAuZm9udFNpemUoMTIpLmZvbnRDb2xvcignIzhBOTRBOCcpLndpZHRoKCcxMDAlJykKICAgICAgICAgIH0KICAgICAgICAgIC53aWR0aCgnMTAwJScpCiAgICAgICAgICAucGFkZGluZygxMikKICAgICAgICAgIC5ib3JkZXJSYWRpdXMoMTApCiAgICAgICAgICAuYmFja2dyb3VuZENvbG9yKCdyZ2JhKDIxLDMwLDQ5LDAuNSknKQoKICAgICAgICAgIFRleHQoJ1YycmF5IMK3ICcgKyAodGhpcy52ZXJzaW9uTmFtZSA9PT0gJycgPyAnSGFybW9ueU9TIE5FWFQnIDogJ3YnICsgdGhpcy52ZXJzaW9uTmFtZSkpCiAgICAgICAgICAgIC5mb250U2l6ZSgxMCkuZm9udENvbG9yKCcjNDc1NTY5JykKICAgICAgICAgICAgLndpZHRoKCcxMDAlJykKICAgICAgICAgICAgLnRleHRBbGlnbihUZXh0QWxpZ24uQ2VudGVyKQogICAgICAgICAgICAucGFkZGluZyh7IHRvcDogMTAsIGJvdHRvbTogcHgydnAodGhpcy5uYXZCYXJQeCkgKyAyNCB9KQogICAgICAgIH0KICAgICAgICAud2lkdGgoJzEwMCUnKQogICAgICB9CiAgICAgIC5sYXlvdXRXZWlnaHQoMSkKICAgICAgLndpZHRoKCcxMDAlJykKICAgICAgLnNjcm9sbEJhcihCYXJTdGF0ZS5PZmYpCiAgICB9CiAgICAud2lkdGgoJzEwMCUnKQogICAgLmhlaWdodCgnMTAwJScpCiAgICAuYmFja2dyb3VuZENvbG9yKCcjMEIxMjIwJykKICAgIC5leHBhbmRTYWZlQXJlYShbU2FmZUFyZWFUeXBlLlNZU1RFTV0sIFtTYWZlQXJlYUVkZ2UuVE9QLCBTYWZlQXJlYUVkZ2UuQk9UVE9NXSkKICB9Cn0K
+import { router } from '@kit.ArkUI';
+import { promptAction } from '@kit.ArkUI';
+import { http } from '@kit.NetworkKit';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { common, bundleManager, Want } from '@kit.AbilityKit';
+
+const RELEASE_API = 'https://api.github.com/repos/ches2010/V2ray_ohos/releases/latest';
+const RELEASE_PAGE = 'https://github.com/ches2010/V2ray_ohos/releases/latest';
+const UPSTREAM = 'https://github.com/2dust/v2rayNG';
+
+/** 关于页：应用信息、检查更新、上游项目与许可 */
+@Entry
+@Component
+struct AboutPage {
+  @State versionName: string = '';
+  @State checking: boolean = false;
+  @State checkResult: string = '';
+  @State latestTag: string = '';
+  @State hasUpdate: boolean = false;
+  @StorageProp('sysBarHeightPx') sysBarPx: number = 0;
+  @StorageProp('navBarHeightPx') navBarPx: number = 0;
+
+  aboutToAppear(): void {
+    try {
+      let info = bundleManager.getBundleInfoForSelfSync(bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT);
+      this.versionName = info.versionName;
+    } catch (e) {
+      this.versionName = '';
+    }
+  }
+
+  /** 检查更新：对比 GitHub latest release 与当前版本 */
+  checkUpdate(): void {
+    if (this.checking) {
+      return;
+    }
+    this.checking = true;
+    this.checkResult = '';
+    let req = http.createHttp();
+    req.request(RELEASE_API, {
+      method: http.RequestMethod.GET,
+      header: { 'User-Agent': 'v2rayng-port' },
+      connectTimeout: 15000,
+      readTimeout: 15000
+    }).then((res: http.HttpResponse) => {
+      let obj = JSON.parse(String(res.result)) as Record<string, Object>;
+      let tag = String(obj['tag_name'] ?? '');
+      this.latestTag = tag;
+      let latest = tag.replace(/^v/, '');
+      if (latest !== '' && latest !== this.versionName) {
+        this.hasUpdate = true;
+        this.checkResult = '发现新版本 ' + tag + '（当前 ' + this.versionName + '），可前往 Release 页下载。';
+      } else {
+        this.hasUpdate = false;
+        this.checkResult = '当前已是最新版本（' + this.versionName + '）。';
+      }
+      this.checking = false;
+    }).catch((e: BusinessError) => {
+      this.checkResult = '检查失败（网络不可用或受限）：' + e.code;
+      this.checking = false;
+    });
+  }
+
+  openUrl(url: string): void {
+    let ctx = getContext(this) as common.UIAbilityContext;
+    let want: Want = { action: 'ohos.want.action.viewData', uri: url };
+    ctx.startAbility(want).catch(() => {
+      promptAction.showToast({ message: '打开浏览器失败' });
+    });
+  }
+
+  @Builder
+  linkRow(label: string, desc: string, url: string) {
+    Row({ space: 10 }) {
+      Column({ space: 2 }) {
+        Text(label).fontSize(15).fontColor('#E5EDFF')
+        Text(desc).fontSize(11).fontColor('#8A94A8')
+      }
+      .alignItems(HorizontalAlign.Start)
+      .layoutWeight(1)
+      Text('前往 ↗').fontSize(13).fontColor('#3B82F6')
+        .onClick(() => { this.openUrl(url); })
+    }
+    .width('100%')
+    .padding(12)
+    .borderRadius(10)
+    .backgroundColor('#151E31')
+    .onClick(() => { this.openUrl(url); })
+  }
+
+  build() {
+    Column() {
+      Row({ space: 12 }) {
+        Text('←').fontSize(22).fontColor('#E5EDFF')
+          .onClick(() => { router.back(); })
+        Text('关于').fontSize(20).fontWeight(FontWeight.Bold).fontColor('#E5EDFF')
+        Blank()
+      }
+      .width('100%')
+      .padding({ left: 16, right: 16, top: px2vp(this.sysBarPx) + 12, bottom: 8 })
+
+      Scroll() {
+        Column() {
+          // 应用标识
+          Column({ space: 6 }) {
+            Text('V2ray').fontSize(26).fontWeight(FontWeight.Bold).fontColor('#E5EDFF')
+            Text(this.versionName === '' ? '版本信息读取中...' : '版本 ' + this.versionName)
+              .fontSize(13).fontColor('#8A94A8')
+            Text('V2RayNG 的 HarmonyOS NEXT 移植版：ArkTS + ArkUI 界面，Xray 核心（ohos-go 交叉编译）+ hev-socks5-tunnel，经 NAPI dlopen 接入。')
+              .fontSize(12).fontColor('#8A94A8')
+              .textAlign(TextAlign.Center)
+              .padding({ top: 6 })
+          }
+          .width('100%')
+          .padding(18)
+          .borderRadius(12)
+          .backgroundColor('#151E31')
+
+          // 检查更新
+          Column({ space: 10 }) {
+            Row({ space: 10 }) {
+              Column({ space: 2 }) {
+                Text('检查更新').fontSize(15).fontColor('#E5EDFF')
+                Text('对比 GitHub Releases 的最新版本').fontSize(11).fontColor('#8A94A8')
+              }
+              .alignItems(HorizontalAlign.Start)
+              .layoutWeight(1)
+              Button(this.checking ? '检查中...' : '检查')
+                .fontSize(12).height(30).backgroundColor('#1D2A44')
+                .onClick(() => { this.checkUpdate(); })
+            }
+            .width('100%')
+
+            if (this.checkResult !== '') {
+              Text(this.checkResult)
+                .fontSize(12)
+                .fontColor(this.hasUpdate ? '#EAB308' : '#22C55E')
+                .width('100%')
+              if (this.hasUpdate) {
+                Button('前往下载 ' + this.latestTag)
+                  .fontSize(13).height(36).width('100%').backgroundColor('#3B82F6')
+                  .onClick(() => { this.openUrl(RELEASE_PAGE); })
+              }
+            }
+          }
+          .width('100%')
+          .padding(12)
+          .borderRadius(10)
+          .backgroundColor('#151E31')
+
+          // 相关链接
+          Column({ space: 10 }) {
+            this.linkRow('上游项目 v2rayNG', '本移植的 Android 原版（GPL-3.0）', UPSTREAM)
+            this.linkRow('本项目 Releases', '获取最新 HAP 与核心库', RELEASE_PAGE)
+          }
+          .width('100%')
+          .padding(12)
+          .borderRadius(10)
+          .backgroundColor('rgba(21,30,49,0.5)')
+
+          // 许可与免责
+          Column({ space: 6 }) {
+            Text('开源许可').fontSize(13).fontColor('#94A3B8').width('100%')
+            Text('本项目遵循 GPL-3.0 协议开源；Xray-core 为 MIT 协议，hev-socks5-tunnel 为 MIT 协议。')
+              .fontSize(12).fontColor('#8A94A8').width('100%')
+            Text('免责声明').fontSize(13).fontColor('#94A3B8').width('100%').padding({ top: 6 })
+            Text('本应用仅用于网络技术学习和个人合规使用，请遵守所在地区法律法规；使用本应用产生的一切后果由使用者自行承担。')
+              .fontSize(12).fontColor('#8A94A8').width('100%')
+          }
+          .width('100%')
+          .padding(12)
+          .borderRadius(10)
+          .backgroundColor('rgba(21,30,49,0.5)')
+
+          Text('V2ray · ' + (this.versionName === '' ? 'HarmonyOS NEXT' : 'v' + this.versionName))
+            .fontSize(10).fontColor('#475569')
+            .width('100%')
+            .textAlign(TextAlign.Center)
+            .padding({ top: 10, bottom: px2vp(this.navBarPx) + 24 })
+        }
+        .width('100%')
+      }
+      .layoutWeight(1)
+      .width('100%')
+      .scrollBar(BarState.Off)
+    }
+    .width('100%')
+    .height('100%')
+    .backgroundColor('#0B1220')
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+  }
+}

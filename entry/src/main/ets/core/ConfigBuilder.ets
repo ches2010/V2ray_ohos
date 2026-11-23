@@ -1,1 +1,211 @@
-aW1wb3J0IHsgdnBuRXh0ZW5zaW9uIH0gZnJvbSAnQGtpdC5OZXR3b3JrS2l0JzsKaW1wb3J0IHsgUHJvZmlsZSB9IGZyb20gJy4uL21vZGVsL1Byb2ZpbGUnOwppbXBvcnQgeyBYcmF5U2V0dGluZ3MgfSBmcm9tICcuL1Byb2ZpbGVTdG9yZSc7Cgp0eXBlIEpzb25PYmogPSBSZWNvcmQ8c3RyaW5nLCBPYmplY3Q+OwoKLyoqIFhyYXkgSlNPTiDphY3nva7kuI4gVlBOIFZwbkNvbmZpZyDnlJ/miJDvvIjlr7nlupQgdjJyYXlORyBDb3JlQ29uZmlnTWFuYWdlciDnsr7nroDniYjvvIkgKi8KZXhwb3J0IGNsYXNzIENvbmZpZ0J1aWxkZXIgewogIC8qKiDnlJ/miJAgVlBOIOiZmuaLn+e9keWNoemFjee9ru+8iOWvueW6lCBDb3JlVnBuU2VydmljZS5jb25maWd1cmVOZXR3b3JrU2V0dGluZ3PvvIkgKi8KICBzdGF0aWMgYnVpbGRWcG5Db25maWcobXR1OiBudW1iZXIsIGV4Y2x1ZGVkQnVuZGxlOiBzdHJpbmcpOiB2cG5FeHRlbnNpb24uVnBuQ29uZmlnIHsKICAgIGxldCBjb25maWc6IHZwbkV4dGVuc2lvbi5WcG5Db25maWcgPSB7CiAgICAgIGFkZHJlc3NlczogWwogICAgICAgIHsgYWRkcmVzczogeyBhZGRyZXNzOiAnMTAuMTExLjIyMi4xJywgZmFtaWx5OiAxIH0sIHByZWZpeExlbmd0aDogMjQgfQogICAgICBdLAogICAgICByb3V0ZXM6IFsKICAgICAgICB7CiAgICAgICAgICBpbnRlcmZhY2U6ICd2cG4tdHVuJywKICAgICAgICAgIGRlc3RpbmF0aW9uOiB7IGFkZHJlc3M6IHsgYWRkcmVzczogJzAuMC4wLjAnLCBmYW1pbHk6IDEgfSwgcHJlZml4TGVuZ3RoOiAwIH0sCiAgICAgICAgICBnYXRld2F5OiB7IGFkZHJlc3M6ICcwLjAuMC4wJywgZmFtaWx5OiAxIH0sCiAgICAgICAgICBoYXNHYXRld2F5OiBmYWxzZSwKICAgICAgICAgIGlzRGVmYXVsdFJvdXRlOiB0cnVlCiAgICAgICAgfQogICAgICBdLAogICAgICBtdHU6IG10dSwKICAgICAgLy8g6Jma5oufIEROUyDnmoQgVURQIOafpeivoueUsSBzb2NrcyDlhaXnq5not6/nlLHliLAgWHJheSBkbnMtb3V077yM6ICM6Z2e55u05o6l5Y+R5YWs572RIFVEUOOAggogICAgICBkbnNBZGRyZXNzZXM6IFsnMTAuMTExLjIyMi4yJ10sCiAgICAgIGlzSVB2NEFjY2VwdGVkOiB0cnVlLAogICAgICBpc0lQdjZBY2NlcHRlZDogZmFsc2UsCiAgICAgIGlzQmxvY2tpbmc6IGZhbHNlLAogICAgICBpc0ludGVybmFsOiBmYWxzZSwKICAgICAgYmxvY2tlZEFwcGxpY2F0aW9uczogW2V4Y2x1ZGVkQnVuZGxlXQogICAgfTsKICAgIHJldHVybiBjb25maWc7CiAgfQoKICBwcml2YXRlIHN0YXRpYyBidWlsZFN0cmVhbVNldHRpbmdzKHA6IFByb2ZpbGUpOiBKc29uT2JqIHsKICAgIGxldCBzdHJlYW06IEpzb25PYmogPSB7ICduZXR3b3JrJzogcC5uZXR3b3JrIH07CiAgICBpZiAocC50bHMgPT09ICd0bHMnKSB7CiAgICAgIHN0cmVhbVsnc2VjdXJpdHknXSA9ICd0bHMnOwogICAgICBsZXQgc2VydmVyTmFtZTogc3RyaW5nID0gcC5zbmkgPT09ICcnID8gKHAuaG9zdCA9PT0gJycgPyBwLnNlcnZlciA6IHAuaG9zdCkgOiBwLnNuaTsKICAgICAgbGV0IHRsczogSnNvbk9iaiA9IHsgJ3NlcnZlck5hbWUnOiBzZXJ2ZXJOYW1lIH07CiAgICAgIGlmIChwLmFsbG93SW5zZWN1cmUpIHsKICAgICAgICB0bHNbJ2FsbG93SW5zZWN1cmUnXSA9IHRydWU7CiAgICAgIH0KICAgICAgaWYgKHAuZmluZ2VycHJpbnQgIT09ICcnKSB7CiAgICAgICAgdGxzWydmaW5nZXJwcmludCddID0gcC5maW5nZXJwcmludDsKICAgICAgfQogICAgICBzdHJlYW1bJ3Rsc1NldHRpbmdzJ10gPSB0bHM7CiAgICB9IGVsc2UgaWYgKHAudGxzID09PSAncmVhbGl0eScpIHsKICAgICAgc3RyZWFtWydzZWN1cml0eSddID0gJ3JlYWxpdHknOwogICAgICBsZXQgcmVhbGl0eTogSnNvbk9iaiA9IHsKICAgICAgICAnc2VydmVyTmFtZSc6IHAuc25pID09PSAnJyA/IHAuc2VydmVyIDogcC5zbmksCiAgICAgICAgJ2ZpbmdlcnByaW50JzogcC5maW5nZXJwcmludCA9PT0gJycgPyAnY2hyb21lJyA6IHAuZmluZ2VycHJpbnQsCiAgICAgICAgJ3B1YmxpY0tleSc6IHAucHVibGljS2V5LAogICAgICAgICdzaG9ydElkJzogcC5zaG9ydElkCiAgICAgIH07CiAgICAgIGlmIChwLnNwaWRlclggIT09ICcnKSB7CiAgICAgICAgcmVhbGl0eVsnc3BpZGVyWCddID0gcC5zcGlkZXJYOwogICAgICB9CiAgICAgIHN0cmVhbVsncmVhbGl0eVNldHRpbmdzJ10gPSByZWFsaXR5OwogICAgfSBlbHNlIHsKICAgICAgc3RyZWFtWydzZWN1cml0eSddID0gJ25vbmUnOwogICAgfQogICAgaWYgKHAubmV0d29yayA9PT0gJ3dzJykgewogICAgICBsZXQgd3NQYXRoOiBzdHJpbmcgPSBwLnBhdGggPT09ICcnID8gJy8nIDogcC5wYXRoOwogICAgICBsZXQgd3M6IEpzb25PYmogPSB7ICdwYXRoJzogd3NQYXRoIH07CiAgICAgIGlmIChwLmhvc3QgIT09ICcnKSB7CiAgICAgICAgbGV0IGhlYWRlcnM6IEpzb25PYmogPSB7ICdIb3N0JzogcC5ob3N0IH07CiAgICAgICAgd3NbJ2hlYWRlcnMnXSA9IGhlYWRlcnM7CiAgICAgIH0KICAgICAgc3RyZWFtWyd3c1NldHRpbmdzJ10gPSB3czsKICAgIH0gZWxzZSBpZiAocC5uZXR3b3JrID09PSAnZ3JwYycpIHsKICAgICAgbGV0IGdycGM6IEpzb25PYmogPSB7ICdzZXJ2aWNlTmFtZSc6IHAuc2VydmljZU5hbWUgfTsKICAgICAgc3RyZWFtWydncnBjU2V0dGluZ3MnXSA9IGdycGM7CiAgICB9CiAgICByZXR1cm4gc3RyZWFtOwogIH0KCiAgcHJpdmF0ZSBzdGF0aWMgYnVpbGRQcm94eU91dGJvdW5kKHA6IFByb2ZpbGUpOiBKc29uT2JqIHwgbnVsbCB7CiAgICBsZXQgc3RyZWFtOiBKc29uT2JqID0gQ29uZmlnQnVpbGRlci5idWlsZFN0cmVhbVNldHRpbmdzKHApOwogICAgaWYgKHAuY29uZmlnVHlwZSA9PT0gJ3ZtZXNzJykgewogICAgICBsZXQgdXNlcjogSnNvbk9iaiA9IHsgJ2lkJzogcC51dWlkLCAnYWx0ZXJJZCc6IHAuYWx0ZXJJZCwgJ3NlY3VyaXR5JzogJ2F1dG8nIH07CiAgICAgIGxldCB1c2VyczogQXJyYXk8T2JqZWN0PiA9IFt1c2VyXTsKICAgICAgbGV0IHZuZXh0RW50cnk6IEpzb25PYmogPSB7ICdhZGRyZXNzJzogcC5zZXJ2ZXIsICdwb3J0JzogcC5zZXJ2ZXJQb3J0LCAndXNlcnMnOiB1c2VycyB9OwogICAgICBsZXQgdm5leHQ6IEFycmF5PE9iamVjdD4gPSBbdm5leHRFbnRyeV07CiAgICAgIGxldCBzZXR0aW5nczogSnNvbk9iaiA9IHsgJ3ZuZXh0Jzogdm5leHQgfTsKICAgICAgcmV0dXJuIHsgJ3RhZyc6ICdwcm94eScsICdwcm90b2NvbCc6ICd2bWVzcycsICdzZXR0aW5ncyc6IHNldHRpbmdzLCAnc3RyZWFtU2V0dGluZ3MnOiBzdHJlYW0gfTsKICAgIH0KICAgIGlmIChwLmNvbmZpZ1R5cGUgPT09ICd2bGVzcycpIHsKICAgICAgbGV0IHVzZXI6IEpzb25PYmogPSB7ICdpZCc6IHAudXVpZCwgJ2VuY3J5cHRpb24nOiAnbm9uZScgfTsKICAgICAgaWYgKHAuZmxvdyAhPT0gJycpIHsKICAgICAgICB1c2VyWydmbG93J10gPSBwLmZsb3c7CiAgICAgIH0KICAgICAgbGV0IHVzZXJzOiBBcnJheTxPYmplY3Q+ID0gW3VzZXJdOwogICAgICBsZXQgdm5leHRFbnRyeTogSnNvbk9iaiA9IHsgJ2FkZHJlc3MnOiBwLnNlcnZlciwgJ3BvcnQnOiBwLnNlcnZlclBvcnQsICd1c2Vycyc6IHVzZXJzIH07CiAgICAgIGxldCB2bmV4dDogQXJyYXk8T2JqZWN0PiA9IFt2bmV4dEVudHJ5XTsKICAgICAgbGV0IHNldHRpbmdzOiBKc29uT2JqID0geyAndm5leHQnOiB2bmV4dCB9OwogICAgICByZXR1cm4geyAndGFnJzogJ3Byb3h5JywgJ3Byb3RvY29sJzogJ3ZsZXNzJywgJ3NldHRpbmdzJzogc2V0dGluZ3MsICdzdHJlYW1TZXR0aW5ncyc6IHN0cmVhbSB9OwogICAgfQogICAgaWYgKHAuY29uZmlnVHlwZSA9PT0gJ3Ryb2phbicpIHsKICAgICAgbGV0IHNlcnZlcjogSnNvbk9iaiA9IHsgJ2FkZHJlc3MnOiBwLnNlcnZlciwgJ3BvcnQnOiBwLnNlcnZlclBvcnQsICdwYXNzd29yZCc6IHAucGFzc3dvcmQgfTsKICAgICAgbGV0IHNlcnZlcnM6IEFycmF5PE9iamVjdD4gPSBbc2VydmVyXTsKICAgICAgbGV0IHNldHRpbmdzOiBKc29uT2JqID0geyAnc2VydmVycyc6IHNlcnZlcnMgfTsKICAgICAgcmV0dXJuIHsgJ3RhZyc6ICdwcm94eScsICdwcm90b2NvbCc6ICd0cm9qYW4nLCAnc2V0dGluZ3MnOiBzZXR0aW5ncywgJ3N0cmVhbVNldHRpbmdzJzogc3RyZWFtIH07CiAgICB9CiAgICBpZiAocC5jb25maWdUeXBlID09PSAnc2hhZG93c29ja3MnKSB7CiAgICAgIGxldCBzZXJ2ZXI6IEpzb25PYmogPSB7CiAgICAgICAgJ2FkZHJlc3MnOiBwLnNlcnZlciwgJ3BvcnQnOiBwLnNlcnZlclBvcnQsICdtZXRob2QnOiBwLnNlY3VyaXR5LCAncGFzc3dvcmQnOiBwLnBhc3N3b3JkCiAgICAgIH07CiAgICAgIGxldCBzZXJ2ZXJzOiBBcnJheTxPYmplY3Q+ID0gW3NlcnZlcl07CiAgICAgIGxldCBzZXR0aW5nczogSnNvbk9iaiA9IHsgJ3NlcnZlcnMnOiBzZXJ2ZXJzIH07CiAgICAgIHJldHVybiB7ICd0YWcnOiAncHJveHknLCAncHJvdG9jb2wnOiAnc2hhZG93c29ja3MnLCAnc2V0dGluZ3MnOiBzZXR0aW5ncyB9OwogICAgfQogICAgaWYgKHAuY29uZmlnVHlwZSA9PT0gJ3NvY2tzJykgewogICAgICBsZXQgdXNlcjogSnNvbk9iaiA9IHsgJ3VzZXInOiBwLnV1aWQsICdwYXNzVHlwZSc6ICdwYXNzd29yZCcsICdwYXNzJzogcC5wYXNzd29yZCB9OwogICAgICBsZXQgdXNlcnM6IEFycmF5PE9iamVjdD4gPSBbdXNlcl07CiAgICAgIGxldCBzZXJ2ZXI6IEpzb25PYmogPSB7ICdhZGRyZXNzJzogcC5zZXJ2ZXIsICdwb3J0JzogcC5zZXJ2ZXJQb3J0LCAndXNlcnMnOiB1c2VycyB9OwogICAgICBsZXQgc2VydmVyczogQXJyYXk8T2JqZWN0PiA9IFtzZXJ2ZXJdOwogICAgICBsZXQgc2V0dGluZ3M6IEpzb25PYmogPSB7ICdzZXJ2ZXJzJzogc2VydmVycyB9OwogICAgICByZXR1cm4geyAndGFnJzogJ3Byb3h5JywgJ3Byb3RvY29sJzogJ3NvY2tzJywgJ3NldHRpbmdzJzogc2V0dGluZ3MgfTsKICAgIH0KICAgIGlmIChwLmNvbmZpZ1R5cGUgPT09ICdodHRwJykgewogICAgICBsZXQgdXNlcjogSnNvbk9iaiA9IHsgJ3VzZXInOiBwLnV1aWQsICdwYXNzJzogcC5wYXNzd29yZCB9OwogICAgICBsZXQgdXNlcnM6IEFycmF5PE9iamVjdD4gPSBbdXNlcl07CiAgICAgIGxldCBzZXJ2ZXI6IEpzb25PYmogPSB7ICdhZGRyZXNzJzogcC5zZXJ2ZXIsICdwb3J0JzogcC5zZXJ2ZXJQb3J0LCAndXNlcnMnOiB1c2VycyB9OwogICAgICBsZXQgc2VydmVyczogQXJyYXk8T2JqZWN0PiA9IFtzZXJ2ZXJdOwogICAgICBsZXQgc2V0dGluZ3M6IEpzb25PYmogPSB7ICdzZXJ2ZXJzJzogc2VydmVycyB9OwogICAgICByZXR1cm4geyAndGFnJzogJ3Byb3h5JywgJ3Byb3RvY29sJzogJ2h0dHAnLCAnc2V0dGluZ3MnOiBzZXR0aW5ncyB9OwogICAgfQogICAgcmV0dXJuIG51bGw7CiAgfQoKICAvKiog55Sf5oiQIFhyYXkg5qC45b+D6YWN572uIEpTT07vvIhzb2NrcyBpbmJvdW5kIOeUsSBuYXRpdmUg5bGCIHR1bjJzb2NrcyDmjqXlhaXvvIkgKi8KICBzdGF0aWMgYnVpbGRYcmF5Q29uZmlnKHA6IFByb2ZpbGUsIHN0OiBYcmF5U2V0dGluZ3MsIGhhc0dlbzogYm9vbGVhbiwgZmlsZXNEaXI6IHN0cmluZyk6IHN0cmluZyB7CiAgICBsZXQgcHJveHk6IEpzb25PYmogfCBudWxsID0gQ29uZmlnQnVpbGRlci5idWlsZFByb3h5T3V0Ym91bmQocCk7CiAgICBpZiAocHJveHkgPT09IG51bGwpIHsKICAgICAgdGhyb3cgbmV3IEVycm9yKCfoioLngrnljY/orq7kuI3lj5fmlK/mjIHvvIzmi5Lnu53pgIDljJbkuLrnm7Tov54nKTsKICAgIH0KICAgIGxldCBvdXRib3VuZHM6IEFycmF5PE9iamVjdD4gPSBbXTsKICAgIGlmIChwcm94eSAhPT0gbnVsbCkgewogICAgICBpZiAoc3QuZW5hYmxlTXV4ICYmIChwLmNvbmZpZ1R5cGUgPT09ICd2bGVzcycgfHwgcC5jb25maWdUeXBlID09PSAndm1lc3MnIHx8IHAuY29uZmlnVHlwZSA9PT0gJ3Ryb2phbicpKSB7CiAgICAgICAgbGV0IG11eDogSnNvbk9iaiA9IHsgJ2VuYWJsZWQnOiB0cnVlLCAnY29uY3VycmVuY3knOiA4IH07CiAgICAgICAgcHJveHlbJ211eCddID0gbXV4OwogICAgICB9CiAgICAgIG91dGJvdW5kcy5wdXNoKHByb3h5KTsKICAgIH0KICAgIGxldCBkaXJlY3Q6IEpzb25PYmogPSB7ICd0YWcnOiAnZGlyZWN0JywgJ3Byb3RvY29sJzogJ2ZyZWVkb20nIH07CiAgICBvdXRib3VuZHMucHVzaChkaXJlY3QpOwogICAgbGV0IGJsb2NrOiBKc29uT2JqID0geyAndGFnJzogJ2Jsb2NrJywgJ3Byb3RvY29sJzogJ2JsYWNraG9sZScgfTsKICAgIG91dGJvdW5kcy5wdXNoKGJsb2NrKTsKICAgIC8vIFhyYXkgMjYuNy4yOCDnmoQgRE5TIOWHuuermeWwhiBBL0FBQUEg6K+35rGC5Lqk57uZ5YaF572uIEROU++8jOi/lOWbnue7mSBUVU4g6LCD55So6ICF44CCCiAgICBsZXQgZG5zU2V0dGluZ3M6IEpzb25PYmogPSB7fTsKICAgIGxldCBkbnNPdXRib3VuZDogSnNvbk9iaiA9IHsgJ3RhZyc6ICdkbnMtb3V0JywgJ3Byb3RvY29sJzogJ2RucycsICdzZXR0aW5ncyc6IGRuc1NldHRpbmdzIH07CiAgICBvdXRib3VuZHMucHVzaChkbnNPdXRib3VuZCk7CgogICAgbGV0IHNvY2tzU2V0dGluZ3M6IEpzb25PYmogPSB7ICd1ZHAnOiB0cnVlLCAnYXV0aCc6ICdub2F1dGgnIH07CiAgICBsZXQgc29ja3NJbmJvdW5kOiBKc29uT2JqID0gewogICAgICAndGFnJzogJ3NvY2tzJywgJ3BvcnQnOiAxMDgwOCwgJ2xpc3Rlbic6ICcxMjcuMC4wLjEnLAogICAgICAncHJvdG9jb2wnOiAnc29ja3MnLCAnc2V0dGluZ3MnOiBzb2Nrc1NldHRpbmdzCiAgICB9OwogICAgaWYgKHN0LmVuYWJsZVNuaWZmaW5nKSB7CiAgICAgIGxldCBkZXN0T3ZlcnJpZGU6IEFycmF5PHN0cmluZz4gPSBbJ2h0dHAnLCAndGxzJywgJ3F1aWMnXTsKICAgICAgbGV0IHNuaWZmaW5nOiBKc29uT2JqID0geyAnZW5hYmxlZCc6IHRydWUsICdkZXN0T3ZlcnJpZGUnOiBkZXN0T3ZlcnJpZGUgfTsKICAgICAgc29ja3NJbmJvdW5kWydzbmlmZmluZyddID0gc25pZmZpbmc7CiAgICB9CiAgICBsZXQgaW5ib3VuZHM6IEFycmF5PE9iamVjdD4gPSBbc29ja3NJbmJvdW5kXTsKCiAgICAvLyDot6/nlLHop4TliJnvvIjlr7nlupQgdjJyYXlORyByb3V0aW5n77yJ44CCCiAgICAvLyBoYXNHZW89ZmFsc2XvvIjlsJrmnKrkuIvovb0gZ2VvaXAvZ2Vvc2l0ZS5kYXTvvInml7bkuI3lvJXnlKggZ2VvIOinhOWIme+8jAogICAgLy8g5pS555SoIENJRFIg55u06L+e56eB5pyJ5Zyw5Z2A77yM5L+d6K+BIFhyYXkg6IO95ZCv5Yqo44CB5YWo5bGA5Luj55CG5Y+v55So44CCCiAgICBsZXQgcnVsZXM6IEFycmF5PE9iamVjdD4gPSBbXTsKICAgIC8vIOW/hemhu+WcqOengeacieWcsOWdgOebtOi/nuinhOWImeS5i+WJjeaNleiOt+iZmuaLnyBETlMg55qEIDUzIOerr+WPo++8jOmBv+WFjeaKiuWug+ebtOi/nuWIsOeJqeeQhue9kee7nOOAggogICAgbGV0IHNvY2tzVGFnczogQXJyYXk8c3RyaW5nPiA9IFsnc29ja3MnXTsKICAgIGxldCBkbnNSdWxlOiBKc29uT2JqID0geyAndHlwZSc6ICdmaWVsZCcsICdpbmJvdW5kVGFnJzogc29ja3NUYWdzLCAncG9ydCc6ICc1MycsICdvdXRib3VuZFRhZyc6ICdkbnMtb3V0JyB9OwogICAgcnVsZXMucHVzaChkbnNSdWxlKTsKICAgIGxldCBkbnNUYWdzOiBBcnJheTxzdHJpbmc+ID0gWydkbnMtaW50ZXJuYWwnXTsKICAgIGxldCBkbnNUcmFuc3BvcnRSdWxlOiBKc29uT2JqID0geyAndHlwZSc6ICdmaWVsZCcsICdpbmJvdW5kVGFnJzogZG5zVGFncywgJ291dGJvdW5kVGFnJzogJ3Byb3h5JyB9OwogICAgcnVsZXMucHVzaChkbnNUcmFuc3BvcnRSdWxlKTsKICAgIGxldCBwcml2YXRlSXBzOiBBcnJheTxzdHJpbmc+ID0gaGFzR2VvCiAgICAgID8gWydnZW9pcDpwcml2YXRlJ10KICAgICAgOiBbJzEwLjAuMC4wLzgnLCAnMTcyLjE2LjAuMC8xMicsICcxOTIuMTY4LjAuMC8xNicsICcxMjcuMC4wLjAvOCcsCiAgICAgICAgICcxNjkuMjU0LjAuMC8xNicsICcyMjQuMC4wLjAvNCcsICcyNTUuMjU1LjI1NS4yNTUvMzInXTsKICAgIGxldCBwcml2YXRlUnVsZTogSnNvbk9iaiA9IHsgJ3R5cGUnOiAnZmllbGQnLCAnaXAnOiBwcml2YXRlSXBzLCAnb3V0Ym91bmRUYWcnOiAnZGlyZWN0JyB9OwogICAgcnVsZXMucHVzaChwcml2YXRlUnVsZSk7CiAgICBpZiAoaGFzR2VvICYmIHN0LmJsb2NrQWRzKSB7CiAgICAgIGxldCBhZERvbWFpbnM6IEFycmF5PHN0cmluZz4gPSBbJ2dlb3NpdGU6Y2F0ZWdvcnktYWRzLWFsbCddOwogICAgICBsZXQgYWRSdWxlOiBKc29uT2JqID0geyAndHlwZSc6ICdmaWVsZCcsICdkb21haW4nOiBhZERvbWFpbnMsICdvdXRib3VuZFRhZyc6ICdibG9jaycgfTsKICAgICAgcnVsZXMucHVzaChhZFJ1bGUpOwogICAgfQogICAgaWYgKGhhc0dlbyAmJiBzdC5yb3V0ZU1vZGUgPT09IDEpIHsKICAgICAgbGV0IGNuSXBzOiBBcnJheTxzdHJpbmc+ID0gWydnZW9pcDpjbiddOwogICAgICBsZXQgY25JcFJ1bGU6IEpzb25PYmogPSB7ICd0eXBlJzogJ2ZpZWxkJywgJ2lwJzogY25JcHMsICdvdXRib3VuZFRhZyc6ICdkaXJlY3QnIH07CiAgICAgIHJ1bGVzLnB1c2goY25JcFJ1bGUpOwogICAgICBsZXQgY25Eb21haW5zOiBBcnJheTxzdHJpbmc+ID0gWydnZW9zaXRlOmNuJ107CiAgICAgIGxldCBjbkRvbWFpblJ1bGU6IEpzb25PYmogPSB7ICd0eXBlJzogJ2ZpZWxkJywgJ2RvbWFpbic6IGNuRG9tYWlucywgJ291dGJvdW5kVGFnJzogJ2RpcmVjdCcgfTsKICAgICAgcnVsZXMucHVzaChjbkRvbWFpblJ1bGUpOwogICAgfQogICAgbGV0IHJvdXRpbmc6IEpzb25PYmogPSB7ICdkb21haW5TdHJhdGVneSc6ICdJUElmTm9uTWF0Y2gnLCAncnVsZXMnOiBydWxlcyB9OwogICAgbGV0IGxvZzogSnNvbk9iaiA9IHsgJ2xvZ2xldmVsJzogc3QubG9nTGV2ZWwsICdlcnJvcic6IGZpbGVzRGlyICsgJy94cmF5LWVycm9yLmxvZycgfTsKICAgIC8vIEROUyDmn6Xor6LlnKjku6PnkIbph4zmlLnotbAgVENQ77yM6YG/5YWN5L6d6LWW6IqC54K555qE5YWs572RIFVEUCBETlMg6L2s5Y+R6IO95Yqb44CCCiAgICAvLyDlhoXnva4gRE5TIOWPquWkhOeQhueUsSBkbnMtb3V0IOaNleiOt+eahOafpeivou+8m+Wug+S4jeS8muiHquWKqOaLpuaIquezu+e7nyBETlPjgIIKICAgIGxldCBkbnNTZXJ2ZXJzOiBBcnJheTxzdHJpbmc+ID0gWyd0Y3A6Ly8xLjEuMS4xJywgJ3RjcDovLzguOC44LjgnXTsKICAgIGxldCBkbnM6IEpzb25PYmogPSB7ICdzZXJ2ZXJzJzogZG5zU2VydmVycywgJ3RhZyc6ICdkbnMtaW50ZXJuYWwnLCAncXVlcnlTdHJhdGVneSc6ICdVc2VJUHY0JyB9OwoKICAgIGxldCBjb25maWc6IEpzb25PYmogPSB7CiAgICAgICdsb2cnOiBsb2csICdkbnMnOiBkbnMsICdpbmJvdW5kcyc6IGluYm91bmRzLCAnb3V0Ym91bmRzJzogb3V0Ym91bmRzLCAncm91dGluZyc6IHJvdXRpbmcKICAgIH07CiAgICByZXR1cm4gSlNPTi5zdHJpbmdpZnkoY29uZmlnKTsKICB9Cn0KCg==
+import { vpnExtension } from '@kit.NetworkKit';
+import { Profile } from '../model/Profile';
+import { XraySettings } from './ProfileStore';
+
+type JsonObj = Record<string, Object>;
+
+/** Xray JSON 配置与 VPN VpnConfig 生成（对应 v2rayNG CoreConfigManager 精简版） */
+export class ConfigBuilder {
+  /** 生成 VPN 虚拟网卡配置（对应 CoreVpnService.configureNetworkSettings） */
+  static buildVpnConfig(mtu: number, excludedBundle: string): vpnExtension.VpnConfig {
+    let config: vpnExtension.VpnConfig = {
+      addresses: [
+        { address: { address: '10.111.222.1', family: 1 }, prefixLength: 24 }
+      ],
+      routes: [
+        {
+          interface: 'vpn-tun',
+          destination: { address: { address: '0.0.0.0', family: 1 }, prefixLength: 0 },
+          gateway: { address: '0.0.0.0', family: 1 },
+          hasGateway: false,
+          isDefaultRoute: true
+        }
+      ],
+      mtu: mtu,
+      // 虚拟 DNS 的 UDP 查询由 socks 入站路由到 Xray dns-out，而非直接发公网 UDP。
+      dnsAddresses: ['10.111.222.2'],
+      isIPv4Accepted: true,
+      isIPv6Accepted: false,
+      isBlocking: false,
+      isInternal: false,
+      blockedApplications: [excludedBundle]
+    };
+    return config;
+  }
+
+  private static buildStreamSettings(p: Profile): JsonObj {
+    let stream: JsonObj = { 'network': p.network };
+    if (p.tls === 'tls') {
+      stream['security'] = 'tls';
+      let serverName: string = p.sni === '' ? (p.host === '' ? p.server : p.host) : p.sni;
+      let tls: JsonObj = { 'serverName': serverName };
+      if (p.allowInsecure) {
+        tls['allowInsecure'] = true;
+      }
+      if (p.fingerprint !== '') {
+        tls['fingerprint'] = p.fingerprint;
+      }
+      stream['tlsSettings'] = tls;
+    } else if (p.tls === 'reality') {
+      stream['security'] = 'reality';
+      let reality: JsonObj = {
+        'serverName': p.sni === '' ? p.server : p.sni,
+        'fingerprint': p.fingerprint === '' ? 'chrome' : p.fingerprint,
+        'publicKey': p.publicKey,
+        'shortId': p.shortId
+      };
+      if (p.spiderX !== '') {
+        reality['spiderX'] = p.spiderX;
+      }
+      stream['realitySettings'] = reality;
+    } else {
+      stream['security'] = 'none';
+    }
+    if (p.network === 'ws') {
+      let wsPath: string = p.path === '' ? '/' : p.path;
+      let ws: JsonObj = { 'path': wsPath };
+      if (p.host !== '') {
+        let headers: JsonObj = { 'Host': p.host };
+        ws['headers'] = headers;
+      }
+      stream['wsSettings'] = ws;
+    } else if (p.network === 'grpc') {
+      let grpc: JsonObj = { 'serviceName': p.serviceName };
+      stream['grpcSettings'] = grpc;
+    }
+    return stream;
+  }
+
+  private static buildProxyOutbound(p: Profile): JsonObj | null {
+    let stream: JsonObj = ConfigBuilder.buildStreamSettings(p);
+    if (p.configType === 'vmess') {
+      let user: JsonObj = { 'id': p.uuid, 'alterId': p.alterId, 'security': 'auto' };
+      let users: Array<Object> = [user];
+      let vnextEntry: JsonObj = { 'address': p.server, 'port': p.serverPort, 'users': users };
+      let vnext: Array<Object> = [vnextEntry];
+      let settings: JsonObj = { 'vnext': vnext };
+      return { 'tag': 'proxy', 'protocol': 'vmess', 'settings': settings, 'streamSettings': stream };
+    }
+    if (p.configType === 'vless') {
+      let user: JsonObj = { 'id': p.uuid, 'encryption': 'none' };
+      if (p.flow !== '') {
+        user['flow'] = p.flow;
+      }
+      let users: Array<Object> = [user];
+      let vnextEntry: JsonObj = { 'address': p.server, 'port': p.serverPort, 'users': users };
+      let vnext: Array<Object> = [vnextEntry];
+      let settings: JsonObj = { 'vnext': vnext };
+      return { 'tag': 'proxy', 'protocol': 'vless', 'settings': settings, 'streamSettings': stream };
+    }
+    if (p.configType === 'trojan') {
+      let server: JsonObj = { 'address': p.server, 'port': p.serverPort, 'password': p.password };
+      let servers: Array<Object> = [server];
+      let settings: JsonObj = { 'servers': servers };
+      return { 'tag': 'proxy', 'protocol': 'trojan', 'settings': settings, 'streamSettings': stream };
+    }
+    if (p.configType === 'shadowsocks') {
+      let server: JsonObj = {
+        'address': p.server, 'port': p.serverPort, 'method': p.security, 'password': p.password
+      };
+      let servers: Array<Object> = [server];
+      let settings: JsonObj = { 'servers': servers };
+      return { 'tag': 'proxy', 'protocol': 'shadowsocks', 'settings': settings };
+    }
+    if (p.configType === 'socks') {
+      let user: JsonObj = { 'user': p.uuid, 'passType': 'password', 'pass': p.password };
+      let users: Array<Object> = [user];
+      let server: JsonObj = { 'address': p.server, 'port': p.serverPort, 'users': users };
+      let servers: Array<Object> = [server];
+      let settings: JsonObj = { 'servers': servers };
+      return { 'tag': 'proxy', 'protocol': 'socks', 'settings': settings };
+    }
+    if (p.configType === 'http') {
+      let user: JsonObj = { 'user': p.uuid, 'pass': p.password };
+      let users: Array<Object> = [user];
+      let server: JsonObj = { 'address': p.server, 'port': p.serverPort, 'users': users };
+      let servers: Array<Object> = [server];
+      let settings: JsonObj = { 'servers': servers };
+      return { 'tag': 'proxy', 'protocol': 'http', 'settings': settings };
+    }
+    return null;
+  }
+
+  /** 生成 Xray 核心配置 JSON（socks inbound 由 native 层 tun2socks 接入） */
+  static buildXrayConfig(p: Profile, st: XraySettings, hasGeo: boolean, filesDir: string): string {
+    let proxy: JsonObj | null = ConfigBuilder.buildProxyOutbound(p);
+    if (proxy === null) {
+      throw new Error('节点协议不受支持，拒绝退化为直连');
+    }
+    let outbounds: Array<Object> = [];
+    if (proxy !== null) {
+      if (st.enableMux && (p.configType === 'vless' || p.configType === 'vmess' || p.configType === 'trojan')) {
+        let mux: JsonObj = { 'enabled': true, 'concurrency': 8 };
+        proxy['mux'] = mux;
+      }
+      outbounds.push(proxy);
+    }
+    let direct: JsonObj = { 'tag': 'direct', 'protocol': 'freedom' };
+    outbounds.push(direct);
+    let block: JsonObj = { 'tag': 'block', 'protocol': 'blackhole' };
+    outbounds.push(block);
+    // Xray 26.7.28 的 DNS 出站将 A/AAAA 请求交给内置 DNS，返回给 TUN 调用者。
+    let dnsSettings: JsonObj = {};
+    let dnsOutbound: JsonObj = { 'tag': 'dns-out', 'protocol': 'dns', 'settings': dnsSettings };
+    outbounds.push(dnsOutbound);
+
+    let socksSettings: JsonObj = { 'udp': true, 'auth': 'noauth' };
+    let socksInbound: JsonObj = {
+      'tag': 'socks', 'port': 10808, 'listen': '127.0.0.1',
+      'protocol': 'socks', 'settings': socksSettings
+    };
+    if (st.enableSniffing) {
+      let destOverride: Array<string> = ['http', 'tls', 'quic'];
+      let sniffing: JsonObj = { 'enabled': true, 'destOverride': destOverride };
+      socksInbound['sniffing'] = sniffing;
+    }
+    let inbounds: Array<Object> = [socksInbound];
+
+    // 路由规则（对应 v2rayNG routing）。
+    // hasGeo=false（尚未下载 geoip/geosite.dat）时不引用 geo 规则，
+    // 改用 CIDR 直连私有地址，保证 Xray 能启动、全局代理可用。
+    let rules: Array<Object> = [];
+    // 必须在私有地址直连规则之前捕获虚拟 DNS 的 53 端口，避免把它直连到物理网络。
+    let socksTags: Array<string> = ['socks'];
+    let dnsRule: JsonObj = { 'type': 'field', 'inboundTag': socksTags, 'port': '53', 'outboundTag': 'dns-out' };
+    rules.push(dnsRule);
+    let dnsTags: Array<string> = ['dns-internal'];
+    let dnsTransportRule: JsonObj = { 'type': 'field', 'inboundTag': dnsTags, 'outboundTag': 'proxy' };
+    rules.push(dnsTransportRule);
+    let privateIps: Array<string> = hasGeo
+      ? ['geoip:private']
+      : ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', '127.0.0.0/8',
+         '169.254.0.0/16', '224.0.0.0/4', '255.255.255.255/32'];
+    let privateRule: JsonObj = { 'type': 'field', 'ip': privateIps, 'outboundTag': 'direct' };
+    rules.push(privateRule);
+    if (hasGeo && st.blockAds) {
+      let adDomains: Array<string> = ['geosite:category-ads-all'];
+      let adRule: JsonObj = { 'type': 'field', 'domain': adDomains, 'outboundTag': 'block' };
+      rules.push(adRule);
+    }
+    if (hasGeo && st.routeMode === 1) {
+      let cnIps: Array<string> = ['geoip:cn'];
+      let cnIpRule: JsonObj = { 'type': 'field', 'ip': cnIps, 'outboundTag': 'direct' };
+      rules.push(cnIpRule);
+      let cnDomains: Array<string> = ['geosite:cn'];
+      let cnDomainRule: JsonObj = { 'type': 'field', 'domain': cnDomains, 'outboundTag': 'direct' };
+      rules.push(cnDomainRule);
+    }
+    let routing: JsonObj = { 'domainStrategy': 'IPIfNonMatch', 'rules': rules };
+    let log: JsonObj = { 'loglevel': st.logLevel, 'error': filesDir + '/xray-error.log' };
+    // DNS 查询在代理里改走 TCP，避免依赖节点的公网 UDP DNS 转发能力。
+    // 内置 DNS 只处理由 dns-out 捕获的查询；它不会自动拦截系统 DNS。
+    let dnsServers: Array<string> = ['tcp://1.1.1.1', 'tcp://8.8.8.8'];
+    let dns: JsonObj = { 'servers': dnsServers, 'tag': 'dns-internal', 'queryStrategy': 'UseIPv4' };
+
+    let config: JsonObj = {
+      'log': log, 'dns': dns, 'inbounds': inbounds, 'outbounds': outbounds, 'routing': routing
+    };
+    return JSON.stringify(config);
+  }
+}
+

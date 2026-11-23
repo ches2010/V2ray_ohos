@@ -1,1 +1,94 @@
-IyEvdXNyL2Jpbi9lbnYgcHl0aG9uMwoiIiJDSSBzdHJ1Y3R1cmUgJiBzeW50YXggY2hlY2sgZm9yIHRoZSBWMnJheU5HIEhhcm1vbnlPUyBwb3J0LgoKVmVyaWZpZXM6IHJlcXVpcmVkIGZpbGVzIGV4aXN0LCBhbGwgLmpzb241Ly5qc29uIHBhcnNlLCB0aGUgVlBOIGV4dGVuc2lvbiBhbmQKSU5URVJORVQgcGVybWlzc2lvbiBhcmUgZGVjbGFyZWQsIGFuZCBldmVyeSBwYWdlIGlzIHJlZ2lzdGVyZWQgZm9yIHJvdXRpbmcuCiIiIgppbXBvcnQganNvbgppbXBvcnQgc3lzCmZyb20gcGF0aGxpYiBpbXBvcnQgUGF0aAoKaW1wb3J0IGpzb241CgpST09UID0gUGF0aChfX2ZpbGVfXykucmVzb2x2ZSgpLnBhcmVudC5wYXJlbnQKClJFUVVJUkVEID0gWwogICAgIkFwcFNjb3BlL2FwcC5qc29uNSIsCiAgICAiYnVpbGQtcHJvZmlsZS5qc29uNSIsCiAgICAiaHZpZ29yZmlsZS50cyIsCiAgICAib2gtcGFja2FnZS5qc29uNSIsCiAgICAiZW50cnkvYnVpbGQtcHJvZmlsZS5qc29uNSIsCiAgICAiZW50cnkvaHZpZ29yZmlsZS50cyIsCiAgICAiZW50cnkvb2gtcGFja2FnZS5qc29uNSIsCiAgICAiZW50cnkvc3JjL21haW4vbW9kdWxlLmpzb241IiwKICAgICJlbnRyeS9zcmMvbWFpbi9yZXNvdXJjZXMvYmFzZS9wcm9maWxlL21haW5fcGFnZXMuanNvbiIsCiAgICAiZW50cnkvc3JjL21haW4vZXRzL2VudHJ5YWJpbGl0eS9FbnRyeUFiaWxpdHkuZXRzIiwKICAgICJlbnRyeS9zcmMvbWFpbi9ldHMvdnBuYWJpbGl0eS9WcG5UdW5uZWxBYmlsaXR5LmV0cyIsCiAgICAiZW50cnkvc3JjL21haW4vZXRzL2NvcmUvQ29uZmlnQnVpbGRlci5ldHMiLAogICAgImVudHJ5L3NyYy9tYWluL2V0cy9jb3JlL1Byb2ZpbGVTdG9yZS5ldHMiLAogICAgImVudHJ5L3NyYy9tYWluL2V0cy9jb3JlL1ZwbkNvbnRyb2xsZXIuZXRzIiwKICAgICJlbnRyeS9zcmMvbWFpbi9ldHMvbW9kZWwvUHJvZmlsZS5ldHMiLAogICAgImVudHJ5L3NyYy9tYWluL2V0cy9uYXRpdmUvbGlieHJheS5ldHMiLAogICAgImVudHJ5L3NyYy9tYWluL2V0cy9wYWdlcy9JbmRleC5ldHMiLAogICAgImVudHJ5L3NyYy9tYWluL2V0cy9wYWdlcy9TZXJ2ZXJFZGl0LmV0cyIsCiAgICAiZW50cnkvc3JjL21haW4vY3BwL0NNYWtlTGlzdHMudHh0IiwKICAgICJlbnRyeS9zcmMvbWFpbi9jcHAvbmFwaV9pbml0LmNwcCIsCl0KCmVycm9ycyA9IFtdCgpmb3IgcmVsIGluIFJFUVVJUkVEOgogICAgaWYgbm90IChST09UIC8gcmVsKS5pc19maWxlKCk6CiAgICAgICAgZXJyb3JzLmFwcGVuZChmIm1pc3NpbmcgZmlsZToge3JlbH0iKQoKZm9yIHAgaW4gc29ydGVkKFJPT1Qucmdsb2IoIiouanNvbjUiKSk6CiAgICBpZiAiLmdpdCIgaW4gcC5wYXJ0cyBvciAibm9kZV9tb2R1bGVzIiBpbiBwLnBhcnRzOgogICAgICAgIGNvbnRpbnVlCiAgICB0cnk6CiAgICAgICAganNvbjUubG9hZHMocC5yZWFkX3RleHQoZW5jb2Rpbmc9InV0Zi04IikpCiAgICBleGNlcHQgRXhjZXB0aW9uIGFzIGU6ICAjIG5vcWE6IEJMRTAwMQogICAgICAgIGVycm9ycy5hcHBlbmQoZiJpbnZhbGlkIGpzb241OiB7cC5yZWxhdGl2ZV90byhST09UKX06IHtlfSIpCgpmb3IgcCBpbiBzb3J0ZWQoUk9PVC5yZ2xvYigiKi5qc29uIikpOgogICAgaWYgIi5naXQiIGluIHAucGFydHMgb3IgIm5vZGVfbW9kdWxlcyIgaW4gcC5wYXJ0czoKICAgICAgICBjb250aW51ZQogICAgdHJ5OgogICAgICAgIGpzb24ubG9hZHMocC5yZWFkX3RleHQoZW5jb2Rpbmc9InV0Zi04IikpCiAgICBleGNlcHQgRXhjZXB0aW9uIGFzIGU6ICAjIG5vcWE6IEJMRTAwMQogICAgICAgIGVycm9ycy5hcHBlbmQoZiJpbnZhbGlkIGpzb246IHtwLnJlbGF0aXZlX3RvKFJPT1QpfToge2V9IikKCm1vZHVsZV9wYXRoID0gUk9PVCAvICJlbnRyeS9zcmMvbWFpbi9tb2R1bGUuanNvbjUiCmlmIG1vZHVsZV9wYXRoLmlzX2ZpbGUoKToKICAgIG1vZHVsZSA9IGpzb241LmxvYWRzKG1vZHVsZV9wYXRoLnJlYWRfdGV4dChlbmNvZGluZz0idXRmLTgiKSkuZ2V0KCJtb2R1bGUiLCB7fSkKICAgIGV4dGVuc2lvbnMgPSBtb2R1bGUuZ2V0KCJleHRlbnNpb25BYmlsaXRpZXMiLCBbXSkKICAgIGlmIG5vdCBhbnkoZS5nZXQoInR5cGUiKSA9PSAidnBuIiBmb3IgZSBpbiBleHRlbnNpb25zKToKICAgICAgICBlcnJvcnMuYXBwZW5kKCJtb2R1bGUuanNvbjU6IG5vIGV4dGVuc2lvbkFiaWxpdHkgd2l0aCB0eXBlICd2cG4nIikKICAgIHZwbl9lbnRyaWVzID0gW2UgZm9yIGUgaW4gZXh0ZW5zaW9ucyBpZiBlLmdldCgidHlwZSIpID09ICJ2cG4iXQogICAgZm9yIGUgaW4gdnBuX2VudHJpZXM6CiAgICAgICAgc3JjID0gZS5nZXQoInNyY0VudHJ5IiwgIiIpCiAgICAgICAgaWYgbm90IChST09UIC8gImVudHJ5L3NyYy9tYWluIiAvIHNyYy5sc3RyaXAoIi4vIikpLmlzX2ZpbGUoKToKICAgICAgICAgICAgZXJyb3JzLmFwcGVuZChmIm1vZHVsZS5qc29uNTogdnBuIHNyY0VudHJ5IG5vdCBmb3VuZDoge3NyY30iKQogICAgcGVybXMgPSBbcGVybS5nZXQoIm5hbWUiKSBmb3IgcGVybSBpbiBtb2R1bGUuZ2V0KCJyZXF1ZXN0UGVybWlzc2lvbnMiLCBbXSldCiAgICBpZiAib2hvcy5wZXJtaXNzaW9uLklOVEVSTkVUIiBub3QgaW4gcGVybXM6CiAgICAgICAgZXJyb3JzLmFwcGVuZCgibW9kdWxlLmpzb241OiBvaG9zLnBlcm1pc3Npb24uSU5URVJORVQgbm90IGRlY2xhcmVkIikKCnBhZ2VzX3BhdGggPSBST09UIC8gImVudHJ5L3NyYy9tYWluL3Jlc291cmNlcy9iYXNlL3Byb2ZpbGUvbWFpbl9wYWdlcy5qc29uIgppZiBwYWdlc19wYXRoLmlzX2ZpbGUoKToKICAgIHRyeToKICAgICAgICBwYWdlcyA9IGpzb24ubG9hZHMocGFnZXNfcGF0aC5yZWFkX3RleHQoZW5jb2Rpbmc9InV0Zi04IikpLmdldCgic3JjIiwgW10pCiAgICAgICAgZm9yIHBhZ2UgaW4gKCJwYWdlcy9JbmRleCIsICJwYWdlcy9TZXJ2ZXJFZGl0Iik6CiAgICAgICAgICAgIGlmIHBhZ2Ugbm90IGluIHBhZ2VzOgogICAgICAgICAgICAgICAgZXJyb3JzLmFwcGVuZChmIm1haW5fcGFnZXMuanNvbjoge3BhZ2V9IG5vdCByZWdpc3RlcmVkIikKICAgIGV4Y2VwdCBFeGNlcHRpb24gYXMgZTogICMgbm9xYTogQkxFMDAxCiAgICAgICAgZXJyb3JzLmFwcGVuZChmIm1haW5fcGFnZXMuanNvbiB1bnJlYWRhYmxlOiB7ZX0iKQoKaWYgZXJyb3JzOgogICAgZm9yIGUgaW4gZXJyb3JzOgogICAgICAgIHByaW50KGYiRkFJTDoge2V9IikKICAgIHN5cy5leGl0KDEpCgpwcmludChmIk9LOiB7bGVuKFJFUVVJUkVEKX0gcmVxdWlyZWQgZmlsZXMgcHJlc2VudCwganNvbjUvanNvbiB2YWxpZCwgdnBuIGV4dGVuc2lvbiArIElOVEVSTkVUIHBlcm1pc3Npb24gZGVjbGFyZWQiKQoKIyDlj6/lpI3njrDnmoTmupDnoIEv5Y6f55Sf5Y2P6K6u5Zue5b2S5b+F6aG75oiQ5Yqf77yb5LiN5Lul5bel5L2c5rWB5pW05L2TIHN1Y2Nlc3Mg5o6p55uWIGJ1aWxkLWhhcCBqb2Ig5aSx6LSl44CCCmltcG9ydCBzdWJwcm9jZXNzCnN1YnByb2Nlc3MucnVuKFtzeXMuZXhlY3V0YWJsZSwgc3RyKFJPT1QgLyAnc2NyaXB0cy9ydW50aW1lX2NvbnRyYWN0X3Rlc3QucHknKV0sIGNoZWNrPVRydWUpCg==
+#!/usr/bin/env python3
+"""CI structure & syntax check for the V2rayNG HarmonyOS port.
+
+Verifies: required files exist, all .json5/.json parse, the VPN extension and
+INTERNET permission are declared, and every page is registered for routing.
+"""
+import json
+import sys
+from pathlib import Path
+
+import json5
+
+ROOT = Path(__file__).resolve().parent.parent
+
+REQUIRED = [
+    "AppScope/app.json5",
+    "build-profile.json5",
+    "hvigorfile.ts",
+    "oh-package.json5",
+    "entry/build-profile.json5",
+    "entry/hvigorfile.ts",
+    "entry/oh-package.json5",
+    "entry/src/main/module.json5",
+    "entry/src/main/resources/base/profile/main_pages.json",
+    "entry/src/main/ets/entryability/EntryAbility.ets",
+    "entry/src/main/ets/vpnability/VpnTunnelAbility.ets",
+    "entry/src/main/ets/core/ConfigBuilder.ets",
+    "entry/src/main/ets/core/ProfileStore.ets",
+    "entry/src/main/ets/core/VpnController.ets",
+    "entry/src/main/ets/model/Profile.ets",
+    "entry/src/main/ets/native/libxray.ets",
+    "entry/src/main/ets/pages/Index.ets",
+    "entry/src/main/ets/pages/ServerEdit.ets",
+    "entry/src/main/cpp/CMakeLists.txt",
+    "entry/src/main/cpp/napi_init.cpp",
+]
+
+errors = []
+
+for rel in REQUIRED:
+    if not (ROOT / rel).is_file():
+        errors.append(f"missing file: {rel}")
+
+for p in sorted(ROOT.rglob("*.json5")):
+    if ".git" in p.parts or "node_modules" in p.parts:
+        continue
+    try:
+        json5.loads(p.read_text(encoding="utf-8"))
+    except Exception as e:  # noqa: BLE001
+        errors.append(f"invalid json5: {p.relative_to(ROOT)}: {e}")
+
+for p in sorted(ROOT.rglob("*.json")):
+    if ".git" in p.parts or "node_modules" in p.parts:
+        continue
+    try:
+        json.loads(p.read_text(encoding="utf-8"))
+    except Exception as e:  # noqa: BLE001
+        errors.append(f"invalid json: {p.relative_to(ROOT)}: {e}")
+
+module_path = ROOT / "entry/src/main/module.json5"
+if module_path.is_file():
+    module = json5.loads(module_path.read_text(encoding="utf-8")).get("module", {})
+    extensions = module.get("extensionAbilities", [])
+    if not any(e.get("type") == "vpn" for e in extensions):
+        errors.append("module.json5: no extensionAbility with type 'vpn'")
+    vpn_entries = [e for e in extensions if e.get("type") == "vpn"]
+    for e in vpn_entries:
+        src = e.get("srcEntry", "")
+        if not (ROOT / "entry/src/main" / src.lstrip("./")).is_file():
+            errors.append(f"module.json5: vpn srcEntry not found: {src}")
+    perms = [perm.get("name") for perm in module.get("requestPermissions", [])]
+    if "ohos.permission.INTERNET" not in perms:
+        errors.append("module.json5: ohos.permission.INTERNET not declared")
+
+pages_path = ROOT / "entry/src/main/resources/base/profile/main_pages.json"
+if pages_path.is_file():
+    try:
+        pages = json.loads(pages_path.read_text(encoding="utf-8")).get("src", [])
+        for page in ("pages/Index", "pages/ServerEdit"):
+            if page not in pages:
+                errors.append(f"main_pages.json: {page} not registered")
+    except Exception as e:  # noqa: BLE001
+        errors.append(f"main_pages.json unreadable: {e}")
+
+if errors:
+    for e in errors:
+        print(f"FAIL: {e}")
+    sys.exit(1)
+
+print(f"OK: {len(REQUIRED)} required files present, json5/json valid, vpn extension + INTERNET permission declared")
+
+# 可复现的源码/原生协议回归必须成功；不以工作流整体 success 掩盖 build-hap job 失败。
+import subprocess
+subprocess.run([sys.executable, str(ROOT / 'scripts/runtime_contract_test.py')], check=True)
