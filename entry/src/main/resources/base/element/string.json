@@ -1,7 +1,1 @@
-{
-  "string": [
-    { "name": "app_name", "value": "V2ray" },
-    { "name": "module_desc", "value": "v2rayNG HarmonyOS port" },
-    { "name": "ability_desc", "value": "V2RayNG main entry" }
-  ]
-}
+ewogICJzdHJpbmciOiBbCiAgICB7ICJuYW1lIjogImFwcF9uYW1lIiwgInZhbHVlIjogIlYycmF5IiB9LAogICAgeyAibmFtZSI6ICJtb2R1bGVfZGVzYyIsICJ2YWx1ZSI6ICJ2MnJheU5HIEhhcm1vbnlPUyBwb3J0IiB9LAogICAgeyAibmFtZSI6ICJhYmlsaXR5X2Rlc2MiLCAidmFsdWUiOiAiVjJSYXlORyBtYWluIGVudHJ5IiB9CiAgXQp9Cg==
