@@ -108,7 +108,8 @@ struct LogsPage {
         + ' native=' + (tr.nativeRunning ? 'Y' : 'N')
         + ' xray=' + (tr.xrayStarted ? 'Y' : 'N')
         + ' hevExit=' + (tr.hevExited ? 'Y' : 'N')
-        + ' age=' + tr.ageMs + 'ms\n';
+        + ' age=' + tr.ageMs + 'ms'
+        + (tr.reason === '' ? '' : ' reason=' + tr.reason) + '\n';
     }
     this.logText = RuntimeStore.redact(s.native.events + '\n--- UI 轮询轨迹（最近 40 次，定位状态跳变）---\n' + traceLines
       + '\n--- Xray 错误日志 ---\n' + xray + '\n--- hev 日志 ---\n' + hev);

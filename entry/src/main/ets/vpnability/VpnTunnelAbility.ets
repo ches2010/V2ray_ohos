@@ -27,6 +27,12 @@ export default class VpnTunnelAbility extends VpnExtensionAbility {
         return; // 另一个会话已在运行，本实例让位，不覆盖它的运行快照
       }
       RuntimeStore.write(this.context, this.snapshot);
+      // 写入后自检：真机轨迹显示 UI 侧多次 read=null（文件间歇不可读）。
+      // 这里确认目标文件确实可读；失败则立刻重写一次，尽量保证 UI 每秒都能读到。
+      let verify: RuntimeSnapshot | null = RuntimeStore.read(this.context);
+      if (verify === null || verify.sessionId !== this.snapshot.sessionId) {
+        RuntimeStore.write(this.context, this.snapshot);
+      }
     } catch (e) {
       hilog.error(0, 'V2ray', '%{public}s', 'VPN 状态快照写入失败');
     }

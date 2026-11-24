@@ -5,6 +5,8 @@ import { RUNTIME_SCHEMA, RuntimeSnapshot } from './RuntimeSnapshot';
 
 /** 进程间通信走原子文件快照；preferences/AppStorage 不承担 VPN 运行状态同步。 */
 export class RuntimeStore {
+  // 最近一次读取失败的原因（文件缺失/为空/读取异常/解析失败/版本不符），供诊断轨迹展示。
+  static lastReadError: string = '';
   static init(context: common.Context): void {
     let dir: string = context.filesDir + '/assets';
     if (!fs.accessSync(dir)) {
@@ -47,17 +49,24 @@ export class RuntimeStore {
   }
 
   static read(context: common.Context): RuntimeSnapshot | null {
-    let text: string = RuntimeStore.readTail(context.filesDir + '/vpn-runtime.json', 65536);
+    let path: string = context.filesDir + '/vpn-runtime.json';
+    let text: string = RuntimeStore.readTail(path, 65536);
     if (text === '') {
+      if (RuntimeStore.lastReadError === '') {
+        RuntimeStore.lastReadError = '文件为空或不存在';
+      }
       return null;
     }
     try {
       let snapshot: RuntimeSnapshot = JSON.parse(text) as RuntimeSnapshot;
       if (snapshot.schema !== RUNTIME_SCHEMA || snapshot.native === undefined) {
+        RuntimeStore.lastReadError = 'schema 不符(' + snapshot.schema + ')';
         return null;
       }
+      RuntimeStore.lastReadError = '';
       return snapshot;
     } catch (e) {
+      RuntimeStore.lastReadError = 'JSON 解析失败(长度 ' + text.length + ')';
       return null;
     }
   }
@@ -69,12 +78,15 @@ export class RuntimeStore {
       let size: number = fs.statSync(file.fd).size;
       let length: number = Math.min(size, maximum);
       if (length <= 0) {
+        RuntimeStore.lastReadError = '文件为空(0 字节)';
         return '';
       }
       let bytes: ArrayBuffer = new ArrayBuffer(length);
       let count: number = fs.readSync(file.fd, bytes, { offset: Math.max(0, size - length), length: length });
+      RuntimeStore.lastReadError = '';
       return buffer.from(bytes.slice(0, count)).toString('utf-8');
     } catch (e) {
+      RuntimeStore.lastReadError = '打开/读取失败: ' + String(e);
       return '';
     } finally {
       if (file !== null) {

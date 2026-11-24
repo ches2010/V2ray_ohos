@@ -96,6 +96,7 @@ struct Index {
   @State errorText: string = '';
   private stateTimer: number = -1;
   private requestStartedAt: number = 0;
+  private lastOkAt: number = 0;
   @State profiles: Profile[] = [];
   @State selectedId: string = '';
   @State latency: number = -1;
@@ -159,12 +160,19 @@ struct Index {
     let context: common.Context = getContext(this) as common.Context;
     let state: RuntimeSnapshot | null = RuntimeStore.read(context);
     if (state === null) {
-      this.vpnRunning = false;
-      recordPollTrace(false, null, false, -1);
+      // 快照文件偶发不可读（真机轨迹显示两次成功写入之间多为 read=null）。
+      // 35 秒内保持上一次的运行显示，不随单次读取失败翻转状态。
+      let sticky: boolean = Date.now() - this.lastOkAt < 35000;
+      recordPollTrace(false, null, this.vpnRunning && sticky, -1, RuntimeStore.lastReadError);
+      if (!sticky) {
+        this.vpnRunning = false;
+      }
       return;
     }
+    this.lastOkAt = Date.now();
     this.vpnRunning = isRuntimeRunning(state);
-    recordPollTrace(true, state, this.vpnRunning, Date.now() - state.updatedAt);
+    recordPollTrace(true, state, this.vpnRunning, Date.now() - state.updatedAt,
+      RuntimeStore.lastReadError === '' ? 'ok' : RuntimeStore.lastReadError);
     this.vpnActive = state.active || state.state === 'starting' || state.state === 'stopping';
     this.connectionState = state.state;
     this.errorText = state.errorText;

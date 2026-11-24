@@ -66,12 +66,13 @@ export class PollTrace {
   xrayStarted: boolean = false;
   hevExited: boolean = false;
   ageMs: number = -1;
+  reason: string = '';
 }
 
 export const pollTraces: PollTrace[] = [];
 
 export function recordPollTrace(readOk: boolean, s: RuntimeSnapshot | null,
-  running: boolean, ageMs: number): void {
+  running: boolean, ageMs: number, reason: string): void {
   let trace: PollTrace = new PollTrace();
   let now: Date = new Date();
   trace.time = now.getHours().toString().padStart(2, '0') + ':'
@@ -80,6 +81,7 @@ export function recordPollTrace(readOk: boolean, s: RuntimeSnapshot | null,
   trace.readOk = readOk;
   trace.running = running;
   trace.ageMs = ageMs;
+  trace.reason = reason;
   if (s !== null) {
     trace.state = s.state;
     trace.stage = s.stage;
