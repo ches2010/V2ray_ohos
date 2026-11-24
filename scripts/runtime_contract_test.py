@@ -21,7 +21,8 @@ class Contracts(unittest.TestCase):
         self.assertIn('isRuntimeRunning(state)', page)
         self.assertNotIn("@StorageProp('vpnRunning')", page)
         self.assertIn('this.startStateReader()', page)
-        self.assertIn("'断开 VPN'", page)
+        self.assertIn("'断开'", page)
+        self.assertIn("'连接'", page)
 
     def test_logs_never_load_ui_core(self):
         page = (ETS / 'pages/Logs.ets').read_text()
