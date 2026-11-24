@@ -676,7 +676,8 @@ struct Index {
                     .strokeDashArray([6, 7])
                   Circle({ width: 80, height: 80 })
                     .fill(this.vpnRunning ? 'rgba(20,83,45,0.85)' : 'rgba(22,78,99,0.85)')
-                    .stroke({ color: C_LINE2, width: 1 })
+                    .stroke(C_LINE2)
+                    .strokeWidth(1)
                   Text(this.vpnRunning ? '断开' :
                     (this.connectionState === 'starting' || this.connectionState === 'stopping' ? '等待' : '连接'))
                     .fontSize(12).fontWeight(FontWeight.Bold).fontColor(this.vpnRunning ? C_OK : C_CY)
