@@ -43,21 +43,19 @@ export class VpnController {
   }
 
   static async stop(context: common.Context): Promise<void> {
-    let state: RuntimeSnapshot = RuntimeStore.read(context) ?? new RuntimeSnapshot();
-    state.state = 'stopping';
-    state.stage = 'stop-request';
-    RuntimeStore.write(context, state);
     let want: Want = { bundleName: BUNDLE_NAME, abilityName: VPN_ABILITY_NAME };
     try {
       await vpnExtension.stopVpnExtensionAbility(want);
     } catch (e) {
+      let state: RuntimeSnapshot = RuntimeStore.read(context) ?? new RuntimeSnapshot();
       state.state = 'error';
       state.errorText = RuntimeStore.redact(String(e));
       RuntimeStore.write(context, state);
       throw new Error(String(e));
     }
-    // 等待 VPN 进程自行发布 stopped。UI 立刻覆盖会与仍在新旧实例之间
-    // 交替写入的运行快照竞争，造成“启动中/异常”与“隧道已启动”来回跳动。
+    // 等待 VPN 进程在 onDestroy 里发布 stopped。UI 在此期间不写快照：
+    // 若扩展尚未被系统销毁，它的心跳仍会写 running，UI 抢写会造成
+    // “启动中/异常”与“隧道已启动”来回跳动（真机已复现）。
     for (let i = 0; i < 20; i++) {
       await new Promise<void>((resolve: () => void) => { setTimeout(resolve, 300); });
       let cur: RuntimeSnapshot | null = RuntimeStore.read(context);
@@ -65,9 +63,24 @@ export class VpnController {
         return;
       }
     }
-    // 兜底：VPN 进程未能发布（例如被系统强杀）时，由 UI 落一个确定的停止态。
+    // 兜底：仅在心跳已停（进程消失）时才落一个确定的停止态；
+    // 心跳仍在说明系统未响应停止请求，再发一次停止指令后短暂等待。
     let cur: RuntimeSnapshot | null = RuntimeStore.read(context);
-    let final: RuntimeSnapshot = cur ?? state;
+    if (cur !== null && cur.state === 'running' && Date.now() - cur.updatedAt < 4000) {
+      try {
+        await vpnExtension.stopVpnExtensionAbility(want);
+      } catch (e) {
+        // 忽略二次停止失败，交由下方按停止态收尾
+      }
+      for (let i = 0; i < 10; i++) {
+        await new Promise<void>((resolve: () => void) => { setTimeout(resolve, 300); });
+        cur = RuntimeStore.read(context);
+        if (cur !== null && (cur.state === 'stopped' || cur.state === 'error') && !cur.active) {
+          return;
+        }
+      }
+    }
+    let final: RuntimeSnapshot = cur ?? new RuntimeSnapshot();
     final.state = 'stopped';
     final.stage = 'stopped';
     final.active = false;

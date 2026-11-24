@@ -418,11 +418,10 @@ static bool ReadSocksReply(int fd, long long deadline) {
 }
 
 static void SetProbeResult(const std::string &full) {
+  // selftest 是诊断信息，不写入 g_lastError：探测失败不代表隧道异常，
+  // 否则 UI 会在隧道正常运行时把状态标成“异常”（真机已复现）。
   std::lock_guard<std::mutex> lock(g_selfTestMutex);
   g_fullSelfTest = full;
-  if (full.find("http:ok") == std::string::npos) {
-    g_lastError = "selftest: " + full;
-  }
 }
 
 static void RunFullSelfTest() {
@@ -453,12 +452,22 @@ static void RunFullSelfTest() {
         ssize_t n = RecvSome(fd, buf, sizeof(buf), 2000);
         if (n >= 2 && buf[0] == 0x05 && buf[1] == 0x00) {
             r2 = "handshake:ok";
-            // SOCKS5 request: VER=5 CMD=1(connect) RSV=0 ATYP=1(IPv4) 1.1.1.1:80
-            const unsigned char req[10] = {0x05, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x50};
-            if (SendAll(fd, reinterpret_cast<const char *>(req), 10, 2000)) {
+            // SOCKS5 request: VER=5 CMD=1(connect) RSV=0 ATYP=3(domain) www.gstatic.com:80
+            // 1.1.1.1:80 对普通 HTTP 请求无响应，曾造成 tcp:ok 但 http:fail 的误报；
+            // 改用 gstatic 的 generate_204 作为连通性探测目标。
+            const char *selfTestHost = "www.gstatic.com";
+            const unsigned char selfTestHostLen = 15;
+            unsigned char req[4 + 1 + 15 + 2];
+            req[0] = 0x05; req[1] = 0x01; req[2] = 0x00; req[3] = 0x03;
+            req[4] = selfTestHostLen;
+            memcpy(req + 5, selfTestHost, selfTestHostLen);
+            req[5 + selfTestHostLen] = 0x00;
+            req[6 + selfTestHostLen] = 0x50;
+            if (SendAll(fd, reinterpret_cast<const char *>(req), sizeof(req), 2000)) {
                 if (ReadSocksReply(fd, NowMs() + 4000)) {
                     r3 = "tcp:ok";
-                    const char *httpReq = "GET / HTTP/1.1\r\nHost: 1.1.1.1\r\nConnection: close\r\n\r\n";
+                    const char *httpReq =
+                        "GET /generate_204 HTTP/1.1\r\nHost: www.gstatic.com\r\nConnection: close\r\n\r\n";
                     if (SendAll(fd, httpReq, strlen(httpReq), 2000)) {
                         ssize_t h = RecvSome(fd, buf, sizeof(buf) - 1, 4000);
                         if (h > 0) {

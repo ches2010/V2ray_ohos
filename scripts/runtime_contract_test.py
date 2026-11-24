@@ -60,7 +60,9 @@ class Contracts(unittest.TestCase):
         self.assertIn("dnsAddresses: ['10.111.222.2']", text)
         self.assertIn("'protocol': 'dns'", text)
         self.assertLess(text.index('rules.push(dnsRule)'), text.index('rules.push(privateRule)'))
-        self.assertIn("'tcp://1.1.1.1'", text)
+        # FakeDNS 本地应答 A/AAAA；上游仅兜底其他记录类型（UDP，避免 TCP 直连被重置）。
+        self.assertIn("'fakedns'", text)
+        self.assertIn("'1.1.1.1'", text)
         self.assertIn("'queryStrategy': 'UseIPv4'", text)
 
     def test_semver_does_not_offer_downgrade(self):
