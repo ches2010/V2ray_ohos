@@ -1,7 +1,7 @@
 import { router, promptAction } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import pasteboard from '@ohos.pasteboard';
-import { RuntimeSnapshot, isRuntimeRunning } from '../core/RuntimeSnapshot';
+import { RuntimeSnapshot, isRuntimeRunning, pollTraces } from '../core/RuntimeSnapshot';
 import { RuntimeStore } from '../core/RuntimeStore';
 
 class DiagnosticLine {
@@ -97,7 +97,21 @@ struct LogsPage {
     this.errorText = RuntimeStore.redact(s.errorText || s.native.lastError || '未记录核心错误；探测失败请查看下方日志');
     let xray: string = RuntimeStore.readTail(context.filesDir + '/xray-error.log', 12000);
     let hev: string = RuntimeStore.readTail(context.filesDir + '/hev.log', 8000);
-    this.logText = RuntimeStore.redact(s.native.events + '\n--- Xray 错误日志 ---\n' + xray + '\n--- hev 日志 ---\n' + hev);
+    let traceLines: string = '';
+    let start: number = pollTraces.length > 40 ? pollTraces.length - 40 : 0;
+    for (let i = start; i < pollTraces.length; i++) {
+      let tr = pollTraces[i];
+      traceLines += '[' + tr.time + '] read=' + (tr.readOk ? 'ok' : 'null')
+        + ' running=' + (tr.running ? 'Y' : 'N')
+        + ' state=' + tr.state
+        + ' active=' + (tr.active ? 'Y' : 'N')
+        + ' native=' + (tr.nativeRunning ? 'Y' : 'N')
+        + ' xray=' + (tr.xrayStarted ? 'Y' : 'N')
+        + ' hevExit=' + (tr.hevExited ? 'Y' : 'N')
+        + ' age=' + tr.ageMs + 'ms\n';
+    }
+    this.logText = RuntimeStore.redact(s.native.events + '\n--- UI 轮询轨迹（最近 40 次，定位状态跳变）---\n' + traceLines
+      + '\n--- Xray 错误日志 ---\n' + xray + '\n--- hev 日志 ---\n' + hev);
   }
 
   private copyLog(): void {

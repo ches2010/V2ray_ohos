@@ -10,6 +10,7 @@ import { VpnController } from '../core/VpnController';
 import { SpeedTest, TestResult } from '../core/SpeedTest';
 import { XraySettings } from '../core/ProfileStore';
 import { RuntimeStore } from '../core/RuntimeStore';
+import { recordPollTrace } from '../core/RuntimeSnapshot';
 import { RuntimeSnapshot, isRuntimeRunning } from '../core/RuntimeSnapshot';
 
 @CustomDialog
@@ -159,9 +160,11 @@ struct Index {
     let state: RuntimeSnapshot | null = RuntimeStore.read(context);
     if (state === null) {
       this.vpnRunning = false;
+      recordPollTrace(false, null, false, -1);
       return;
     }
     this.vpnRunning = isRuntimeRunning(state);
+    recordPollTrace(true, state, this.vpnRunning, Date.now() - state.updatedAt);
     this.vpnActive = state.active || state.state === 'starting' || state.state === 'stopping';
     this.connectionState = state.state;
     this.errorText = state.errorText;
@@ -447,7 +450,8 @@ struct Index {
       Row() {
         Text('V2ray').fontSize(22).fontWeight(FontWeight.Bold).fontColor('#E5EDFF')
         Blank()
-        Text(this.vpnRunning ? '隧道已启动' : (this.vpnActive ? '启动中 / 异常' : '未连接'))
+        Text(this.vpnRunning ? '隧道已启动' : (this.connectionState === 'error' ? '异常' :
+          (this.connectionState === 'stopping' ? '断开中' : (this.vpnActive ? '启动中' : '未连接'))))
           .fontSize(13)
           .fontColor(this.vpnRunning ? '#22C55E' : '#8A94A8')
           .padding({ left: 10, right: 10, top: 4, bottom: 4 })

@@ -46,9 +46,50 @@ export class RuntimeSnapshot {
 
 /** 只有 VPN 进程的心跳及 native 存活证据能表示已启动；探测成功不是其必要条件。 */
 export function isRuntimeRunning(s: RuntimeSnapshot | null): boolean {
-  if (s === null || Date.now() - s.updatedAt > 10000) {
+  // 30s 窗口：1s 心跳下偶发一次写入延迟不应把运行中的隧道翻成“启动中/异常”。
+  if (s === null || Date.now() - s.updatedAt > 30000) {
     return false;
   }
   return s.state === 'running' && s.active && s.native.running
     && s.native.xrayStarted && !s.native.hevExited;
+}
+
+/** UI 每秒轮询的读取轨迹；循环/跳变时与日志页对照即可定位翻转字段。 */
+export class PollTrace {
+  time: string = '';
+  readOk: boolean = false;
+  state: string = '';
+  stage: string = '';
+  active: boolean = false;
+  running: boolean = false;
+  nativeRunning: boolean = false;
+  xrayStarted: boolean = false;
+  hevExited: boolean = false;
+  ageMs: number = -1;
+}
+
+export const pollTraces: PollTrace[] = [];
+
+export function recordPollTrace(readOk: boolean, s: RuntimeSnapshot | null,
+  running: boolean, ageMs: number): void {
+  let trace: PollTrace = new PollTrace();
+  let now: Date = new Date();
+  trace.time = now.getHours().toString().padStart(2, '0') + ':'
+    + now.getMinutes().toString().padStart(2, '0') + ':'
+    + now.getSeconds().toString().padStart(2, '0');
+  trace.readOk = readOk;
+  trace.running = running;
+  trace.ageMs = ageMs;
+  if (s !== null) {
+    trace.state = s.state;
+    trace.stage = s.stage;
+    trace.active = s.active;
+    trace.nativeRunning = s.native.running;
+    trace.xrayStarted = s.native.xrayStarted;
+    trace.hevExited = s.native.hevExited;
+  }
+  pollTraces.push(trace);
+  if (pollTraces.length > 60) {
+    pollTraces.splice(0, pollTraces.length - 60);
+  }
 }
