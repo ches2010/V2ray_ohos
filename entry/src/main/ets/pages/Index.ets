@@ -193,7 +193,13 @@ struct Index {
   async refresh(): Promise<void> {
     try {
       await ProfileStore.init(getContext(this) as common.Context);
-      this.profiles = await ProfileStore.loadProfiles();
+      let loaded: Profile[] = await ProfileStore.loadProfiles();
+      for (let i = 0; i < loaded.length; i++) {
+        if (loaded[i].testMs === -3) {
+          loaded[i].testMs = -1; // 测速中断的残留状态恢复为未测
+        }
+      }
+      this.profiles = loaded;
       this.selectedId = await ProfileStore.loadSelectedId();
     } catch (e) {
       this.errorText = '读取节点数据失败';
@@ -324,7 +330,7 @@ struct Index {
     let cleared: Profile[] = [];
     for (let i = 0; i < this.profiles.length; i++) {
       let p = this.profiles[i];
-      p.testMs = -1;
+      p.testMs = -3; // -3=测速中（-2 是 SpeedTest 的超时约定）：卡片实时显示“测速中”
       cleared.push(p);
     }
     this.profiles = cleared;
@@ -357,6 +363,9 @@ struct Index {
   }
 
   msLabel(ms: number): string {
+    if (ms === -3) {
+      return '测速中';
+    }
     if (ms === -1 || ms === 0) {
       return '';
     }
@@ -367,6 +376,9 @@ struct Index {
   }
 
   msColor(ms: number): string {
+    if (ms === -3) {
+      return '#8A94A8';
+    }
     if (ms < 0) {
       return '#EF4444';
     }
