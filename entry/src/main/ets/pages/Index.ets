@@ -558,6 +558,15 @@ struct Index {
     }
   }
 
+  /** 组内测速值摘要：任何节点测速状态变化都会改变组 key，强制列表实时刷新 */
+  private groupSum(g: NodeGroup): number {
+    let s: number = 0;
+    for (let i = 0; i < g.items.length; i++) {
+      s += g.items[i].testMs;
+    }
+    return s;
+  }
+
   private selectedName(): string {
     for (let i = 0; i < this.profiles.length; i++) {
       if (this.profiles[i].id === this.selectedId) {
@@ -820,7 +829,7 @@ struct Index {
                   }, (p: Profile) => p.id + '_' + p.testMs)
                 }
                 .width('100%')
-              }, (g: NodeGroup) => g.title + '_' + g.items.length)
+              }, (g: NodeGroup) => g.title + '_' + g.items.length + '_' + this.groupSum(g))
             }
             .width('100%')
           }
