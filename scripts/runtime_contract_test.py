@@ -34,7 +34,9 @@ class Contracts(unittest.TestCase):
     def test_atomic_runtime_not_handmade_json(self):
         text = (ETS / 'core/RuntimeStore.ets').read_text()
         self.assertIn('JSON.stringify(snapshot)', text)
-        self.assertIn('fs.renameSync(temporary, path)', text)
+        # 多副本轮换写入：每份仍走 tmp + rename 的原子替换。
+        self.assertIn('fs.renameSync(temporary, targets[i])', text)
+        self.assertIn("dir + '/vpn-runtime-' + slot + '.json'", text)
         self.assertIn('encoded.byteOffset', text)
         ability = (ETS / 'vpnability/VpnTunnelAbility.ets').read_text()
         self.assertNotIn('diag.json', ability)

@@ -22,53 +22,79 @@ export class RuntimeStore {
     }
   }
 
+  static writeSeq: number = 0;
+
   static write(context: common.Context, snapshot: RuntimeSnapshot): void {
     snapshot.updatedAt = Date.now();
-    let path: string = context.filesDir + '/vpn-runtime.json';
-    let temporary: string = path + '.' + snapshot.sessionId + '.tmp';
-    let file: fs.File = fs.openSync(temporary,
-      fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE | fs.OpenMode.TRUNC);
-    try {
-      let encoded: buffer.Buffer = buffer.from(JSON.stringify(snapshot), 'utf-8');
-      let bytes: ArrayBuffer = encoded.buffer.slice(encoded.byteOffset, encoded.byteOffset + encoded.length);
-      // writeSync 的返回值不保证一次写完，循环写入防止截断状态文件。
-      let offset: number = 0;
-      while (offset < bytes.byteLength) {
-        let rest: ArrayBuffer = bytes.slice(offset);
-        let count: number = fs.writeSync(file.fd, rest);
-        if (count <= 0) {
-          throw new Error('运行状态文件写入失败');
-        }
-        offset += count;
-      }
-      fs.fsyncSync(file.fd);
-    } finally {
-      fs.closeSync(file.fd);
+    let dir: string = context.filesDir;
+    let encoded: buffer.Buffer = buffer.from(JSON.stringify(snapshot), 'utf-8');
+    let bytes: ArrayBuffer = encoded.buffer.slice(encoded.byteOffset, encoded.byteOffset + encoded.length);
+    if (bytes.byteLength === 0) {
+      throw new Error('运行状态序列化为空');
     }
-    fs.renameSync(temporary, path);
+    // 真机轨迹显示单份快照文件会被系统间歇清空（stat size=0）。
+    // 轮换写 3 个编号副本 + 1 个兼容副本，读取端取 updatedAt 最新的可解析快照，
+    // 单份文件异常不影响其余副本。
+    let slot: number = RuntimeStore.writeSeq % 3;
+    RuntimeStore.writeSeq = RuntimeStore.writeSeq + 1;
+    let targets: Array<string> = [dir + '/vpn-runtime-' + slot + '.json', dir + '/vpn-runtime.json'];
+    for (let i = 0; i < targets.length; i++) {
+      let temporary: string = targets[i] + '.' + snapshot.sessionId + '.tmp';
+      let file: fs.File = fs.openSync(temporary,
+        fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE | fs.OpenMode.TRUNC);
+      try {
+        let offset: number = 0;
+        while (offset < bytes.byteLength) {
+          let rest: ArrayBuffer = bytes.slice(offset);
+          let count: number = fs.writeSync(file.fd, rest);
+          if (count <= 0) {
+            throw new Error('运行状态文件写入失败');
+          }
+          offset += count;
+        }
+        fs.fsyncSync(file.fd);
+      } finally {
+        fs.closeSync(file.fd);
+      }
+      fs.renameSync(temporary, targets[i]);
+    }
   }
 
   static read(context: common.Context): RuntimeSnapshot | null {
-    let path: string = context.filesDir + '/vpn-runtime.json';
-    let text: string = RuntimeStore.readTail(path, 65536);
-    if (text === '') {
-      if (RuntimeStore.lastReadError === '') {
-        RuntimeStore.lastReadError = '文件为空或不存在';
+    let dir: string = context.filesDir;
+    let candidates: Array<string> = [
+      dir + '/vpn-runtime.json',
+      dir + '/vpn-runtime-0.json',
+      dir + '/vpn-runtime-1.json',
+      dir + '/vpn-runtime-2.json'
+    ];
+    let best: RuntimeSnapshot | null = null;
+    let errors: string = '';
+    for (let i = 0; i < candidates.length; i++) {
+      let text: string = RuntimeStore.readTail(candidates[i], 65536);
+      if (text === '') {
+        errors += RuntimeStore.lastReadError + ';';
+        continue;
       }
+      try {
+        let snapshot: RuntimeSnapshot = JSON.parse(text) as RuntimeSnapshot;
+        if (snapshot.schema !== RUNTIME_SCHEMA || snapshot.native === undefined) {
+          errors += 'schema(' + snapshot.schema + ');';
+          continue;
+        }
+        if (best === null || snapshot.updatedAt > best.updatedAt) {
+          best = snapshot;
+        }
+      } catch (e) {
+        errors += 'parse(' + candidates[i].substring(candidates[i].length - 20) + ');';
+      }
+    }
+    if (best === null) {
+      RuntimeStore.lastReadError = errors;
       return null;
     }
-    try {
-      let snapshot: RuntimeSnapshot = JSON.parse(text) as RuntimeSnapshot;
-      if (snapshot.schema !== RUNTIME_SCHEMA || snapshot.native === undefined) {
-        RuntimeStore.lastReadError = 'schema 不符(' + snapshot.schema + ')';
-        return null;
-      }
-      RuntimeStore.lastReadError = '';
-      return snapshot;
-    } catch (e) {
-      RuntimeStore.lastReadError = 'JSON 解析失败(长度 ' + text.length + ')';
-      return null;
-    }
+    RuntimeStore.lastReadError = '';
+    return best;
   }
 
   static readTail(path: string, maximum: number): string {
