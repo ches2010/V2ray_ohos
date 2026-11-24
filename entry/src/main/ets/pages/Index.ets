@@ -28,6 +28,10 @@ const C_OK: string = '#4ADE80';
 const C_WARN: string = '#FACC15';
 const C_BAD: string = '#F87171';
 
+// 示波器双波形路径（360x56 视口）
+const WAVE1: string = 'M0 34.7 L6 29.0 L12 24.3 L18 21.3 L24 20.3 L30 21.2 L36 23.3 L42 25.9 L48 28.1 L54 29.4 L60 29.7 L66 29.3 L72 28.8 L78 28.9 L84 30.3 L90 33.3 L96 37.6 L102 42.5 L108 47.3 L114 50.9 L120 52.6 L126 52.0 L132 49.2 L138 45.0 L144 40.3 L150 35.9 L156 32.6 L162 30.7 L168 30.2 L174 30.4 L180 30.8 L186 30.5 L192 29.2 L198 27.0 L204 24.1 L210 21.4 L216 19.7 L222 19.7 L228 21.9 L234 26.0 L240 31.4 L246 37.2 L252 42.4 L258 46.2 L264 48.0 L270 47.9 L276 46.4 L282 44.2 L288 42.1 L294 40.8 L300 40.6 L306 41.1 L312 41.8 L318 42.1 L324 41.2 L330 38.7 L336 34.7 L342 29.7 L348 24.5 L354 20.2 L360 17.5';
+const WAVE2: string = 'M0 22.7 L6 21.0 L12 20.9 L18 22.4 L24 25.2 L30 28.8 L36 32.3 L42 35.4 L48 37.4 L54 38.5 L60 38.8 L66 38.7 L72 38.9 L78 39.6 L84 41.0 L90 42.8 L96 44.7 L102 46.1 L108 46.3 L114 45.1 L120 42.4 L126 38.6 L132 34.2 L138 30.0 L144 26.6 L150 24.5 L156 23.9 L162 24.5 L168 25.9 L174 27.5 L180 28.8 L186 29.6 L192 29.7 L198 29.5 L204 29.4 L210 30.0 L216 31.6 L222 34.4 L228 37.9 L234 41.8 L240 45.3 L246 47.7 L252 48.7 L258 47.9 L264 45.7 L270 42.6 L276 39.1 L282 36.0 L288 33.8 L294 32.4 L300 31.9 L306 31.8 L312 31.6 L318 30.9 L324 29.5 L330 27.5 L336 25.2 L342 23.4 L348 22.5 L354 23.0 L360 25.0';
+
 @CustomDialog
 struct LinkDialog {
   controller: CustomDialogController = new CustomDialogController({ builder: '' });
@@ -129,7 +133,6 @@ struct Index {
   private prevRx: number = 0;
   private prevAt: number = 0;
   private connectedAt: number = 0;
-  private canvasCtx: CanvasRenderingContext2D | null = null;
   @StorageProp('sysBarHeightPx') sysBarPx: number = 0;
   @StorageProp('navBarHeightPx') navBarPx: number = 0;
   dialogController: CustomDialogController = new CustomDialogController({
@@ -574,45 +577,6 @@ struct Index {
     return -1;
   }
 
-  /** 在画布上绘制双波形（静态一次，透明度随连接状态变化） */
-  private drawWave(): void {
-    let ctx = this.canvasCtx;
-    if (ctx === null) {
-      return;
-    }
-    let w: number = ctx.width;
-    let h: number = ctx.height;
-    ctx.clearRect(0, 0, w, h);
-    // 青色主波
-    ctx.beginPath();
-    ctx.strokeStyle = C_CY;
-    ctx.lineWidth = 2;
-    for (let x = 0; x <= w; x += 4) {
-      let y = h * 0.62 - Math.sin(x / 26) * h * 0.22 - Math.sin(x / 11) * h * 0.10;
-      if (x === 0) {
-        ctx.moveTo(x, y);
-      } else {
-        ctx.lineTo(x, y);
-      }
-    }
-    ctx.stroke();
-    // 品红副波
-    ctx.beginPath();
-    ctx.strokeStyle = C_MG;
-    ctx.globalAlpha = 0.55;
-    ctx.lineWidth = 2;
-    for (let x2 = 0; x2 <= w; x2 += 4) {
-      let y2 = h * 0.72 - Math.sin(x2 / 19 + 1.2) * h * 0.18 - Math.sin(x2 / 7) * h * 0.07;
-      if (x2 === 0) {
-        ctx.moveTo(x2, y2);
-      } else {
-        ctx.lineTo(x2, y2);
-      }
-    }
-    ctx.stroke();
-    ctx.globalAlpha = 1;
-  }
-
   @Builder
   groupHeader(g: NodeGroup) {
     Row({ space: 8 }) {
@@ -747,14 +711,13 @@ struct Index {
               .width('100%')
               .margin({ top: 12 })
 
-              // 示波器
+              // 示波器（静态双波形，连接后变绿高亮）
               Stack() {
-                Canvas(this.canvasCtx)
-                  .width('100%').height(54)
-                  .onReady((ctx: CanvasRenderingContext2D) => {
-                    this.canvasCtx = ctx;
-                    this.drawWave();
-                  })
+                Path().commands(WAVE1).width('100%').height(54)
+                  .fill(Color.Transparent).stroke(this.vpnRunning ? C_OK : C_CY).strokeWidth(2)
+                Path().commands(WAVE2).width('100%').height(54)
+                  .fill(Color.Transparent).stroke(C_MG).strokeWidth(2).fillOpacity(0)
+                  .opacity(0.55)
               }
               .width('100%')
               .margin({ top: 12 })
@@ -886,7 +849,7 @@ struct Index {
         .width('100%')
         .height(52)
         .padding({ left: 16, right: 16 })
-        .border({ width: { top: 1 }, color: { top: C_LINE } })
+        .border({ width: 1, color: C_LINE })
         .backgroundColor('rgba(7,11,16,0.9)')
         .alignItems(VerticalAlign.Center)
       }
